@@ -21,10 +21,11 @@ services:
     build: .
     ports:
       - 8080:8080
+    networks:
+      - appnet
     depends_on:
       db:
         condition: service_healthy
-    network_mode: host
     healthcheck:
       test: ["CMD", "node", "healthcheck.js"]
       interval: 30s

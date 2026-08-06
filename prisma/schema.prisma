@@ -12,6 +12,13 @@ datasource db {
   provider = "postgresql"
 }
 
+model Session {
+  id      String @id
+  sid     String @unique
+  data    String
+  expiresAt  DateTime
+}
+
 model Users { 
   id    Int     @id @default(autoincrement()) 
   username String @unique

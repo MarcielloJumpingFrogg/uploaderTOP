@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: user123
       POSTGRES_DB: db123
     ports:
-      - 2345:5432
+      - "2345:5432"
     networks:
         - appnet
     healthcheck:
@@ -19,6 +19,9 @@ services:
       start_period: 60s
   app:
     build: .
+    environment:
+      DATABASE_URL: "postgresql://user123:password123@db:5432/db123"
+      NODE_ENV: "docker"
     ports:
       - 8080:8080
     networks:

@@ -2,15 +2,17 @@ import bcrypt from "bcryptjs"
 import { passport } from "../../config/passport"
 import type { Express } from "express"
 import { prisma } from "../../lib/prisma"
+import {body, validationResult} from "express-validator"
+
+import { validateUser } from "./controller"
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
-    console.log("e fin qua ci siamo")
     res.redirect("/login")
   })
 
   app.get("/login", (req, res) => {
-    res.render("login", { user: req.user })
+    res.render("login", { user: req.user, title: "Login" })
   })
 
   app.post("/login", passport.authenticate("local", {
@@ -33,7 +35,12 @@ async function routes(app: Express) {
 
   })
 
-  app.post("/signUp", async (req, res) => {
+  app.post("/signUp", validateUser , async (req: any, res: any) => {
+    const errors = validationResult(req);
+    req.errors=errors
+    if(!errors.isEmpty()) {
+      return res.status(400).render("signUp" , {errors: errors.array()})
+    }
     try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10)
       const newUser = await prisma.users.create({
@@ -42,11 +49,25 @@ async function routes(app: Express) {
           password: hashedPassword
         }
       })
-      console.log(newUser)
-    } catch (e) {
-      console.error(e)
+      //console.log(newUser)
+      req.login(newUser, function (err:any) {
+        if(err) {
+          console.error(err)
+        } else {
+          res.redirect('/')
+        }
+      })
+    } catch (e: any) {
+      if(e.code === "P2002") {
+        const error = [{msg: "Username Already Take"}]
+        return res.status(400).render("signUp", {errors: error})
+      } else {
+        const genericError = [{msg: "There has been an unexpected error, please try again later"}]
+        return res.status(400).render("signUp", {errors: genericError})
+        console.error(e)
+      }
     }
-    res.redirect("/")
+    //res.redirect("/")
 
   })
 }

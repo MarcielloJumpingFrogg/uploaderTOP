@@ -1,20 +1,31 @@
 import { passport } from "../../config/passport"
 import type { Express } from "express"
-import { signUpController } from "./controller"
+import { signUpController } from "../controllers/signUpController"
+import { multerController } from "../controllers/multerController"
 
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
-    res.redirect("/login")
+    if(req.user) {
+      res.redirect("/account")
+    } else{
+      res.redirect("/login")
+    }
   })
 
   app.get("/login", (req, res) => {
     res.render("login", { user: req.user, title: "Login" })
   })
 
+  app.get("/api/login", (req, res) => {
+    console.log("should be here")
+    console.log(req.user)
+    res.json(req.user)
+  })
+
   app.post("/login", passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/",
+    successRedirect: "/account",
+    failureRedirect: "/signUp",
     failurMessage: true,
   }))
 
@@ -32,7 +43,13 @@ async function routes(app: Express) {
 
   })
 
-  app.post("/signUp",   signUpController)
+  app.post("/signUp", signUpController)
+
+  app.get("/account", (req, res) => {
+    res.render("account", {user: req.user })
+  })
+
+  app.post("/account", multerController)
 }
 
 export { routes }

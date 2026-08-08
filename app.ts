@@ -5,6 +5,7 @@ import { routes } from "./src/startup/routes";
 import type { Express } from "express";
 import expressSession from 'express-session'
 import {prisma} from "./lib/prisma"
+import {handleMulterError} from "./src/controllers/multerController"
 
 const PORT = 8080
 const app: Express = express()
@@ -44,6 +45,8 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 routes(app)
+app.use("/static", express.static("static"))
+app.use(handleMulterError)
 
 
 

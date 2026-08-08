@@ -1,4 +1,4 @@
-import {body, validationResult, matchedData } from "express-validator"
+import {body} from "express-validator"
 
 
 const userNameLenghtErr = "Username Must be between 3 and 15 characters"
@@ -8,7 +8,6 @@ const passwordStrenght = "Password Must have at least one lowerCase, one upperCa
 
 const validateUser = [
 	body("username").trim()
-	    .isAlpha().withMessage(userNameAlphaErr)
 	    .isLength({min: 3, max: 15}).withMessage(userNameLenghtErr),
 	body("password").trim()
 	    .isLength({min:8, max: 16}).withMessage(passwordLenghtErr)

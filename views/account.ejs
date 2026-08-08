@@ -1,3 +1,26 @@
 <!DOCTYPE html>
 
-<%- include("partials/head", {title: user.name}) %>
+<% if(locals.user) {%>
+	<%- include("partials/head", {title: user.username}) %>
+	<h1>Welcome Back <%= user.username %></h1>
+
+	<a href="/log-out">LOG OUT</a>
+
+<% if(locals.errorName) {%>
+	<%- include("partials/errors") %>
+<%}%>
+	<form action="/account" method="post" enctype="multipart/form-data"> 
+		<input type="file" name="avatar" id="AvatarFile"/>
+		<label for="name">Name</label>
+		<input type="text" name="name" id="nameField" />
+		<button type="submit">Submit</button>
+	</form>
+
+<%}else {%>
+	<%- include("partials/head", {title: "Error"}) %>
+	<h1>There seems to be an error with your account</h1>
+	<h2>Please try again later</h2>
+	<a href="/">Home</a>
+<%}%>
+
+

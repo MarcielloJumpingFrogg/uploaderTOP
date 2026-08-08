@@ -9,6 +9,9 @@ function getDB() {
   if (nodeEnv == "docker") {
     return pg
   }
+  else if(nodeEnv == "test") {
+    return process.env.TEST_DATABASE_URL
+  }
   else {
     return process.env.LOCAL_CONNECTION_STRING
   }

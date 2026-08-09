@@ -16,6 +16,7 @@ app.set("view engine", "ejs")
 
 import { createRequire } from "node:module"
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import bodyParser from "body-parser";
 const require = createRequire(import.meta.url)
 
 require("dotenv/config")
@@ -40,12 +41,15 @@ app.use(
   })
 );
 
+  
   // Insert express-session options here
+
 
 app.use(passport.initialize())
 app.use(passport.session())
 routes(app)
 app.use("/static", express.static("static"))
+app.use(bodyParser.raw({type: "image/jpg"}))
 app.use(handleMulterError)
 
 

@@ -2,6 +2,8 @@ import { passport } from "../../config/passport"
 import type { Express } from "express"
 import { signUpController } from "../controllers/signUpController"
 import { multerController } from "../controllers/multerController"
+import { prisma } from "../../lib/prisma"
+import { cookie } from "express-validator"
 
 
 async function routes(app: Express) {
@@ -18,14 +20,13 @@ async function routes(app: Express) {
   })
 
   app.get("/api/login", (req, res) => {
-    console.log("should be here")
-    console.log(req.user)
-    res.json(req.user)
-  })
+		res.json({user: req.user})
+
+	} )
 
   app.post("/login", passport.authenticate("local", {
     successRedirect: "/account",
-    failureRedirect: "/signUp",
+    failureRedirect: "/",
     failurMessage: true,
   }))
 

@@ -1,5 +1,6 @@
 import type { Request, Response }  from "express"
 import multer from "multer"
+import "dotenv/config"
 
 class FieldTypeError extends Error{
 	constructor(message:any) {
@@ -19,18 +20,26 @@ const fileImageFilter= (_req:Request, file:Express.Multer.File , cb:any) => {
 	}
 }
 
-const uploadImage = multer({dest: "uploads/", fileFilter: fileImageFilter})
+function getDestination() {
+  if(process.env.NODE_ENV == "test") {
+    return ("./tests/testUploads/")
+  } else if(process.env.NODE_ENV == "local") {
+    return ("uploads/")
+  }
+}
+
+const uploadImage = multer({dest: getDestination(), fileFilter: fileImageFilter, limits: {fileSize: 1024 * 1024 * 5}})
 
 const multerController = [ uploadImage.single("avatar"),  (req:Request, res:Response, _next:Function) => {
     console.log(req.file)
-    res.redirect("/account")
+    res.status(201).render("account", {user: req.user})
   }
 ]
 
 
 const handleMulterError = (err:Error, req:Request, res:Response, _next:Function) => {
 	if(err instanceof multer.MulterError || err.name==="FieldTypeError") {
-		return res.status(402).render("account", {errorName: err.name, errors: [err], user: req.user})
+		return res.status(400).render("account", {errorName: err.name, errors: [err], user: req.user})
 	}
 }
 

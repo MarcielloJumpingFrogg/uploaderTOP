@@ -17,12 +17,11 @@ const  signUpController =[ validateUser , async (req: any, res: any) => {
           password: hashedPassword
         }
       })
-      //console.log(newUser)
       req.login(newUser, function (err:any) {
+      req.user=newUser
         if(err) {
           console.error(err)
         } else {
-          req.user=newUser
           res.status(201).redirect('/account')
         }
       })

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test prisma migrate deploy && prisma generate && vitest dev",
+    "test:vb": "NODE_ENV=test prisma migrate deploy && prisma generate && vitest dev --coverage",
     "dev": "NODE_ENV=docker tsx app.ts",
     "local": "NODE_ENV=local tsx --watch app.ts",
     "docker": "prisma migrate dev --name init && prisma generate && NODE_ENV=docker tsx app.ts ",
@@ -20,6 +21,7 @@
     "@prisma/client": "^7.8.0",
     "@quixo3/prisma-session-store": "^3.1.21",
     "bcryptjs": "^3.0.3",
+    "body-parser": "^2.3.0",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
@@ -33,6 +35,7 @@
     "tsx": "^4.23.0"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.19.6",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.6",
     "@types/express-session": "^1.19.0",
@@ -40,6 +43,8 @@
     "@types/node": "^26.1.0",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/ui": "^4.1.10",
     "prisma": "^7.8.0",
     "supertest": "^7.2.2",
     "typescript": "^6.0.3",

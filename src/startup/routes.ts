@@ -2,8 +2,7 @@ import { passport } from "../../config/passport"
 import type { Express } from "express"
 import { signUpController } from "../controllers/signUpController"
 import { multerController } from "../controllers/multerController"
-import { prisma } from "../../lib/prisma"
-import { cookie } from "express-validator"
+import { viewFiles } from "../functions/viewFiles"
 
 
 async function routes(app: Express) {
@@ -46,8 +45,10 @@ async function routes(app: Express) {
 
   app.post("/signUp", signUpController)
 
-  app.get("/account", (req, res) => {
-    res.render("account", {user: req.user })
+  app.get("/account", async (req, res) => {
+    console.log(req.user)
+    const files = await viewFiles(req.user.id)
+    res.render("account", {user: req.user, files: files })
   })
 
   app.post("/account", multerController)

@@ -1,11 +1,12 @@
 import {app} from "../app"
 import { createRequire } from "node:module"
-import {describe, it, expect, test, beforeEach, vi} from "vitest"
+import {describe, it, expect, test, beforeEach} from "vitest"
 const require = createRequire(import.meta.url)
 const request = require("supertest")
 import fs from "node:fs"
-import { dirname} from "node:path"
+// import { dirname } from "node:path"
 import {prisma} from "../lib/prisma"
+import path from "node:path/posix"
 
 async function resetDb() {
 	await prisma.$transaction([
@@ -15,7 +16,15 @@ async function resetDb() {
 }
 
 async function resetUploads() {
-  fs.rmSync(__dirname + "/testUploads/", {recursive: true, force: true, maxRetries: 3}) 
+  const dir = __dirname + "/testUploads/"
+  fs.readdir(dir, (err, files) => {
+    if (err) throw err 
+    for (const file of files) {
+      fs.unlink(path.join(dir, file), err => {
+        if(err) throw err
+      })
+    }
+  })
 }
 
 beforeEach(()=>{
@@ -164,7 +173,6 @@ describe("Testing Multer", () => {
 		const cred = {username: "username", password: "Password1234!"}
 		await agent.post("/signUp").type("form").send({username: cred.username , password: cred.password}).expect(302)
 		await agent.post("/login").type("form").send({username: cred.username, password: cred.password}).expect(302)
-		//await agent.get("/api/login").then(res =>{ expect(res.body.user).toEqual(expect.objectContaining({username: cred.username})) })
 
 	}
 
@@ -174,7 +182,7 @@ describe("Testing Multer", () => {
     await agent
       .post("/account")
       .attach("avatar", __dirname +"/testFiles/avatar.jpg")
-      .expect(201)
+      .expect(302)
     resetUploads()
 	})
 

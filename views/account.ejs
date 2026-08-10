@@ -11,10 +11,16 @@
 <%}%>
 	<form action="/account" method="post" enctype="multipart/form-data"> 
 		<input type="file" name="avatar" id="AvatarFile"/>
-		<label for="name">Name</label>
+		<label for="name">New Name For File (optional): </label>
 		<input type="text" name="name" id="nameField" />
 		<button type="submit">Submit</button>
 	</form>
+
+  <div>
+  <% files.forEach(element => { %>
+  <li><%- element.usrFileName %></li>
+  <% })%>
+</div>
 
 <%}else {%>
 	<%- include("partials/head", {title: "Error"}) %>
@@ -22,5 +28,3 @@
 	<h2>Please try again later</h2>
 	<a href="/">Home</a>
 <%}%>
-
-

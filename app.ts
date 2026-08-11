@@ -49,7 +49,6 @@ app.use(passport.initialize())
 app.use(passport.session())
 routes(app)
 app.use("/static", express.static("static"))
-app.use(bodyParser.raw({type: "image/jpg"}))
 app.use(handleMulterError)
 
 

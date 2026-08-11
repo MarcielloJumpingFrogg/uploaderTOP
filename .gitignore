@@ -3,4 +3,5 @@ node_modules
 
 /generated/prisma
 prisma/migrations
-
+# uploads/
+tests/testUploads/

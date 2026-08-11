@@ -33,6 +33,6 @@ model Files {
   mimetype    String
   size        Int
   uploadTime  DateTime @default(now())
-  owner       Users   @relation(fields: [ownerId], references: [id])
   ownerId     Int
+  owner       Users   @relation(fields: [ownerId], references: [id])
 }

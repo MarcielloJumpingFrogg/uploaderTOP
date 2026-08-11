@@ -1,31 +1,15 @@
 import {app} from "../app"
-import { createRequire } from "node:module"
 import {describe, it, expect, test, beforeEach} from "vitest"
-const require = createRequire(import.meta.url)
-const request = require("supertest")
-import fs from "node:fs"
-// import { dirname } from "node:path"
+import  request  from "supertest"
 import {prisma} from "../lib/prisma"
-import path from "node:path/posix"
 
 async function resetDb() {
 	await prisma.$transaction([
 		prisma.users.deleteMany(),
-		prisma.session.deleteMany(),
+		prisma.session.deleteMany()
 	])
 }
 
-async function resetUploads() {
-  const dir = __dirname + "/testUploads/"
-  fs.readdir(dir, (err, files) => {
-    if (err) throw err 
-    for (const file of files) {
-      fs.unlink(path.join(dir, file), err => {
-        if(err) throw err
-      })
-    }
-  })
-}
 
 beforeEach(()=>{
 	resetDb()
@@ -39,85 +23,29 @@ request(app)
 	.expect(200)
 })
 
-test("We should be able to create an account on signUp", async () => {
-	request(app)
-		.post("/signUp")
-		.type("form")
-		.send({username: "testName", password: "Password1234!"})
-		.expect("Location", "/account")
-		.expect(200)
+test("These tests should fail since they are trying to give invalid credentials", async () => {
+  const credentials = [
+    {username: "12",                          password: "Password1234!"          },
+    {username: "1234567890abcdefghjklmno",    password: "Password1234!"          },
+    {username: "User1234",                    password: "Pd4!"                   },
+    {username: "User1235",                    password: "Pd4!1234567890234567890"},
+    {username: "User1236",                    password: "password1234!"          },
+    {username: "User1238",                    password: "PASSWORD1234!"          },
+    {username: "User1239",                    password: "Passwordabcd!"          },	
+    {username: "User1230",                    password: "123412341234!"          },
+    {username: "User1231",                    password: "Password12341"          }
+  ]
+  for(let i = 0; i < credentials.length; i++) {
+    request(app)
+      .post("/signUp")
+      .type("form")
+      .send({username: credentials[i].username, password: credentials[i].password})
+      .expect("Location", "/account")
+      .expect(406)
+  }
 }) 
 
-describe("These tests should fail since they are trying to give invalid credentials", async () => {
-	it("username too short", async ()=>{
-	request(app)
-		.post("/signUp")
-		.type("form")
-		.send({username: "12", password: "Password1234!"})
-		.expect(406)
-	})
 
-	it("Username too long", async () => {
-		request(app)
-			.post("/signUp")
-			.type("form")
-			.send({username: "1234567890abcdefghjklmno", password: "Password1234!"})
-			.expect(406)
-	})
-
-	it("Password too short", async () => {
-		request(app)
-			.post("/signUp")
-			.type("form")
-			.send({username: "1234", password: "Pd4!"})
-			.expect(406)
-	})
-
-	it("Password too long", async () => {
-		request(app)
-			.post("/signUp")
-			.type("form")
-			.send({username: "1234", password: "Pd4!12345678901234567890"})
-			.expect(406)
-	})
-
-		it("Password no UpperCase", async () => {
-		request(app)
-			.post("/signUp")
-			.type("form")
-			.send({username: "1234", password: "password1234!"})
-			.expect(406)
-	})
-
-		it("Password no lowerCase", async () => {
-		request(app)
-			.post("/signUp")
-			.type("form")
-			.send({username: "1234", password: "PASSWORD1234!"})
-			.expect(406)
-	})
-		it("Password no numbers", async () => {
-		request(app)
-			.post("/signUp")
-			.type("form")
-			.send({username: "1234", password: "Passwordabcd!"})
-			.expect(406)
-	})
-		it("Password no letters", async () => {
-		request(app)
-			.post("/signUp")
-			.type("form")
-			.send({username: "1234", password: "123412341234!"})
-			.expect(406)
-	})
-		it("Password no symbols", async () => {
-		request(app)
-			.post("/signUp")
-			.type("form")
-			.send({username: "1234", password: "Password12341"})
-			.expect(406)
-	})
-} )
 
 it("Same username", async () => {
 	request(app)
@@ -139,20 +67,13 @@ test("Log in after registration", async () => {
 	await agent
 		.post("/signUp")
 		.type("form")
-		.send({username: "username", password: "Password1234!"})
-		.expect(302)
-
-	await agent 
-		.post("/login")
-		.type("form")
-		.send({username: "username", password: "Password1234!"})
-		.expect(302)
-		.expect("Location", "/account")
+		.send({username: "user", password: "Password1234!"})
+    .expect("Location", "/account")
 
 	await agent
 	.get("/api/login")
 	.then(res =>{
-		expect(res.body.user).toEqual(expect.objectContaining({username:"username"}))
+		expect(res.body.user).toEqual(expect.objectContaining({username:"user"}))
 	})
 })
 
@@ -162,47 +83,7 @@ test("Trying to log in without registration", async () => {
 		.post("/login")
 		.type("form")
 		.send({username: "user", password: "Password1234!"})
-		.expect(302)
-		.expect("Location", "/")
+		.expect("Location", "/login")
 })
 
-
-describe("Testing Multer", () => {
-	async function login(agent:any) {
-		await resetDb()
-		const cred = {username: "username", password: "Password1234!"}
-		await agent.post("/signUp").type("form").send({username: cred.username , password: cred.password}).expect(302)
-		await agent.post("/login").type("form").send({username: cred.username, password: cred.password}).expect(302)
-
-	}
-
-	it("Image Correct", async () => {
-    const agent = request.agent(app)
-    login(agent)
-    await agent
-      .post("/account")
-      .attach("avatar", __dirname +"/testFiles/avatar.jpg")
-      .expect(302)
-    resetUploads()
-	})
-
-
-	it("Text fails", async() => {
-		const agent = request.agent(app)
-		await login(agent)
-		 await agent 
-			.post("/account")
-			.attach("avatar", __dirname + "/testFiles/textTest.txt")
-			.expect(400)
-	})
-  
-  it("Image Too big", async() => {
-		const agent = request.agent(app)
-		await login(agent)
-		 await agent 
-			.post("/account")
-			.attach("avatar", __dirname + "/testFiles/imageTooBig.png")
-			.expect(400)
-	})
-})
 

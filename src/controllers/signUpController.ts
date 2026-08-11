@@ -3,9 +3,8 @@ import { prisma } from "../../lib/prisma"
 import { validationResult } from "express-validator";
 import { validateUser } from "./validateUser";
 
-const  signUpController =[ validateUser , async (req: any, res: any) => {
+const  signUpController:any =[ validateUser , async (req: any, res: any) => {
     const errors = validationResult(req);
-    req.errors=errors
     if(!errors.isEmpty()) {
       return res.status(406).render("signUp" , {errors: errors.array()})
     }

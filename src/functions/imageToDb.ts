@@ -1,10 +1,10 @@
 import {prisma} from "../../lib/prisma"
 
 
-async function imageToDb(file: any , body:any , user: any) {
+async function uploadToDb(file: any , body:any , user: any) {
   try {
-  if(body.name) {
-    file.originalname = body.name
+    if(body.name) {
+      file.originalname = body.name
   }
 
   const result = await prisma.files.create({
@@ -17,10 +17,10 @@ async function imageToDb(file: any , body:any , user: any) {
     }
   })
 
-  console.log(result)
-    } catch(e) {
+  // console.log(result)
+  } catch(e) {
     console.error(e)
   }
 }
 
-export {imageToDb}
+export {uploadToDb}

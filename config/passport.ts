@@ -5,6 +5,7 @@ import { prisma } from "../lib/prisma"
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 import bcrypt from "bcryptjs"
+import customErrorContainer from "../src/functions/customErrorContainer"
 
 
 
@@ -18,13 +19,16 @@ const strategy = new LocalStrategy(async (username: string, password: string, do
     })
 
     if (!user) {
-      // console.log("failed login")
-      return done(null, false, { message: "Incorrect username" })
+      const error = {message: "Incorrect Username"}
+      customErrorContainer.passportError(error, 406)
+      return done(null, false, error)
     }
     const match = await bcrypt.compare(password, user.password)
     if (!match) {
-      // console.log("failed login")
-      return done(null, false, { message: "Incorrect password" })
+
+      const error = { message: "Incorrect password" }
+      customErrorContainer.passportError(error, 406)
+      return done(null, false, error)
     }
     return done(null, user)
   } catch (e) {

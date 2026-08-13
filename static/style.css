@@ -1,3 +1,46 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  outline: none;
+  border: none;
+}
+
 .error{
 	color: red;
+}
+
+.avatar {
+	width: 70px;
+	border-radius: 50%;
+}
+
+.placeholder {
+	background: grey;
+}
+
+header {
+	  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+	position: sticky;
+}
+
+.imageContainer {
+	padding: 10px;
+	background: blue;
+	position: sticky
+}
+.hidden {
+	display: none
+}
+
+.visible {
+	background: grey;
+	display: block;
+	position: absolute;
+	top: 100%;
+	left: -80%;
 }

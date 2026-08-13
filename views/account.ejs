@@ -1,27 +1,41 @@
 <!DOCTYPE html>
 
+
+
 <% if(locals.user) {%>
 	<%- include("partials/head", {title: user.username}) %>
-	<h1>Welcome Back <%= user.username %></h1>
-
-	<a href="/log-out">LOG OUT</a>
+<body>
+	<header>	<h1>Welcome Back <%= user.username %></h1>
+		<div class="imageContainer">
+	<% if(locals.avatar) { %>
+		<img src="/img/<%=avatar%>" class="avatar" onclick="toggleVisibility()"/>
+	<%}else {%>
+		<img src="/static/userPlaceholder.svg" class="avatar placeholder" onclick=""/>
+	<%}%>
+			<div id="popUpUser" class="hidden" >
+			<a href="/log-out">LOG OUT</a>
+			<form action="/account/avatar" method="post" enctype="multipart/form-data"> 
+				<input type="file" name="avatar" id="AvatarFile"/>
+				<button type="submit">Confirm</button>
+			</form>
+</div>
+		</div>
+</header>
 
 <% if(locals.errorName) {%>
 	<%- include("partials/errors") %>
 <%}%>
-	<form action="/account/avatar" method="post" enctype="multipart/form-data"> 
-		<input type="file" name="avatar" id="AvatarFile"/>
-		<label for="name">New Name For File (optional): </label>
-		<input type="text" name="name" id="nameField" />
-		<button type="submit">Submit</button>
-	</form>
+
 
   <div>
 	<% if(!files) { %>
 	<p>No files</p>
 	<%} else {%>
   <% files.forEach(element => { %>
+		<% if(element.usrFileName != user.username+"@avatar") {%>
+
   <li><%= element.usrFileName %></li>
+		<% } %>
   <% })%>
 		<%}%>
 
@@ -33,3 +47,12 @@
 	<h2>Please try again later</h2>
 	<a href="/">Home</a>
 <%}%>
+</body>
+
+
+<script>
+function toggleVisibility() {
+	document.getElementById("popUpUser").classList.toggle("hidden")
+	document.getElementById("popUpUser").classList.toggle("visible")
+}
+</script>

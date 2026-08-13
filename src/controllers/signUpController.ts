@@ -2,11 +2,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma"
 import { validationResult } from "express-validator";
 import { validateUser } from "./validateUser";
+import customErrorContainer from "../functions/customErrorContainer";
 
 const  signUpController:any =[ validateUser , async (req: any, res: any) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
-      return res.status(406).render("signUp" , {errors: errors.array()})
+      customErrorContainer.validatorError(errors.errors)
+      return res.status(customErrorContainer.getErrorCode()).render("signUp" , {errors: customErrorContainer.getErrorList()})
     }
     try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10)
@@ -26,12 +28,14 @@ const  signUpController:any =[ validateUser , async (req: any, res: any) => {
       })
     } catch (e: any) {
       if(e.code === "P2002") {
-        const error = [{message: "Username Already Take"}]
-        return res.status(403).render("signUp", {errors: error})
+        const error =  "Username Already Take"
+        customErrorContainer.signUpError(error, 409)
+        return res.status(customErrorContainer.getErrorCode()).render("signUp", {errors: customErrorContainer.getErrorList()})
       } else {
-        const genericError = [{message: "There has been an unexpected error, please try again later"}]
+        const genericError =  "There has been an unexpected error, please try again later"
+      customErrorContainer.signUpError(genericError, 400)
         console.error(e)
-        return res.status(400).render("signUp", {errors: genericError})
+        return res.status(customErrorContainer.getErrorCode()).render("signUp", {errors: customErrorContainer.getErrorList()})
       }
     }
 } ];

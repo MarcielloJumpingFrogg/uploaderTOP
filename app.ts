@@ -7,6 +7,7 @@ import expressSession from 'express-session'
 import {prisma} from "./lib/prisma"
 import {handleMulterError} from "./src/controllers/multerController"
 
+
 const PORT = 8080
 const app: Express = express()
 app.use(express.json())
@@ -49,6 +50,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 routes(app)
 app.use("/static", express.static("static"))
+app.use("/img", express.static("uploads"))
 app.use(handleMulterError)
 
 

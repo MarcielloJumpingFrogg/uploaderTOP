@@ -2,9 +2,10 @@ import type { Request, Response }  from "express"
 import multer from "multer"
 import "dotenv/config"
 import {body, check} from "express-validator"
-import { uploadToDb } from "../functions/imageToDb";
+import { avatarToDb} from "../functions/avatarToDb";
 import { viewFiles } from "../functions/viewFiles";
-import {account} from "../controllers/accountController"
+import {renderAccount} from "../controllers/accountController"
+import customErrorContainer from "../functions/customErrorContainer";
 
 class FieldTypeError extends Error{
 	constructor(message:any) {
@@ -25,7 +26,7 @@ const fileImageFilter= (_req:Request, file:Express.Multer.File , cb:any) => {
 }
 
 const filesCheck = (req:Request, file:Express.Multer.File, cb: any) => {
-
+  //most stuff
 }
 
 function getDestination() {
@@ -46,18 +47,19 @@ const avatarController  = [ uploadImage.single("avatar")/*, body("name").optiona
   // TODO: need to find a way to escape the "original name" of the file before uploading it to the "server" also need to make sure the file is escaped with <%= filename %> to make sure it's only passed as text and not a script
 
     // console.log("multer user:", req.user)
-    uploadToDb(req.file, req.body, req.user)
-    account.resetAccount()
-    res.redirect("/account" )
+    avatarToDb(req.file, req.user)
+    // customErrorContainer.resetAccount()
+    res.redirect("/account")
+    // renderAccount(req, res)
   }
 ]
 
 
+
 const handleMulterError = (err:Error, req:Request, res:Response, _next:Function) => {
 	if(err instanceof multer.MulterError || err.name==="FieldTypeError") {
-    account.setErrors(err, 400)
-    console.log("what are we looking at? ")
-    res.redirect("/account")
+    customErrorContainer.multerError(err, 400)
+    renderAccount(req, res)
 		// return res.status(400).render("account", {errorName: err.name, errors: [err], user: req.user, files:viewFiles})
 	}
 }

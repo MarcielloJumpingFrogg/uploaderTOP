@@ -10,5 +10,21 @@ async function viewFiles(userId:number) {
   }
 }
 
+async function getAvatar(userId:number) {
+  try {
+    const user = await prisma.users.findUnique({where: {id: userId}})
+    console.log(user)
+    const avatar = await prisma.files.findFirst({where: {
+      ownerId:userId,
+      usrFileName:user.username+"@avatar"
+    }})
+    console.log(avatar)
+    return avatar.fileName
+  } catch(e) {
+    console.error("error: ", e)
+    return null
+  }
+}
 
-export {viewFiles} 
+
+export {viewFiles, getAvatar} 

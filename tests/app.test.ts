@@ -1,18 +1,19 @@
 import {app} from "../app"
-import {describe, it, expect, test, beforeEach} from "vitest"
+import {describe, it, expect, test, beforeEach, afterEach} from "vitest"
 import  request  from "supertest"
 import {prisma} from "../lib/prisma"
 
 async function resetDb() {
 	await prisma.$transaction([
+    prisma.files.deleteMany(),
 		prisma.users.deleteMany(),
-		prisma.session.deleteMany()
+		prisma.session.deleteMany(),
 	])
 }
 
 
-beforeEach(()=>{
-	resetDb()
+beforeEach(async ()=>{
+	await resetDb()
 })
 
 test("checking if i am capable of connecting to my site", () => {
@@ -47,7 +48,7 @@ test("These tests should fail since they are trying to give invalid credentials"
 
 
 
-it("Same username", async () => {
+test("Same username", async () => {
 	request(app)
 		.post("/signUp")
 		.type("form")
@@ -61,29 +62,28 @@ it("Same username", async () => {
 		.expect(403)
 })
 
-test("Log in after registration", async () => {
-	await resetDb()
+test("auto-login after registration", async () => {
 	const agent = request.agent(app)
-	await agent
+	agent
 		.post("/signUp")
 		.type("form")
 		.send({username: "user", password: "Password1234!"})
     .expect("Location", "/account")
+    .then(()=> {
+      agent
+      .get("/api/login")
+      .then(res =>{
+        expect(res.body.user).toEqual(expect.objectContaining({username:"user"}))
+      })
+  })
 
-	await agent
-	.get("/api/login")
-	.then(res =>{
-		expect(res.body.user).toEqual(expect.objectContaining({username:"user"}))
-	})
 })
 
 test("Trying to log in without registration", async () => {
-	await resetDb()
 	await request(app)
 		.post("/login")
 		.type("form")
 		.send({username: "user", password: "Password1234!"})
-		.expect("Location", "/login")
+		.expect("Location", "/login?error=Invalid+credentials")
 })
-
 

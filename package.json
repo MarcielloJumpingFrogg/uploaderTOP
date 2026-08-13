@@ -2,12 +2,12 @@
   "name": "secondexe",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.ts",
   "scripts": {
     "test": "NODE_ENV=test prisma migrate reset --force && prisma migrate dev --name test && prisma generate && vitest dev",
     "test:vb": "NODE_ENV=test prisma migrate deploy && prisma generate && vitest dev --coverage",
     "dev": "NODE_ENV=docker tsx app.ts",
-    "local": "NODE_ENV=local tsx --watch app.ts",
+    "local": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx --watch app.ts'",
     "docker": "prisma migrate dev --name init && prisma generate && NODE_ENV=docker tsx app.ts ",
     "migrate": "prisma migrate dev --name init && prisma generate",
     "migrate_local": "NODE_ENV=local prisma migrate deploy && prisma generate"
@@ -45,8 +45,10 @@
     "@types/supertest": "^7.2.1",
     "@vitest/coverage-v8": "^4.1.10",
     "@vitest/ui": "^4.1.10",
+    "nodemon": "^3.1.14",
     "prisma": "^7.9.1",
     "supertest": "^7.2.2",
+    "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   },

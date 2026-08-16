@@ -5,7 +5,7 @@ import { prisma } from "../lib/prisma"
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy
 import bcrypt from "bcryptjs"
-import customErrorContainer from "../src/functions/customErrorContainer"
+import customErrorContainer from "../src/customErrors/customErrorContainer"
 
 
 

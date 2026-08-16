@@ -21,7 +21,6 @@
     "@prisma/client": "^7.9.1",
     "@quixo3/prisma-session-store": "^3.1.21",
     "bcryptjs": "^3.0.3",
-    "body-parser": "^2.3.0",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
@@ -35,7 +34,6 @@
     "tsx": "^4.23.0"
   },
   "devDependencies": {
-    "@types/body-parser": "^1.19.6",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.6",
     "@types/express-session": "^1.19.0",

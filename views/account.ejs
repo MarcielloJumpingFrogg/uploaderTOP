@@ -10,7 +10,7 @@
 	<% if(locals.avatar) { %>
 		<img src="/img/<%=avatar%>" class="avatar" onclick="toggleVisibility()"/>
 	<%}else {%>
-		<img src="/static/userPlaceholder.svg" class="avatar placeholder" onclick=""/>
+		<img src="/static/userPlaceholder.svg" class="avatar placeholder" onclick="toggleVisibility()"/>
 	<%}%>
 			<div id="popUpUser" class="hidden" >
 			<a href="/log-out">LOG OUT</a>
@@ -33,8 +33,7 @@
 	<%} else {%>
   <% files.forEach(element => { %>
 		<% if(element.usrFileName != user.username+"@avatar") {%>
-
-  <li><%= element.usrFileName %></li>
+  <li><%= element.usrFileName.split("@")[1] %></li>
 		<% } %>
   <% })%>
 		<%}%>

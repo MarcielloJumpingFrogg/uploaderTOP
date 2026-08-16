@@ -1,61 +1,50 @@
 import express from "express";
 import { result } from "./config/db";
-import { passport } from "./config/passport"
+import { passport } from "./config/passport";
 import { routes } from "./src/startup/routes";
 import type { Express } from "express";
-import expressSession from 'express-session'
-import {prisma} from "./lib/prisma"
-import {handleMulterError} from "./src/controllers/multerController"
+import expressSession from "express-session";
+import { prisma } from "./lib/prisma";
+import { handleMulterError } from "./src/controllers/multerController";
 
+const PORT = 8080;
+const app: Express = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const PORT = 8080
-const app: Express = express()
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+app.set("view engine", "ejs");
 
-app.set("view engine", "ejs")
-
-import { createRequire } from "node:module"
+import { createRequire } from "node:module";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import bodyParser from "body-parser";
-const require = createRequire(import.meta.url)
+const require = createRequire(import.meta.url);
 
-require("dotenv/config")
-
+require("dotenv/config");
 
 app.use(
   expressSession({
     cookie: {
-     maxAge: 24 * 60 * 60 * 1000 // ms
+      maxAge: 24 * 60 * 60 * 1000, // ms
     },
-    secret: 'a santa at nasa',
+    secret: "a santa at nasa",
     resave: true,
     saveUninitialized: true,
-    store: new PrismaSessionStore(
-      prisma,
-      {
-        checkPeriod: 2 * 60 * 1000,  //ms
-        dbRecordIdIsSessionId: true,
-        dbRecordIdFunction: undefined,
-      }
-    )
-  })
+    store: new PrismaSessionStore(prisma, {
+      checkPeriod: 2 * 60 * 1000, //ms
+      dbRecordIdIsSessionId: true,
+      dbRecordIdFunction: undefined,
+    }),
+  }),
 );
 
-  
-  // Insert express-session options here
+// Insert express-session options here
 
+app.use(passport.initialize());
+app.use(passport.session());
+routes(app);
+app.use("/static", express.static("static"));
+app.use("/img", express.static("uploads"));
+app.use(handleMulterError);
 
-app.use(passport.initialize())
-app.use(passport.session())
-routes(app)
-app.use("/static", express.static("static"))
-app.use("/img", express.static("uploads"))
-app.use(handleMulterError)
+app.listen(PORT, "0.0.0.0", () => console.log("listenting on 8080"));
 
-
-
-app.listen(PORT, "0.0.0.0", () => console.log("listenting on 8080"))
-
-
-export {app}
+export { app };

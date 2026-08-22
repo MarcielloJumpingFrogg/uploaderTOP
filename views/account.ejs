@@ -7,18 +7,26 @@
 <body>
 	<header>	<h1>Welcome Back <%= user.username %></h1>
 		<div class="imageContainer">
-	<% if(locals.avatar) { %>
-		<img src="/img/<%=avatar%>" class="avatar" onclick="toggleVisibility()"/>
-	<%}else {%>
-		<img src="/static/userPlaceholder.svg" class="avatar placeholder" onclick="toggleVisibility()"/>
-	<%}%>
-			<div id="popUpUser" class="hidden" >
-			<a href="/log-out">LOG OUT</a>
-			<form action="/account/avatar" method="post" enctype="multipart/form-data"> 
-				<input type="file" name="avatar" id="AvatarFile"/>
-				<button type="submit">Confirm</button>
-			</form>
-</div>
+			<% if(locals.avatar) { %>
+				<img src="/img/<%=avatar%>" class="avatar" onclick="toggleVisibility()"/>
+			<%}else {%>
+				<img src="/static/userPlaceholder.svg" class="avatar placeholder" onclick="toggleVisibility()"/>
+			<%}%>
+			<div id="user_modal" class="hidden user_modal" >
+				<div class="user_modal_header">
+					<span><%= user.username %></span>
+				</div>
+				<div class="user_modal_actions">
+					<a href="/log-out" class="log-out">LOG OUT</a>
+					<h3>Edit Avatar Profile Picture: </h3>
+					<form action="/account/avatar" method="post" enctype="multipart/form-data"> 
+						<label for="AvatarFile" class="custom_avatar_uploader">Upload Avatar</label>
+						<input type="file" name="avatar" id="AvatarFile"/>
+						<button type="submit">Confirm</button>
+					</form>
+				</div>
+				<div class="user_modal_footer">Bye</div>
+			</div>
 		</div>
 </header>
 
@@ -51,7 +59,7 @@
 
 <script>
 function toggleVisibility() {
-	document.getElementById("popUpUser").classList.toggle("hidden")
-	document.getElementById("popUpUser").classList.toggle("visible")
+	document.getElementById("user_modal").classList.toggle("hidden")
+	document.getElementById("user_modal").classList.toggle("visible")
 }
 </script>

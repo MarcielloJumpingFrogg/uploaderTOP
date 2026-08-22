@@ -23,7 +23,12 @@ test("Get Picture From Wrong Account", async () => {
     .post("/signUp")
     .type("form")
     .send({ username: cred2.username, password: cred2.password });
-  const dir = __dirname + "/testUploads/";
+  const dir = __dirname + "/testUploads/users/";
+
+  const response1 = await agent1.get("/api/login");
+  const user1Id = response1.body.user.id;
+  const response2 = await agent2.get("/api/login");
+  const user2Id = response2.body.user.id;
 
   await agent1
     .post("/account/avatar")
@@ -31,26 +36,26 @@ test("Get Picture From Wrong Account", async () => {
     .expect(302);
 
   let firstFileName;
+  const dir1 = dir + user1Id;
+  const dir2 = dir + user2Id;
 
-  fs.readdir(dir, (err, files) => {
-    if (err) throw err;
+  fs.readdir(dir1, (err: any, files) => {
     expect(files.length).toBe(1);
-    firstFileName = files[0];
-    console.log("firstest", firstFileName);
+    if (err) {
+      throw new Error(err);
+    }
   });
-
-  let secondFileName;
 
   await agent2
     .post("/account/avatar")
     .attach("avatar", __dirname + "/testFiles/spiderMan.jpg")
     .expect(302);
 
-  fs.readdir(dir, (err, files) => {
-    if (err) throw err;
-    expect(files.length).toBe(2);
-    secondFileName = files[1];
-    console.log("secondest:", secondFileName);
+  fs.readdir(dir2, (err: any, files) => {
+    expect(files.length).toBe(1);
+    if (err) {
+      throw new Error(err);
+    }
   });
 
   await agent2.get("/img/" + firstFileName).expect(400);

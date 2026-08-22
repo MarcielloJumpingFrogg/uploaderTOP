@@ -7,40 +7,62 @@
   border: none;
 }
 
-.error{
-	color: red;
+.error {
+  color: red;
 }
 
 .avatar {
-	width: 70px;
-	border-radius: 50%;
+  width: 70px;
+  border-radius: 50%;
 }
 
 .placeholder {
-	background: grey;
+  background: grey;
 }
 
 header {
-	  display: flex;
+  display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: space-around;
-	position: sticky;
+  position: sticky;
 }
 
 .imageContainer {
-	padding: 10px;
-	background: blue;
-	position: sticky
+  padding: 10px;
+  background: blue;
+  position: sticky;
 }
 .hidden {
-	display: none
+  display: none;
 }
 
 .visible {
-	background: grey;
-	display: block;
-	position: absolute;
-	top: 100%;
-	left: -80%;
+  background: grey;
+  display: flex;
+  position: absolute;
+  top: 100%;
+  left: -150%;
+  padding: 20px;
+  margin: 20px;
+  width: 400%;
+  flex-direction: column;
 }
+
+.user_modal * {
+  padding: 15px;
+  text-align: center;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom_avatar_uploader{
+  border: 1px solid black;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/**/

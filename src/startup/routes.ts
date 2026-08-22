@@ -6,6 +6,7 @@ import { accountController } from "../controllers/accountController";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "fs";
 import { isPicOfUser } from "../databaseMethods/isPicOfUser";
+import { getDestination } from "../controllers/multerController";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -16,13 +17,11 @@ async function routes(app: Express) {
     }
   });
 
-  app.get("/login", (req: any, res) => {
-    res
-      .status(customErrorContainer.getErrorCode())
-      .render("login", {
-        title: "Login",
-        errors: customErrorContainer.getErrorList(),
-      });
+  app.get("/login", (_req: any, res) => {
+    res.status(customErrorContainer.getErrorCode()).render("login", {
+      title: "Login",
+      errors: customErrorContainer.getErrorList(),
+    });
   });
 
   app.get("/api/login", (req, res) => {
@@ -59,9 +58,12 @@ async function routes(app: Express) {
   app.post("/account/avatar", avatarController);
 
   app.get("/img/:imageName", async (req, res) => {
+    const result = getDestination();
     if (await isPicOfUser(req.user.id, req.params.imageName)) {
       const imageName = req.params.imageName;
-      const readStream = fs.createReadStream(`uploads/${imageName}`);
+      const readStream = fs.createReadStream(
+        `${result}/users/${req.user.id}/avatar/${imageName}`,
+      );
       readStream.pipe(res);
       console.log("yes");
     } else {

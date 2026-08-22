@@ -39,11 +39,6 @@ function getDestination() {
 
 let uploadFolder: any = getDestination();
 
-function updateDestination(destination: any) {
-  const folder: any = getDestination();
-  uploadFolder = path.join(folder, destination);
-}
-
 const uploadImage = multer({
   dest: uploadFolder,
   fileFilter: fileImageFilter,
@@ -65,18 +60,32 @@ const uploadFiles = multer({
   },
 });
 
+function moveFile(fileName: any, userId: number, destination: string) {
+  const homeDir = path.join(__dirname, "../..");
+  console.log("dirname", homeDir);
+  const oldPath = homeDir + "/" + uploadFolder + fileName;
+  const avatarPath = homeDir + "/" + uploadFolder + "users/" + userId;
+  fs.mkdirSync(avatarPath + "/" + destination, { recursive: true });
+  const newPath = avatarPath + "/" + destination + "/" + fileName;
+  console.log("OldPath: ", oldPath);
+  console.log("newPath: ", newPath);
+  fs.renameSync(oldPath, newPath);
+}
+
 const avatarController = [
-  uploadImage.single("avatar") /*, body("name").optional()/* .escape() */,
-  (req: Request, res: Response, _next: Function) => {
+  uploadImage.single("avatar"),
+  body("name").escape(),
+  (req: any, res: Response, _next: Function) => {
     // TODO: need to find a way to escape the "original name" of the file before uploading it to the "server" also need to make sure the file is escaped with <%= filename %> to make sure it's only passed as text and not a script
 
     // console.log("multer user:", req.user)
     avatarToDb(req.file, req.user);
+    console.log(req.file);
+    moveFile(req.file?.filename, req.user.id, "avatar");
+
     // customErrorContainer.resetAccount()
     res.redirect("/account");
     // renderAccount(req, res)
-
-    fs;
   },
 ];
 
@@ -93,10 +102,4 @@ const handleMulterError = (
   }
 };
 
-export {
-  avatarController,
-  handleMulterError,
-  uploadFolder,
-  getDestination,
-  updateDestination,
-};
+export { avatarController, handleMulterError, uploadFolder, getDestination };

@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 * {
   margin: 0;
   padding: 0;
@@ -38,31 +40,126 @@ header {
 }
 
 .visible {
-  background: grey;
+  background: hsl(43 100 85);
+  border-radius: 10%;
+  border: 1px solid grey;
+  box-shadow: 1px 1px grey;
   display: flex;
   position: absolute;
   top: 100%;
   left: -150%;
-  padding: 20px;
-  margin: 20px;
+  padding: 10px;
+  margin: 10px;
   width: 400%;
   flex-direction: column;
 }
 
 .user_modal * {
-  padding: 15px;
+  padding: 10px;
   text-align: center;
 }
 
-input[type="file"] {
-  display: none;
+.user_modal_actions {
+  padding: 0;
+  margin: 0;
 }
 
-.custom_avatar_uploader{
+/* input[type="file"] { */
+/*   display: none; */
+/* } */
+
+
+input[type="file"] {
+  position: relative;
+}
+
+input[type="file"]::file-selector-button {
+  width: 136px;
+  color: transparent;
+}
+
+/* Faked label styles and icon */
+input[type="file"]::before {
+  position: absolute;
+  pointer-events: none;
+  top: 18px;
+  left: 20px;
+  height: 20px;
+  width: 20px;
+  content: "";
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230964B0'%3E%3Cpath d='M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z'/%3E%3C/svg%3E");
+}
+
+input[type="file"]::after {
+  position: absolute;
+  pointer-events: none;
+  top: 17px;
+  left: 45px;
+  color: #0964b0;
+  content: "Upload File";
+}
+
+/* ------- From Step 1 ------- */
+
+/* file upload button */
+input[type="file"]::file-selector-button {
+  border-radius: 4px;
+  padding: 0 16px;
+  height: 40px;
+  cursor: pointer;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+  margin-right: 16px;
+  transition: background-color 200ms;
+}
+
+/* file upload button hover state */
+input[type="file"]::file-selector-button:hover {
+  background-color: #f3f4f6;
+}
+
+/* file upload button active state */
+input[type="file"]::file-selector-button:active {
+  background-color: #e5e7eb;
+}
+.log-out {
+  text-decoration: none;
+  background-color: hsl(0 0 94);
   border: 1px solid black;
-  display: inline-block;
-  padding: 6px 12px;
+  border-radius: 5px;
+  padding: 6px 20px;
+  cursor: pointer;
+  width: 50%;
+  align-self: center;
+}
+
+.submit-button {
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: hsl(0 0 94);
+  padding: 6px 20px;
+  margin: 5px;
   cursor: pointer;
 }
 
+.mini-avatar {
+  width: 40%;
+  border-radius: 50%;
+}
+
+.username {
+  display: flex;
+  align-items: center;
+  font-style: italic;
+  color: black;
+  text-decoration: underline;
+}
+
+hr.solid {
+  border-top: 3px solid hsl(0 0 84);
+  margin: 0;
+  padding: 0;
+  border-radius: 5px;
+}
 /**/

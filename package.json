@@ -10,7 +10,8 @@
     "local": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx --watch app.ts'",
     "docker": "prisma migrate dev --name init && prisma generate && NODE_ENV=docker tsx app.ts ",
     "migrate": "prisma migrate dev --name init && prisma generate",
-    "migrate_local": "NODE_ENV=local prisma migrate deploy && prisma generate"
+    "migrate_local": "NODE_ENV=local prisma migrate deploy && prisma generate",
+    "tailwindcss": "npx @tailwindcss/cli -i ./static/style.css -o ./static/output.css --watch"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@quixo3/prisma-session-store": "^3.1.21",
+    "@tailwindcss/cli": "^4.3.3",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
@@ -31,6 +33,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.22.0",
     "pg-pool": "^3.14.0",
+    "tailwindcss": "^4.3.3",
     "tsx": "^4.23.0"
   },
   "devDependencies": {

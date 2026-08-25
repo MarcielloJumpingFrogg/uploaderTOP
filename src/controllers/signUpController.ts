@@ -4,8 +4,7 @@ import { validationResult } from "express-validator";
 import { validateUser } from "./validateUser";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "node:fs";
-import { getDestination } from "../controllers/multerController";
-import { checkNewDatabase } from "../databaseMethods/checkNewDatabase";
+import { getDestination } from "../multer/multer";
 import path from "node:path";
 
 const signUpController: any = [
@@ -26,23 +25,10 @@ const signUpController: any = [
           password: hashedPassword,
         },
       });
-      checkNewDatabase(newUser.id);
-      req.login(newUser, function (err: any) {
+      req.login(newUser, (err: any) => {
+        if (err) throw err;
         req.user = newUser;
-        fs.mkdir(
-          path.join(
-            __dirname + "/../../" + getDestination() + "/users/" + newUser.id,
-          ),
-          { recursive: true },
-          (err: any) => {
-            throw new Error(err);
-          },
-        );
-        if (err) {
-          console.error(err);
-        } else {
-          res.status(201).redirect("/account");
-        }
+        res.redirect("/account");
       });
     } catch (e: any) {
       if (e.code === "P2002") {

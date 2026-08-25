@@ -5,32 +5,33 @@
 <% if(locals.user) {%>
 	<%- include("partials/head", {title: user.username}) %>
 <body>
-	<header>	<h1>Welcome Back <%= user.username %></h1>
+	<header>	<h1 class="text-3xl">Welcome Back <span class="underline italic"><%= user.username %></span></h1>
 		<div class="imageContainer">
 			<% if(locals.avatar) { %>
-				<img src="/img/<%=avatar%>" class="avatar" onclick="toggleVisibility()"/>
+				<img src="/img/<%=avatar%>" class="avatar header-avatar" onclick="toggleVisibility()"/>
 			<%}else {%>
-				<img src="/static/userPlaceholder.svg" class="avatar placeholder" onclick="toggleVisibility()"/>
+				<img src="/static/userPlaceholder.svg" class="avatar header-avatar placeholder" onclick="toggleVisibility()"/>
 			<%}%>
-			<div id="user_modal" class="visible user_modal" >
+			<div id="user_modal" class="hidden user_modal" >
 				<div class="user_modal_header flex">
 					<% if(locals.avatar) { %>
-						<img src="/img/<%=avatar%>" class="mini-avatar" onclick="toggleVisibility()"/>
+						<img src="/img/<%=avatar%>" class="avatar menu-avatar" onclick="toggleVisibility()"/>
 					<%}else {%>
-						<img src="/static/userPlaceholder.svg" class="avatar placeholder" onclick="toggleVisibility()"/>
+						<img src="/static/userPlaceholder.svg" class="avatar menu-avatar placeholder" onclick="toggleVisibility()"/>
 					<%}%>
 					<span class="username"><%= user.username %></span>
 				</div>
-				<hr class="solid">
 				<div class="user_modal_actions">
-					<h4 class="italic edit-pfp">Edit Avatar Profile Picture: </h4>
+					<hr class="solid">
 					<form action="/account/avatar" method="post" enctype="multipart/form-data"> 
-						<input type="file" name="avatar" id="AvatarFile"/>
+						<label for="AvatarFile">Upload An Avatar: </label>
+						<input type="file" name="avatar" id="AvatarFile" />
 						<br/>
 						<button type="submit" class="submit-button">Confirm</button>
 					</form>
 				</div>
 				<div class="user_modal_footer"></div>
+					<hr class="solid">
 					<a href="/log-out" class="log-out">LOG OUT</a>
 			</div>
 		</div>
@@ -40,9 +41,19 @@
 	<%- include("partials/errors") %>
 <%}%>
 
+	<div>
+		<form action="/account/file" method="post" enctype="multipart/form-data">
+			<label for="file">New File: </label>
+			<input type="file" name="usrFile" id="file" />
+			<label for="newName">New Name for your file</label>
+			<input type="text" name="newName" id="newName"/>
+			<br/>
+			<button type="submit">Submit</button>
+		</form>
+	</div>
 
   <div>
-	<% if(!files) { %>
+	<% if(files.length == 0 ) { %>
 	<p>No files</p>
 	<%} else {%>
   <% files.forEach(element => { %>

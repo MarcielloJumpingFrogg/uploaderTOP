@@ -5,7 +5,7 @@ import { routes } from "./src/startup/routes";
 import type { Express } from "express";
 import expressSession from "express-session";
 import { prisma } from "./lib/prisma";
-import { handleMulterError } from "./src/controllers/multerController";
+import { handleMulterError } from "./src/multer/multer";
 
 const PORT = 8080;
 const app: Express = express();

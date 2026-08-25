@@ -1,12 +1,13 @@
 import { passport } from "../../config/passport";
 import type { Express } from "express";
 import { signUpController } from "../controllers/signUpController";
-import { avatarController } from "../controllers/multerController";
 import { accountController } from "../controllers/accountController";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "fs";
 import { isPicOfUser } from "../databaseMethods/isPicOfUser";
-import { getDestination } from "../controllers/multerController";
+import { getDestination } from "../multer/multer";
+import { avatarUploader } from "../multer/avatarUploader";
+import { fileUploader } from "../multer/fileUploader";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -55,7 +56,7 @@ async function routes(app: Express) {
 
   app.get("/account", accountController);
 
-  app.post("/account/avatar", avatarController);
+  app.post("/account/avatar", avatarUploader);
 
   app.get("/img/:imageName", async (req, res) => {
     const result = getDestination();
@@ -72,9 +73,7 @@ async function routes(app: Express) {
     }
   });
 
-  app.post("/create/folder", async (req, res) => {
-    const folderName = req.body.name;
-  });
+  app.post("/account/file", fileUploader);
 }
 
 export { routes };

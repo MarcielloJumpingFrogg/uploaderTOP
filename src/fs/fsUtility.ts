@@ -9,7 +9,9 @@ function moveFile(fileName: any, userId: number, destination: string) {
   const dirPath = filePath + "/" + destination;
   console.log("dirpath: ", dirPath);
   fs.mkdirSync(dirPath, { recursive: true });
-  deletePreviousFile(dirPath);
+  if (destination == "avatar") {
+    deletePreviousFile(dirPath);
+  }
 
   const newPath = dirPath + "/" + fileName;
   fs.renameSync(oldPath, newPath);

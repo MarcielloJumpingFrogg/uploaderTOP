@@ -22,11 +22,7 @@ const fileImageFilter = (_req: Request, file: Express.Multer.File, cb: any) => {
 
 const filesCheck = (req: Request, file: Express.Multer.File, cb: any) => {
   //most stuff
-  if (file.mimetype.startsWith("image/")) {
-    cb(null, true);
-  } else {
-    cb(new FieldTypeError("Supposed to Be Image"), false);
-  }
+  cb(null, true);
 };
 
 function getDestination() {
@@ -54,7 +50,7 @@ const uploadFiles = multer({
   fileFilter: filesCheck,
   limits: {
     fileSize: 1024 * 1024 * 5,
-    files: 1,
+    files: 100,
     fields: 1,
     fieldNestingDepth: 3,
   },

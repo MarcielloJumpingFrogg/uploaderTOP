@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<header>
+    <h1 class="text-3xl">Welcome Back <span class="underline italic"><%= user.username %></span></h1>
+    <div class="imageContainer">
+      <% if(locals.avatar) { %>
+        <img src="/img/<%=avatar%>" class="avatar header-avatar" onclick="toggleVisibility()" />
+      <%}else {%>
+        <img src="/static/userPlaceholder.svg" class="avatar header-avatar placeholder" onclick="toggleVisibility()" />
+      <%}%>
+			<div id="user_modal" class="hidden user_modal" >
+				<div class="user_modal_header flex">
+          <% if(locals.avatar) { %>
+            <img src="/img/<%=avatar%>" class="avatar menu-avatar" onclick="toggleVisibility()" />
+          <%}else {%>
+            <img src="/static/userPlaceholder.svg" class="avatar menu-avatar placeholder" onclick="toggleVisibility()" />
+          <%}%>
+          <span class="username"><%= user.username %></span>
+        </div>
+        <div class="user_modal_actions">
+          <hr class="solid">
+          <form action="/account/avatar" method="post" enctype="multipart/form-data">
+            <label for="AvatarFile">Upload An Avatar: </label>
+            <input type="file" name="avatar" id="AvatarFile" required />
+            <br />
+            <button type="submit" class="submit-button">Confirm</button>
+          </form>
+        </div>
+        <div class="user_modal_footer">    <hr class="solid">
+        <a href="/log-out" class="log-out">LOG OUT</a>
+        </div>
+      </div>
+    </div>
+  </header>
+

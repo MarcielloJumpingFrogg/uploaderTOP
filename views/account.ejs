@@ -6,78 +6,14 @@
 <%- include("partials/head", {title: user.username}) %>
 
 <body>
-  <header>
-    <h1 class="text-3xl">Welcome Back <span class="underline italic"><%= user.username %></span></h1>
-    <div class="imageContainer">
-      <% if(locals.avatar) { %>
-        <img src="/img/<%=avatar%>" class="avatar header-avatar" onclick="toggleVisibility()" />
-      <%}else {%>
-        <img src="/static/userPlaceholder.svg" class="avatar header-avatar placeholder" onclick="toggleVisibility()" />
-      <%}%>
-			<div id="user_modal" class="hidden user_modal" >
-				<div class="user_modal_header flex">
-          <% if(locals.avatar) { %>
-            <img src="/img/<%=avatar%>" class="avatar menu-avatar" onclick="toggleVisibility()" />
-          <%}else {%>
-            <img src="/static/userPlaceholder.svg" class="avatar menu-avatar placeholder" onclick="toggleVisibility()" />
-          <%}%>
-          <span class="username"><%= user.username %></span>
-        </div>
-        <div class="user_modal_actions">
-          <hr class="solid">
-          <form action="/account/avatar" method="post" enctype="multipart/form-data">
-            <label for="AvatarFile">Upload An Avatar: </label>
-            <input type="file" name="avatar" id="AvatarFile" required />
-            <br />
-            <button type="submit" class="submit-button">Confirm</button>
-          </form>
-        </div>
-        <div class="user_modal_footer">    <hr class="solid">
-        <a href="/log-out" class="log-out">LOG OUT</a>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <% if(locals.errorName) {%>
+  <%- include("components/header") %>
+  
   <%- include("partials/errors") %>
-  <%}%>
 
-	<div>
-			<form action="/account/file" method="post" enctype="multipart/form-data">
-			<label for="file" >New File: </label>
-			<input type="file" name="usrFile" id="file" required  multiple/>
-			<label for="newName">New Name for your file</label>
-			<input type="text" name="newName" id="newName"/>
-			<br/>
-			<button type="submit">Submit</button>
-		</form>
-	</div>
-
-  <div class="listContainer flex flex-wrap justify-center">
-  <% if(files.length == 0 ) { %>
-  <p>No files</p>
-    <%} else {%>
-  <% files.forEach(element => { %>
-  <% let filetype %>
-  <% const extensions = [ 'ae','avi', 'css','csv', 'excel','file', 'html','illustrator', 'jpeg','mpeg', 'ms-powerpoint', 'other', 'pdf','photoshop', 'png','quicktime', 'rar','txt', 'wave','word', 'x-eps','zip'];%>
-  <% const mimetype = element.mimetype.split("/"); let first = mimetype[0]; let second = mimetype[1]; %>
-  <% if(first == "text") filetype = "txt"%>
-  <% if(second =="octet-stream") filetype="other"%>
-  <% const splitElement = second.split("."); console.log("splitElement of element:", element , splitElement)%>
-  <% splitElement.forEach(( part )=>{if(extensions.includes(part)) filetype=part})%>
-  <% if(!filetype) filetype="other"%>
-  <% if(element.usrFileName != user.username+"@avatar") {%>
-  <div class="itemContainer flex flex-col list-none size-50 bg-amber-100 p-5 m-5 rounded-2xl border-1 text-center justify-center">
-    <img class="w-20 self-center" src=<%= "/static/resources/"+filetype+".svg" %> />
-    <li class="truncate "><%= element.usrFileName.split("@")[1] %></li>
-  </div>
-  <% } %>
-  <% })%>
-  <%}%>
-
-</div>
-
+  <%- include("components/fileForm") %>
+	
+  <%- include("components/fileList") %>
+  
 <%}else {%>
   <%- include("partials/head", {title: "Error"}) %>
   <h1>There seems to be an error with your account</h1>
@@ -91,8 +27,6 @@
 function toggleVisibility() {
 	document.getElementById("user_modal").classList.toggle("hidden")
 	document.getElementById("user_modal").classList.toggle("visible")
-
-
 
 }
 </script>

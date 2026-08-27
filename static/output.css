@@ -178,9 +178,6 @@
   .m-5 {
     margin: calc(var(--spacing) * 5);
   }
-  .m-10 {
-    margin: calc(var(--spacing) * 10);
-  }
   .flex {
     display: flex;
   }
@@ -233,9 +230,6 @@
   }
   .text-center {
     text-align: center;
-  }
-  .align-middle {
-    vertical-align: middle;
   }
   .text-2xl {
     font-size: var(--text-2xl);

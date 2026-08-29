@@ -27,6 +27,7 @@ const signUpController: any = [
       });
       req.login(newUser, (err: any) => {
         if (err) throw err;
+        console.log("newUser: ", newUser);
         req.user = newUser;
         res.redirect("/account");
       });

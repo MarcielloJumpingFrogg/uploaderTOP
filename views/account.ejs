@@ -5,16 +5,17 @@
 <% if(locals.user) {%>
 <%- include("partials/head", {title: user.username}) %>
 
+
 <body>
   <%- include("components/header") %>
-  
+
   <%- include("partials/errors") %>
 
   <%- include("components/fileForm") %>
-	
-  <%- include("components/fileList") %>
-  
-<%}else {%>
+
+  <%- include("components/fileList", {user: user, files: files}) %>
+
+  <%}else {%>
   <%- include("partials/head", {title: "Error"}) %>
   <h1>There seems to be an error with your account</h1>
   <h2>Please try again later</h2>

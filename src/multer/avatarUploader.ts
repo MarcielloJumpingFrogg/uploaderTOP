@@ -10,7 +10,6 @@ const avatarUploader = [
   (req: any, res: Response, _next: Function) => {
     customErrorContainer.resetError();
     avatarToDb(req.file, req.user);
-    console.log(req.file);
     moveFile(req.file?.filename, req.user.id, "avatar");
 
     res.redirect("/account");

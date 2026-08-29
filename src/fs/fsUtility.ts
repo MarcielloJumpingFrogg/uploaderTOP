@@ -7,7 +7,6 @@ function moveFile(fileName: any, userId: number, destination: string) {
   const oldPath = homeDir + "/" + uploadFolder + fileName;
   const filePath = homeDir + "/" + uploadFolder + "users/" + userId;
   const dirPath = filePath + "/" + destination;
-  console.log("dirpath: ", dirPath);
   fs.mkdirSync(dirPath, { recursive: true });
   if (destination == "avatar") {
     deletePreviousFile(dirPath);
@@ -19,7 +18,6 @@ function moveFile(fileName: any, userId: number, destination: string) {
 
 function deletePreviousFile(userDirPath: any) {
   const files = fs.readdirSync(userDirPath, { recursive: true });
-  console.log("resulting files: ", files);
   files.forEach((file) => {
     fs.rmSync(userDirPath + "/" + file);
   });

@@ -66,9 +66,11 @@ async function routes(app: Express) {
         `${result}/users/${req.user.id}/avatar/${imageName}`,
       );
       readStream.pipe(res);
-      console.log("yes");
+      console.log("Confirmed picture is of current user, loading image");
     } else {
-      console.log("no");
+      console.log(
+        "Picture is not of current user, the action has been blocked",
+      );
       res.status(400).render("404");
     }
   });

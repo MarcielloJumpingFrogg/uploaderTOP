@@ -8,6 +8,7 @@ import { isPicOfUser } from "../databaseMethods/isPicOfUser";
 import { getDestination } from "../multer/multer";
 import { avatarUploader } from "../multer/avatarUploader";
 import { fileUploader } from "../multer/fileUploader";
+import { folderVisualizer } from "../controllers/folderVisualizer";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -55,6 +56,8 @@ async function routes(app: Express) {
   app.post("/signUp", signUpController);
 
   app.get("/account", accountController);
+
+  app.get("/account/:path/:path", folderVisualizer);
 
   app.post("/account/avatar", avatarUploader);
 

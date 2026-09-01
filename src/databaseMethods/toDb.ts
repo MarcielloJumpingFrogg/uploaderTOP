@@ -3,8 +3,9 @@ import fs from "fs";
 import path from "node:path";
 import { getDestination } from "../multer/multer";
 
-async function toDb(file: any, user: any, newName: string) {
-  const nameToPush = user.username + "@Home/" + newName;
+async function toDb(file: any, user: any, newName: string, folder?: string) {
+  const folderDestination = folder ? folder : "Home";
+  const nameToPush = user.id + "@" + folderDestination + "/" + newName;
   try {
     const result = await prisma.files.create({
       data: {
@@ -21,7 +22,7 @@ async function toDb(file: any, user: any, newName: string) {
 }
 
 async function avatarToDb(file: any, user: any) {
-  let newName = user.username + "@Home/";
+  let newName = user.id + "@";
   const destination = "avatar";
   try {
     const exists = await prisma.files.findUnique({
@@ -30,14 +31,14 @@ async function avatarToDb(file: any, user: any) {
       },
     });
     if (!exists) {
-      toDb(file, user, destination);
+      toDb(file, user, destination, "System");
     } else {
       await prisma.files.delete({
         where: {
           usrFileName: newName + destination,
         },
       });
-      toDb(file, user, destination);
+      toDb(file, user, destination, "System");
     }
   } catch (e) {
     console.error(e);

@@ -2,7 +2,10 @@ import { prisma } from "../../lib/prisma";
 
 async function viewFiles(userId: number) {
   try {
-    const files = await prisma.files.findMany({ where: { ownerId: userId } });
+    const avatarName = userId + "@System/avatar";
+    const files = await prisma.files.findMany({
+      where: { ownerId: userId, usrFileName: { not: avatarName } },
+    });
     return files;
   } catch (e) {
     console.error("error:", e);
@@ -12,11 +15,10 @@ async function viewFiles(userId: number) {
 
 async function getAvatar(userId: number) {
   try {
-    const user = await prisma.users.findUnique({ where: { id: userId } });
     const avatar = await prisma.files.findFirst({
       where: {
         ownerId: userId,
-        usrFileName: user?.username + "@avatar",
+        usrFileName: userId + "@System/avatar",
       },
     });
     return avatar?.fileName;

@@ -4,14 +4,15 @@
   "description": "",
   "main": "app.ts",
   "scripts": {
-    "test": "NODE_ENV=test prisma migrate reset --force && prisma migrate dev --name test && prisma generate && vitest dev",
+    "test": "NODE_ENV=test prisma migrate reset --force && prisma migrate dev --name test && prisma generate && vitest",
     "test:vb": "NODE_ENV=test prisma migrate deploy && prisma generate && vitest dev --coverage",
     "dev": "NODE_ENV=docker tsx app.ts",
     "local": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx --watch app.ts'",
     "docker": "prisma migrate dev --name init && prisma generate && NODE_ENV=docker tsx app.ts ",
     "migrate": "prisma migrate dev --name init && prisma generate",
     "migrate_local": "NODE_ENV=local prisma migrate deploy && prisma generate",
-    "tailwindcss": "npx @tailwindcss/cli -i ./static/style.css -o ./static/output.css --watch"
+    "tailwindcss": "npx @tailwindcss/cli -i ./static/style.css -o ./static/output.css --watch",
+    "reset": "prisma migrate reset --force && tsx deleteUploads.ts && nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx --watch app.ts'"
   },
   "keywords": [],
   "author": "",

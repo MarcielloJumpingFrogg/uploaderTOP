@@ -11,23 +11,26 @@ async function fileList(user: any) {
     name: string;
   }[] = [];
 
-  files.forEach((element: { mimetype: string; usrFileName: string }) => {
-    const filetype = getFileType(element);
+  files.forEach(
+    (element: { mimetype: string; usrFileName: string; fileId: number }) => {
+      const filetype = getFileType(element);
 
-    const file: any = element.usrFileName.split("@")[1]; //gets rid of the userid in the name of the file
-    const folders = file.split("/"); //all the folders of the current file are set in an array
-    const filePath = [];
-    for (let i = 0; i < folders.length - 1; i++) {
-      filePath.push(folders[i]);
-    }
-    const finalFile = {
-      path: filePath,
-      type: filetype,
-      name: folders[1],
-    };
+      const file: any = element.usrFileName.split("@")[1]; //gets rid of the userid in the name of the file
+      const folders = file.split("/"); //all the folders of the current file are set in an array
+      const filePath = [];
+      for (let i = 0; i < folders.length - 1; i++) {
+        filePath.push(folders[i]);
+      }
+      const finalFile = {
+        id: element.fileId,
+        path: filePath,
+        type: filetype,
+        name: folders[1],
+      };
 
-    loadedFiles.push(finalFile);
-  });
+      loadedFiles.push(finalFile);
+    },
+  );
 
   return loadedFiles;
 }
@@ -85,6 +88,7 @@ async function renderAccount(req: any, res: Response) {
   const avatar = await getAvatar(req.user.id);
   let tempPath = "Home";
   if (req.params.path) {
+    console.log("req.params.path: ", req.params.path);
     tempPath = req.params.path;
   }
   const path = tempPath.split("/");

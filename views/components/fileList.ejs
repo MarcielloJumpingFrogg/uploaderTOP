@@ -6,9 +6,27 @@
   <%} else {%>
     <%
   console.log("path: ", path)
-      files.forEach(file=> {
-        
-  })
+  files.forEach(file=> {
+  let match = true
+  let finalFileType = file.type
+  let finalName=file.name
+  let loadedFolder=[]
+  for(let i =0 ; i < file.path; i++) {
+    if(file.path[i] !== path[i]){
+      match= false;
+      finalFileType = folder;
+      finalName = file.path[i];
+      
+      loadedFolder.push(file.path[i])
+      break;
+    }
+  }
+    %>
+  <div class="itemContainer flex flex-col size-50 bg-amber-100 p-5 m-5 rounded-2xl border-1 justify-center text-center">
+    <img src=<%= "/static/resources/" + finalFileType + ".svg" %> class="w-20 self-center"  />
+    <p><%= finalName %></p>
+  </div>
+  <%})
   %>
   <%}%>
 

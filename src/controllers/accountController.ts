@@ -1,4 +1,8 @@
-import { getAvatar, viewFiles } from "../databaseMethods/viewFiles";
+import {
+  filesInFolder,
+  getAvatar,
+  viewFiles,
+} from "../databaseMethods/viewFiles";
 import type { Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 
@@ -84,21 +88,22 @@ function getFileType(element: any) {
 }
 
 async function renderAccount(req: any, res: Response) {
-  const files = await fileList(req.user);
-  const avatar = await getAvatar(req.user.id);
-  let tempPath = "Home";
-  if (req.params.path) {
-    console.log("req.params.path: ", req.params.path);
-    tempPath = req.params.path;
+  let tempPath = ["Home"];
+  if (req.currentPath) {
+    tempPath = req.currentPath;
   }
-  const path = tempPath.split("/");
+  const avatar = await getAvatar(req.user.id);
+  const files = await filesInFolder(req.user.id, tempPath);
+
+  console.log("req.currentPath: ", req.currentPath);
+  console.log("files: ", files);
   res.status(customErrorContainer.getErrorCode()).render("account", {
     user: req.user,
     files: files,
     errorName: customErrorContainer.getErrorName(),
     errors: customErrorContainer.getErrorList(),
     avatar: avatar,
-    path: path,
+    path: tempPath,
   });
 }
 

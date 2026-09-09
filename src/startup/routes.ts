@@ -57,7 +57,7 @@ async function routes(app: Express) {
 
   app.get("/account", accountController);
 
-  app.get("/account/:path/:path", folderVisualizer);
+  app.get("/account/:path", folderVisualizer);
 
   app.post("/account/avatar", avatarUploader);
 

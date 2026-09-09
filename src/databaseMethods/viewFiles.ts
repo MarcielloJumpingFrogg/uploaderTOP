@@ -28,4 +28,25 @@ async function getAvatar(userId: number) {
   }
 }
 
-export { viewFiles, getAvatar };
+async function filesInFolder(userId: number, currentPath: Array<string>) {
+  try {
+    let filePath = "";
+    for (let i = 0; i < currentPath.length; i++) {
+      filePath += currentPath[i] + "/";
+    }
+    const avatarName = userId + "@System/avatar";
+    const finalName = userId + "@" + filePath;
+    console.log(finalName);
+    const files = await prisma.files.findMany({
+      where: {
+        ownerId: userId,
+        usrFileName: { startsWith: finalName },
+      },
+    });
+    return files;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export { viewFiles, getAvatar, filesInFolder };

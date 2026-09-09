@@ -3,6 +3,10 @@ import type { Request, Response } from "express";
 
 const folderVisualizer = [
   async (req: Request, res: Response) => {
+    const paramPath = req.params.path;
+    const path = paramPath ? paramPath.split("@") : [];
+    console.log("divided path: ", path);
+    req.currentPath = path;
     renderAccount(req, res);
   },
 ];

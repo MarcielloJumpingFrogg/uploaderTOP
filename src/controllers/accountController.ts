@@ -6,9 +6,7 @@ import {
 import type { Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 
-async function fileList(user: any) {
-  const files = await viewFiles(user.id);
-
+async function getFileList(files: any) {
   const loadedFiles: {
     path: Array<string>;
     type: string;
@@ -89,17 +87,21 @@ function getFileType(element: any) {
 
 async function renderAccount(req: any, res: Response) {
   let tempPath = ["Home"];
-  if (req.currentPath) {
+  if (req.currentPath !== undefined) {
     tempPath = req.currentPath;
   }
   const avatar = await getAvatar(req.user.id);
   const files = await filesInFolder(req.user.id, tempPath);
+  const fileList: {
+    id: number;
+    path: Array<string>;
+    type: string;
+    name: string;
+  }[] = await getFileList(files);
 
-  console.log("req.currentPath: ", req.currentPath);
-  console.log("files: ", files);
   res.status(customErrorContainer.getErrorCode()).render("account", {
     user: req.user,
-    files: files,
+    files: fileList,
     errorName: customErrorContainer.getErrorName(),
     errors: customErrorContainer.getErrorList(),
     avatar: avatar,

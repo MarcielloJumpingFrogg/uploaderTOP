@@ -175,24 +175,14 @@
   .static {
     position: static;
   }
-  .m-5 {
-    margin: calc(var(--spacing) * 5);
-  }
   .flex {
     display: flex;
   }
   .hidden {
     display: none;
   }
-  .size-50 {
-    width: calc(var(--spacing) * 50);
-    height: calc(var(--spacing) * 50);
-  }
   .w-20 {
     width: calc(var(--spacing) * 20);
-  }
-  .flex-col {
-    flex-direction: column;
   }
   .flex-wrap {
     flex-wrap: wrap;
@@ -203,25 +193,9 @@
   .self-center {
     align-self: center;
   }
-  .rounded-2xl {
-    border-radius: var(--radius-2xl);
-  }
-  .border-1 {
-    border-style: var(--tw-border-style);
-    border-width: 1px;
-  }
   .border-2 {
     border-style: var(--tw-border-style);
     border-width: 2px;
-  }
-  .bg-amber-100 {
-    background-color: var(--color-amber-100);
-  }
-  .p-5 {
-    padding: calc(var(--spacing) * 5);
-  }
-  .text-center {
-    text-align: center;
   }
   .text-2xl {
     font-size: var(--text-2xl);
@@ -367,6 +341,20 @@ hr.solid {
 }
 input[type="text"], input[type="password"] {
   border: 1px black solid;
+}
+.itemContainer {
+  margin: calc(var(--spacing) * 5);
+  display: flex;
+  width: calc(var(--spacing) * 40);
+  height: calc(var(--spacing) * 40);
+  flex-direction: column;
+  justify-content: center;
+  border-radius: var(--radius-2xl);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  background-color: var(--color-amber-100);
+  padding: calc(var(--spacing)*5);
+  text-align: center;
 }
 @property --tw-border-style {
   syntax: "*";

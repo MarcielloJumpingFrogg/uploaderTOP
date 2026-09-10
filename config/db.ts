@@ -11,10 +11,6 @@ function getDB() {
   } else if (nodeEnv == "test") {
     return process.env.TEST_DATABASE_URL;
   } else {
-    console.log(
-      "LOCAL_CONNECTION_STRING: ",
-      process.env.LOCAL_CONNECTION_STRING,
-    );
     return process.env.LOCAL_CONNECTION_STRING;
   }
 }

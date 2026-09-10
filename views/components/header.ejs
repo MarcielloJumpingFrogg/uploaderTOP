@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <header>
-    <h1 class="text-3xl">Welcome Back <span class="underline italic"><%= user.username %></span></h1>
+    <a class="text-3xl" href="/account" >Welcome Back <span class="underline italic"><%= user.username %></span></a>
     <div class="imageContainer">
       <% if(locals.avatar) { %>
         <img src="/img/<%=avatar%>" class="avatar header-avatar" onclick="toggleVisibility()" />

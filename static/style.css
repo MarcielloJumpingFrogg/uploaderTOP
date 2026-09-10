@@ -148,3 +148,18 @@ hr.solid {
 input[type="text"], input[type="password"] {
   border: 1px black solid;
 }
+
+.itemContainer {
+  margin: calc(var(--spacing) * 5);
+  display: flex;
+  width: calc(var(--spacing) * 40);
+  height: calc(var(--spacing) * 40);
+  flex-direction: column;
+  justify-content: center;
+  border-radius: var(--radius-2xl);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  background-color: var(--color-amber-100);
+  padding: calc(var(--spacing)*5);
+  text-align: center;
+}

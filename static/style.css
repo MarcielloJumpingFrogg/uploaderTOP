@@ -162,4 +162,40 @@ input[type="text"], input[type="password"] {
   background-color: var(--color-amber-100);
   padding: calc(var(--spacing)*5);
   text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.itemContainer:hover {
+  transform:scale(1.1);
+  background-color: hsl(48, 97%, 85%, 100%);
+}
+
+.buttonClass{
+  padding: 20px;
+  border: 1px black solid;
+  width: 30%;
+  align-self: center;
+  border-radius: 20px;
+  margin: 10px;
+}
+
+.disabled {
+  cursor:not-allowed;
+  color: grey;
+}
+
+.inFolder {
+  background-color: white;
+  cursor: pointer;
+  color: black;
+}
+
+.pressed {
+  background-color: hsl(177, 70%, 41%);
+}
+
+.pressed:hover {
+
+  background-color: hsl(177, 70%, 51%);
 }

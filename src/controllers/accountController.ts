@@ -27,7 +27,7 @@ async function getFileList(files: any) {
         id: element.fileId,
         path: filePath,
         type: filetype,
-        name: folders[1],
+        name: folders[folders.length - 1],
       };
 
       loadedFiles.push(finalFile);

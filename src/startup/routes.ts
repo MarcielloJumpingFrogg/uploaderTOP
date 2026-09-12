@@ -9,6 +9,7 @@ import { getDestination } from "../multer/multer";
 import { avatarUploader } from "../multer/avatarUploader";
 import { fileUploader } from "../multer/fileUploader";
 import { folderVisualizer } from "../controllers/folderVisualizer";
+import { newFolderController } from "../controllers/newFolderController";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -60,6 +61,8 @@ async function routes(app: Express) {
   app.get("/account/:path", folderVisualizer);
 
   app.post("/account/avatar", avatarUploader);
+
+  app.post("/account/newFolder", newFolderController);
 
   app.get("/img/:imageName", async (req, res) => {
     const result = getDestination();

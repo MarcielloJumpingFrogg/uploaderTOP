@@ -16,6 +16,21 @@
 <% } else { %>
     <button class="buttonClass "><p class="<%= buttonClass %> "><%= text %></p></button>
 <% } %>
+    <button class="newFolderButton" onClick="folderFormReveal()" >New Folder </button>
+    <script>
+      function folderFormReveal() {
+        const folderForm = document.getElementById("folderForm")
+        folderForm.classList.toggle("hidden")
+        folderForm.classList.toggle("showFolderForm")
+      }
+    </script>
+    <div id="folderForm" class="hidden">
+      <form action="/account/newFolder" method="POST" >
+        <label for="folderName">Folder Name: </label>
+        <input type="text" name="folderName"/>
+        <button type="submit" >Confirm</button>
+      </form>
+    </div>
 
 <div class="listContainer flex flex-wrap justify-center">
   <% if(files.length == 0 ) { %>

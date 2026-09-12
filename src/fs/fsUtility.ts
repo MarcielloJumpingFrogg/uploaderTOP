@@ -2,8 +2,12 @@ import path from "node:path";
 import { uploadFolder } from "../multer/multer";
 import fs from "node:fs";
 
+function getHomeDir() {
+  return path.join(__dirname, "../..");
+}
+
 function moveFile(fileName: any, userId: number, destination: string) {
-  const homeDir = path.join(__dirname, "../..");
+  const homeDir = getHomeDir();
   const oldPath = homeDir + "/" + uploadFolder + fileName;
   const filePath = homeDir + "/" + uploadFolder + "users/" + userId;
   const dirPath = filePath + "/" + destination;
@@ -23,4 +27,10 @@ function deletePreviousFile(userDirPath: any) {
   });
 }
 
-export { moveFile, deletePreviousFile };
+function createFolder(name: string, userId: number) {
+  const homeDir = getHomeDir();
+  const path = homeDir + "/" + uploadFolder + "users/" + userId + "/usrFiles";
+  fs.mkdirSync(path + "/" + name, { recursive: true });
+}
+
+export { moveFile, deletePreviousFile, createFolder };

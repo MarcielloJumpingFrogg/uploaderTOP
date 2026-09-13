@@ -2,9 +2,16 @@ import { prisma } from "../../lib/prisma";
 import fs from "fs";
 import path from "node:path";
 import { getDestination } from "../multer/multer";
+import { createFolder } from "../fs/fsUtility";
 
 async function toDb(file: any, user: any, newName: string, folder?: string) {
   const folderDestination = folder ? folder : "Home";
+  // const filePath = newName.split("/")
+  // if(filePath.length > 1 ) {
+  //   filePath.forEach(folder => {
+  //     createFolder(folder)
+  //   })
+  // }
   const nameToPush = user.id + "@" + folderDestination + "/" + newName;
   try {
     const result = await prisma.files.create({

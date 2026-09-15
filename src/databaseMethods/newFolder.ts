@@ -11,7 +11,7 @@ async function newFolder(name: string, user: any) {
       ownerId: user,
     };
     await toDb(folder, user, name);
-    createFolder(folder.filename, user.id);
+    createFolder(folder.filename, user);
   } catch (e) {
     console.error(e);
   }

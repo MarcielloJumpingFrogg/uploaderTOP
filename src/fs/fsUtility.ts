@@ -27,7 +27,8 @@ function deletePreviousFile(userDirPath: any) {
   });
 }
 
-function createFolder(name: string, userId: number) {
+function createFolder(name: string, user: any) {
+  const userId = user.id;
   const homeDir = getHomeDir();
   const path = homeDir + "/" + uploadFolder + "users/" + userId + "/usrFiles";
   fs.mkdirSync(path + "/" + name, { recursive: true });

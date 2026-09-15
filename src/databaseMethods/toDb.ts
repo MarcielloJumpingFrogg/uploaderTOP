@@ -6,15 +6,18 @@ import { createFolder } from "../fs/fsUtility";
 
 async function toDb(file: any, user: any, newName: string, folder?: string) {
   const folderDestination = folder ? folder : "Home";
-  // const filePath = newName.split("/")
-  // if(filePath.length > 1 ) {
-  //   filePath.forEach(folder => {
-  //     createFolder(folder)
-  //   })
-  // }
+  const filePath = newName.split("/");
+  if (filePath.length > 1) {
+    for (let i = 0; i < filePath.length - 1; i++) {
+      const folderPath = concatPath(folderDestination, filePath, i);
+      console.log(folderPath);
+      createFolder(folderPath, user);
+    }
+  }
   const nameToPush = user.id + "@" + folderDestination + "/" + newName;
   try {
-    const result = await prisma.files.create({
+    /* const result = */
+    await prisma.files.create({
       data: {
         usrFileName: nameToPush,
         fileName: file.filename,
@@ -26,6 +29,18 @@ async function toDb(file: any, user: any, newName: string, folder?: string) {
   } catch (e) {
     console.error(e);
   }
+}
+
+function concatPath(
+  folderDestination: string,
+  filePath: Array<string>,
+  i: number,
+) {
+  let concat = folderDestination;
+  for (let j = 0; j < i; j++) {
+    concat += filePath[j] + "/";
+  }
+  return concat;
 }
 
 async function avatarToDb(file: any, user: any) {

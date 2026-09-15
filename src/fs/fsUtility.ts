@@ -15,7 +15,6 @@ function moveFile(fileName: any, userId: number, destination: string) {
   if (destination == "avatar") {
     deletePreviousFile(dirPath);
   }
-
   const newPath = dirPath + "/" + fileName;
   fs.renameSync(oldPath, newPath);
 }

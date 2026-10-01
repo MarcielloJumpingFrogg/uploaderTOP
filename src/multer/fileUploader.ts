@@ -9,7 +9,7 @@ const fileUploader = [
   uploadFiles.array("usrFile", 50),
   body("name").escape(),
   (req: any, res: Response) => {
-    req.files.forEach((file) => {
+    req.files.forEach((file: any) => {
       customErrorContainer.resetError();
       let newName;
       if (req.body.newName) {

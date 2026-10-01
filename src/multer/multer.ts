@@ -34,9 +34,11 @@ function getDestination() {
 }
 
 let uploadFolder: any = getDestination();
+const storage = multer.memoryStorage();
 
 const uploadImage = multer({
-  dest: uploadFolder,
+  // dest: uploadFolder,
+  storage: storage,
   fileFilter: fileImageFilter,
   limits: {
     fileSize: 1024 * 1024 * 5,
@@ -47,6 +49,7 @@ const uploadImage = multer({
 });
 const uploadFiles = multer({
   dest: uploadFolder,
+  storage: storage,
   fileFilter: filesCheck,
   limits: {
     fileSize: 1024 * 1024 * 5,

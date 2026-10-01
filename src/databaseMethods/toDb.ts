@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma";
-import fs from "fs";
-import path from "node:path";
-import { getDestination } from "../multer/multer";
+// import fs from "fs";
+// import path from "node:path";
+// import { getDestination } from "../multer/multer";
 import { createFolder } from "../fs/fsUtility";
 
 async function toDb(file: any, user: any, newName: string, folder?: string) {
@@ -52,16 +52,14 @@ async function avatarToDb(file: any, user: any) {
         usrFileName: newName + destination,
       },
     });
-    if (!exists) {
-      toDb(file, user, destination, "System");
-    } else {
+    if (exists) {
       await prisma.files.delete({
         where: {
           usrFileName: newName + destination,
         },
       });
-      toDb(file, user, destination, "System");
     }
+    toDb(file, user, destination, "System");
   } catch (e) {
     console.error(e);
   }

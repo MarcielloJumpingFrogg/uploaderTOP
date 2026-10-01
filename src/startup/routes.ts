@@ -6,7 +6,7 @@ import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "fs";
 import { isPicOfUser } from "../databaseMethods/isPicOfUser";
 import { getDestination } from "../multer/multer";
-import { avatarUploader } from "../multer/avatarUploader";
+import { avatarUploader } from "../controllers/avatarUploader";
 import { fileUploader } from "../multer/fileUploader";
 import { folderVisualizer } from "../controllers/folderVisualizer";
 import { newFolderController } from "../controllers/newFolderController";
@@ -65,6 +65,9 @@ async function routes(app: Express) {
   app.post("/account/newFolder", newFolderController);
 
   app.get("/img/:imageName", async (req, res) => {
+    //TODO: this whole section needs to be removed
+    //and changed with a simple link to said image, if it's an avatar
+    //or deny the request, but i think since i will just be using the avatar bucket that's probably not gonna be necessary
     const result = getDestination();
     if (await isPicOfUser(req.user.id, req.params.imageName)) {
       const imageName = req.params.imageName;

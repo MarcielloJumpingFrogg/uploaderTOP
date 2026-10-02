@@ -1,8 +1,5 @@
-import {
-  filesInFolder,
-  getAvatar,
-  viewFiles,
-} from "../databaseMethods/viewFiles";
+import { filesInFolder, viewFiles } from "../databaseMethods/viewFiles";
+import { getAvatar } from "../../supabaseFn/getAvatar";
 import type { Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 
@@ -90,7 +87,7 @@ async function renderAccount(req: any, res: Response) {
   if (req.currentPath !== undefined) {
     tempPath = req.currentPath;
   }
-  const avatar = await getAvatar(req.user.id);
+  const avatar = await getAvatar(String(req.user.id));
   const files = await filesInFolder(req.user.id, tempPath);
   const fileList: {
     id: number;

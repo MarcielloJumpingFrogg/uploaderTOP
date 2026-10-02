@@ -1,4 +1,6 @@
 import { admin_supabase } from "../config/supabase";
+import { checkExists } from "./checkExists";
+import { updateAvatar } from "./updateAvatar";
 
 export async function uploadFile(
   fileBase64: any,
@@ -6,13 +8,22 @@ export async function uploadFile(
   bucket: string,
   name: string,
 ) {
-  const result = await admin_supabase.storage
-    .from(bucket)
-    .upload(name, fileBase64, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: file.mimetype,
-    });
+  try {
+    if (await checkExists(name, bucket)) {
+      console.log("Confirmed exists");
+      updateAvatar(name, fileBase64, file);
+    } else {
+      const result = await admin_supabase.storage
+        .from(bucket)
+        .upload(name, fileBase64, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.mimetype,
+        });
 
-  console.log("Result: ", result);
+      console.log("Result: ", result);
+    }
+  } catch (e) {
+    console.error("Error catched: ", e);
+  }
 }

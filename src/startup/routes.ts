@@ -10,6 +10,7 @@ import { avatarUploader } from "../controllers/avatarUploader";
 import { fileUploader } from "../multer/fileUploader";
 import { folderVisualizer } from "../controllers/folderVisualizer";
 import { newFolderController } from "../controllers/newFolderController";
+import { getAvatar } from "../../supabaseFn/getAvatar";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -68,20 +69,21 @@ async function routes(app: Express) {
     //TODO: this whole section needs to be removed
     //and changed with a simple link to said image, if it's an avatar
     //or deny the request, but i think since i will just be using the avatar bucket that's probably not gonna be necessary
-    const result = getDestination();
-    if (await isPicOfUser(req.user.id, req.params.imageName)) {
-      const imageName = req.params.imageName;
-      const readStream = fs.createReadStream(
-        `${result}/users/${req.user.id}/avatar/${imageName}`,
-      );
-      readStream.pipe(res);
-      console.log("Confirmed picture is of current user, loading image");
-    } else {
-      console.log(
-        "Picture is not of current user, the action has been blocked",
-      );
-      res.status(400).render("404");
-    }
+    // const result = getDestination();
+    // if (await isPicOfUser(req.user.id, req.params.imageName)) {
+
+    const imageName = req.params.imageName;
+    console.log("imageNamea; ", imageName);
+    const avatarLink = await getAvatar(imageName);
+    const readStream = fs.createReadStream(avatarLink || "");
+    readStream.pipe(res);
+    console.log("Confirmed picture is of current user, loading image");
+    // } else {
+    // console.log(
+    //   "Picture is not of current user, the action has been blocked",
+    // );
+    // res.status(400).render("404");
+    // }
   });
 
   app.post("/account/file", fileUploader);

@@ -2,7 +2,7 @@ import { body } from "express-validator";
 import { uploadFiles } from "./multer";
 import type { Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
-import { toDb } from "../databaseMethods/toDb";
+// import { toDb } from "../databaseMethods/toDb";
 import { moveFile } from "../fs/fsUtility";
 
 const fileUploader = [
@@ -17,8 +17,8 @@ const fileUploader = [
       } else {
         newName = file.originalname;
       }
-      toDb(file, req.user, newName);
-      moveFile(file?.filename, req.user.id, "usrFiles");
+      // toDb(file, req.user, newName);
+      // moveFile(file?.filename, req.user.id, "usrFiles");
     });
     res.redirect("/account");
   },

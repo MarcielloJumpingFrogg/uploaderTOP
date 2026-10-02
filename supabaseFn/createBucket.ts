@@ -13,7 +13,7 @@ async function createBucket(
     fileSizeLimit: fileSizeLimit,
   });
 
-  console.log(result);
+  console.log("bucket result: ", result);
 }
 
 createBucket("avatar", ["image/*"], mb * 5);

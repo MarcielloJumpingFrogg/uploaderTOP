@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import multer from "multer";
-import { viewFiles } from "../databaseMethods/viewFiles";
+// import { viewFiles } from "../databaseMethods/viewFiles";
 import { renderAccount } from "../controllers/accountController";
 
 class FieldTypeError extends Error {

@@ -20,7 +20,7 @@ model Session {
 }
 
 model Users { 
-  id    Int     @id @default(autoincrement()) 
+  id    String    @id @default(uuid()) 
   username String @unique
   password String 
   fileList Files[]
@@ -33,6 +33,6 @@ model Files {
   mimetype    String
   size        Int
   uploadTime  DateTime @default(now())
-  ownerId     Int
+  ownerId     String
   owner       Users   @relation(fields: [ownerId], references: [id])
 }

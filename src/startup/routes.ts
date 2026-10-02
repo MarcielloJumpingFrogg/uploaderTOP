@@ -4,7 +4,7 @@ import { signUpController } from "../controllers/signUpController";
 import { accountController } from "../controllers/accountController";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "fs";
-import { isPicOfUser } from "../databaseMethods/isPicOfUser";
+// import { isPicOfUser } from "../databaseMethods/isPicOfUser";
 import { getDestination } from "../multer/multer";
 import { avatarUploader } from "../controllers/avatarUploader";
 import { fileUploader } from "../multer/fileUploader";

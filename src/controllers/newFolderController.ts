@@ -1,8 +1,9 @@
-import { newFolder } from "../databaseMethods/newFolder";
+// import { newFolder } from "../databaseMethods/newFolder";
 
 const newFolderController = [
   async (req: any, res: any) => {
-    await newFolder(req.body.folderName, req.user);
+    console.log("TO IMPLEMENT");
+    // await newFolder(req.body.folderName, req.user);
     res.redirect("/account");
   },
 ];

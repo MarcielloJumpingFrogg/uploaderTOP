@@ -30,16 +30,16 @@ const avatarUploader = [
       const fileBase64 = decode(file.buffer.toString("base64"));
       const uploadName = "avatars/" + req.user.id;
 
-      const { data, error } = await readFile("avatar", uploadName);
-      if (error) {
-        console.error(error);
-      }
-      if (data) {
-        //TODO: delete file need to be implemented
-        console.log("delete file need to be implemented");
-        deleteFile();
-      }
-
+      // const { data, error } = await readFile("avatar", uploadName);
+      // if (error) {
+      //   console.error(error);
+      // }
+      // if (data) {
+      //   //TODO: delete file need to be implemented
+      //   console.log("delete file need to be implemented");
+      //   deleteFile();
+      // }
+      //
       uploadFile(fileBase64, file, "avatar", uploadName);
 
       // moveFile(req.file?.filename, req.user.id, "avatar");

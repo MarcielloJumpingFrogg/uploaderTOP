@@ -11,8 +11,8 @@ function getDB() {
   } else if (nodeEnv == "test") {
     return process.env.TEST_DATABASE_URL;
   } else {
-    return process.env.DATABASE_URL;
-    // return process.env.DIRECT_URL;
+    // return process.env.DATABASE_URL;
+    return process.env.DIRECT_URL;
   }
 }
 const result = getDB();

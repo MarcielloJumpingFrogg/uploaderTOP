@@ -4,14 +4,15 @@ import { checkExists } from "./checkExists";
 
 export async function getAvatar(id: string) {
   if (!checkExists("avatars/" + id, "avatar")) {
+    console.log("does not exits in getAvbatr");
     return "/static/userPlaceholder.svg";
   }
+  // console.log("am i here");
   const result = admin_supabase.storage
     .from("avatar")
     .getPublicUrl("avatars/" + id);
-  // const result = await readFile("avatar", "avatars/" + id);
-  // console.log(result);
-  return result.data.publicUrl;
-}
 
-// getAvatar("10");
+  const cacheTimeStamp =
+    result.data.publicUrl + "?cacheTimeStamp=" + Date.now();
+  return cacheTimeStamp;
+}

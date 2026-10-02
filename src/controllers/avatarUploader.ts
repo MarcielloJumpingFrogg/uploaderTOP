@@ -1,6 +1,6 @@
 import type { Response } from "express";
 import "dotenv/config";
-import { avatarToDb } from "../databaseMethods/toDb";
+// import { avatarToDb } from "../databaseMethods/toDb";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import { uploadImage } from "../multer/multer";
 import { decode } from "base64-arraybuffer";

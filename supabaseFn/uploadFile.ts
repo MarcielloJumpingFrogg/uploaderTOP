@@ -13,6 +13,7 @@ export async function uploadFile(
       console.log("Confirmed exists");
       updateAvatar(name, fileBase64, file);
     } else {
+      console.log("does not exist");
       const result = await admin_supabase.storage
         .from(bucket)
         .upload(name, fileBase64, {

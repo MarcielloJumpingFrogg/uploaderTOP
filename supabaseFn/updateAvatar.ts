@@ -6,6 +6,7 @@ export async function updateAvatar(
   newFile: any,
 ) {
   try {
+    console.log("newFile: ", newFile);
     const { data, error } = await admin_supabase.storage
       .from("avatar")
       .update(name, newBase64File, {
@@ -13,8 +14,7 @@ export async function updateAvatar(
         contentType: newFile.mimetype,
       });
 
-    console.log("Data: ", data);
-    console.log("ERrorsa; ", error);
+    console.error(error);
     return data;
   } catch (e) {
     console.error(e);

@@ -1,10 +1,11 @@
-import { filesInFolder, viewFiles } from "../databaseMethods/viewFiles";
+// import { filesInFolder, viewFiles } from "../databaseMethods/viewFiles";
 import { getAvatar } from "../../supabaseFn/getAvatar";
 import type { Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 
 async function getFileList(files: any) {
   const loadedFiles: {
+    id: number;
     path: Array<string>;
     type: string;
     name: string;
@@ -88,13 +89,15 @@ async function renderAccount(req: any, res: Response) {
     tempPath = req.currentPath;
   }
   const avatar = await getAvatar(String(req.user.id));
-  const files = await filesInFolder(req.user.id, tempPath);
+  const files = [
+    "ToImplement",
+  ]; /*  await filesInFolder(req.user.id, tempPath); */
   const fileList: {
     id: number;
     path: Array<string>;
     type: string;
     name: string;
-  }[] = await getFileList(files);
+  }[] = []; /* await getFileList(files) */
 
   res.status(customErrorContainer.getErrorCode()).render("account", {
     user: req.user,

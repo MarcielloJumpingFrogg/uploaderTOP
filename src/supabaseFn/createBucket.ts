@@ -1,4 +1,4 @@
-import { admin_supabase } from "../config/supabase";
+import { admin_supabase } from "../../config/supabase";
 
 const mb = 1024 * 1024;
 

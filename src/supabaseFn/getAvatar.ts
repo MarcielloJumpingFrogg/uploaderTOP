@@ -1,13 +1,12 @@
 import { readFile } from "./readFile";
-import { admin_supabase } from "../config/supabase";
+import { admin_supabase } from "../../config/supabase";
 import { checkExists } from "./checkExists";
-import { getAvatarVersion } from "../src/prismaDb/getAvatarVersion";
+import { getAvatarVersion } from "../../src/prismaDb/getAvatarVersion";
 
 export async function getAvatar(id: string) {
   if (!(await checkExists("avatars/" + id, "avatar"))) {
     return "/static/userPlaceholder.svg";
   }
-  // console.log("am i here");
   const result = admin_supabase.storage
     .from("avatar")
     .getPublicUrl("avatars/" + id);

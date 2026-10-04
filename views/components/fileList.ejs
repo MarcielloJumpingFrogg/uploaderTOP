@@ -28,62 +28,39 @@
       <form action="/account/newFolder" method="POST" >
         <label for="folderName">Folder Name: </label>
         <input type="text" name="folderName"/>
+        <input type="hidden" name="_location" value="<%=path%>" />
         <button type="submit" >Confirm</button>
       </form>
     </div>
 
-<div class="listContainer flex flex-wrap justify-center">
-  <% if(files.length == 0 ) { %>
-  <p>No files</p>
-      <%} else { %>
+  <div class="listContainer flex flex-wrap justify-center">
+    <% if(files.length == 0 ) { %>
+      <p>No files</p>
+    <%} else { 
+      let loadedFolder=[]
+      files.forEach(file=> {
+        let match = true
+        let finalFileType = file.type
+        let finalName=file.name %>
 
-  <%
-  let loadedFolder=[]
-  files.forEach(file=> {
-  let match = true
-  let finalFileType = file.type
-  let finalName=file.name
-  let skipping = false
-    for(let i = 0 ; i < file.path.length; i++) {
-      if(file.path[i] !== path[i]  ){
-        match = false;
-        finalFileType = "folder";
-        finalName = file.path[i];
-      
-        if(!loadedFolder.includes(file.path[i])) {
-          loadedFolder.push(file.path[i])
-          break
-        } else {
-          skipping = true;
-          break;
-        }
-      } 
-    }
-    if(!skipping ){
-    %>
         <div class="itemContainer element<%= file.id %>" id="element<%= file.id %>"  
           data-finalname = "<%= finalName %>"
           data-path = "<%=path%>"
-          onclick="
-          <% if(finalFileType=="folder" || finalFileType=="folder_alt") { 
-          %> travelFolder(this ) <% } else { %> toggleShow(this) <% } %>" >
-    <img src=<%= "/static/resources/" + finalFileType + ".svg" %> class="w-20 self-center"  />
-    <p><%= finalName %></p>
-    <div class="onClickAction hidden">
-      <%
-      if(finalFileType == "folder" || finalFileType == "folder_alt") { %>
-      
-      <% } else { %>
-        <p>To Implement</p>
-      <% }
+          onclick=" <% if(finalFileType=="folder" || finalFileType=="folder_alt") { %> travelFolder(this ) <% } else { %> toggleShow(this) <% } %>" >
+            <img src=<%= "/static/resources/" + finalFileType + ".svg" %> class="w-20 self-center"  />
+            <p><%= finalName %></p>
+            <form action="/account/delete" method="POST">
+              <input type="hidden" name="_method" value="DELETE" />
+              <input type="hidden" name="_currentPath" value="<%=path%>" />
+              <input type="hidden" name="_name" value="<%=finalName%>" />
+              <input type="hidden" name="_type" value="<%=finalFileType%>" />
+              <button type="submit" value="Delete">Delete</button>
+            </form>
+        </div>
+      <%})
       %>
-    </div>
+    <%}%>
   </div>
-  <%}})
-  %>
-  <%}%>
-
-</div>
 </div>
 
 <script>

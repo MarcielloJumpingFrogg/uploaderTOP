@@ -11,13 +11,19 @@ class FieldTypeError extends Error {
   }
 }
 
-const fileImageFilter = (_req: Request, file: Express.Multer.File, cb: any) => {
-  //only images
+const fileImageFilter = async (
+  _req: Request,
+  file: Express.Multer.File,
+  cb: any,
+) => {
+  // only images
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
     cb(new FieldTypeError("Supposed to Be image"), false);
   }
+
+  cb(null, true);
 };
 
 const filesCheck = (req: Request, file: Express.Multer.File, cb: any) => {
@@ -37,7 +43,6 @@ let uploadFolder: any = getDestination();
 const storage = multer.memoryStorage();
 
 const uploadImage = multer({
-  // dest: uploadFolder,
   storage: storage,
   fileFilter: fileImageFilter,
   limits: {
@@ -48,13 +53,12 @@ const uploadImage = multer({
   },
 });
 const uploadFiles = multer({
-  dest: uploadFolder,
   storage: storage,
   fileFilter: filesCheck,
   limits: {
     fileSize: 1024 * 1024 * 5,
     files: 100,
-    fields: 1,
+    fields: 2,
     fieldNestingDepth: 3,
   },
 });

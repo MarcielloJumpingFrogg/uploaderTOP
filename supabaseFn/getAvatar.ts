@@ -1,10 +1,10 @@
 import { readFile } from "./readFile";
 import { admin_supabase } from "../config/supabase";
 import { checkExists } from "./checkExists";
+import { getAvatarVersion } from "../src/prismaDb/getAvatarVersion";
 
 export async function getAvatar(id: string) {
-  if (!checkExists("avatars/" + id, "avatar")) {
-    console.log("does not exits in getAvbatr");
+  if (!(await checkExists("avatars/" + id, "avatar"))) {
     return "/static/userPlaceholder.svg";
   }
   // console.log("am i here");
@@ -12,7 +12,8 @@ export async function getAvatar(id: string) {
     .from("avatar")
     .getPublicUrl("avatars/" + id);
 
-  const cacheTimeStamp =
-    result.data.publicUrl + "?cacheTimeStamp=" + Date.now();
-  return cacheTimeStamp;
+  const avatarVersion = await getAvatarVersion(id);
+  const cachedVersion =
+    result.data.publicUrl + "?cacheVersion=" + avatarVersion;
+  return cachedVersion;
 }

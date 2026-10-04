@@ -40,7 +40,7 @@ const avatarUploader = [
       //   deleteFile();
       // }
       //
-      uploadFile(fileBase64, file, "avatar", uploadName);
+      uploadFile(fileBase64, file, "avatar", uploadName, req.user.id);
 
       // moveFile(req.file?.filename, req.user.id, "avatar");
     } catch (e) {

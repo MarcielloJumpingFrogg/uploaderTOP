@@ -1,20 +1,19 @@
-import { admin_supabase } from "../config/supabase";
+import { admin_supabase } from "../../config/supabase";
 import { checkExists } from "./checkExists";
 import { updateAvatar } from "./updateAvatar";
+import { decode } from "base64-arraybuffer";
 
 export async function uploadFile(
-  fileBase64: any,
   file: any,
   bucket: string,
   name: string,
   userId: string,
 ) {
   try {
+    const fileBase64 = decode(file.buffer.toString("base64"));
     if (await checkExists(name, bucket)) {
-      console.log("Confirmed exists");
-      updateAvatar(name, fileBase64, file, userId);
+      await updateAvatar(name, fileBase64, file, userId);
     } else {
-      console.log("does not exist");
       const result = await admin_supabase.storage
         .from(bucket)
         .upload(name, fileBase64, {
@@ -23,7 +22,6 @@ export async function uploadFile(
           contentType: file.mimetype,
         });
 
-      console.log("Result: ", result);
       return result;
     }
   } catch (e) {

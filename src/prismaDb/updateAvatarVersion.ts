@@ -3,8 +3,9 @@ import { getAvatarVersion } from "./getAvatarVersion";
 
 export async function updateAvatarVersion(userId: string) {
   const avatarVersion = await getAvatarVersion(userId);
-  await prisma.users.update({
+  const result = await prisma.users.update({
     where: { id: userId },
     data: { avatarVersion: avatarVersion + 1 },
   });
+  console.log("result: ", result);
 }

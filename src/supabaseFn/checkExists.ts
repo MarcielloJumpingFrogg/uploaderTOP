@@ -1,4 +1,4 @@
-import { admin_supabase } from "../config/supabase";
+import { admin_supabase } from "../../config/supabase";
 
 export async function checkExists(fileName: string, bucket: string) {
   try {

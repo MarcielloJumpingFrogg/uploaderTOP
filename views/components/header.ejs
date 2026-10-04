@@ -1,20 +1,13 @@
 <!DOCTYPE html>
-<%
-  let imageForUser 
-  if(locals.avatar) {
-    imageForUser = avatar
-  } else {
-    imageForUser = "/static/userPlaceholder.svg"
-  }
-  %>
+
 
 <header>
     <a class="text-3xl" href="/account" >Welcome Back <span class="underline italic"><%= user.username %></span></a>
     <div class="imageContainer">
-      <img src="<%= imageForUser %>" class="avatar header-avatar" onclick="toggleVisibility()" />
+      <img src="<%= avatar %>" class="avatar header-avatar" onclick="toggleVisibility()" />
 			<div id="user_modal" class="hidden user_modal" >
 				<div class="user_modal_header flex">
-          <img src="<%= imageForUser %>" class="avatar menu-avatar" onclick="toggleVisibility()" />
+          <img src="<%= avatar %>" class="avatar menu-avatar" onclick="toggleVisibility()" />
           <span class="username"><%= user.username %></span>
         </div>
         <div class="user_modal_actions">

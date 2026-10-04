@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt, { hash } from "bcryptjs";
 import { prisma } from "../../lib/prisma";
 import { validationResult } from "express-validator";
 import { validateUser } from "./validateUser";
@@ -10,7 +10,7 @@ import path from "node:path";
 const signUpController: any = [
   validateUser,
   async (req: any, res: any) => {
-    const errors = validationResult(req);
+    const errors: any = validationResult(req);
     if (!errors.isEmpty()) {
       customErrorContainer.validatorError(errors.errors);
       return res
@@ -21,6 +21,7 @@ const signUpController: any = [
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       const newUser = await prisma.users.create({
         data: {
+          // id: crypto.randomUUID(),
           username: req.body.username,
           password: hashedPassword,
         },

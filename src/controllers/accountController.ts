@@ -88,7 +88,7 @@ async function renderAccount(req: any, res: Response) {
   if (req.currentPath !== undefined) {
     tempPath = req.currentPath;
   }
-  const avatar = await getAvatar(String(req.user.id));
+  const avatar = await getAvatar(req.user.id);
   const files = [
     "ToImplement",
   ]; /*  await filesInFolder(req.user.id, tempPath); */

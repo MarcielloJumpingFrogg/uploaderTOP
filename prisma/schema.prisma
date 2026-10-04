@@ -20,10 +20,11 @@ model Session {
 }
 
 model Users { 
-  id    String    @id @default(uuid()) 
-  username String @unique
+  id       String    @id @default(uuid()) 
+  username String    @unique
   password String 
   fileList Files[]
+  avatarVersion Int  @default(0)
 } 
 
 model Files {

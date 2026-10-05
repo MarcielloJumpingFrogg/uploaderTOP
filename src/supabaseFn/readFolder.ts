@@ -19,7 +19,6 @@ export async function readFolder(
       if (item.id !== null) {
         // It's a file
         if (item.name !== ".emptyFolderPlaceholder" || context !== "user") {
-          console.log("wtf");
           FullList.push({ type: "file", item });
         }
       } else {

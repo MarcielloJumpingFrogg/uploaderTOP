@@ -11,6 +11,7 @@ import { folderVisualizer } from "../controllers/folderVisualizer";
 import { newFolderController } from "../controllers/newFolderController";
 import { getAvatar } from "../supabaseFn/getAvatar";
 import { fileDeleteController } from "../controllers/fileDeleteController";
+import { renameController } from "../controllers/renameController";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -67,16 +68,16 @@ async function routes(app: Express) {
 
   app.get("/img/:imageName", async (req, res) => {
     const imageName = req.params.imageName;
-    console.log("imageNamea; ", imageName);
     const avatarLink = await getAvatar(imageName);
     const readStream = fs.createReadStream(avatarLink || "");
     readStream.pipe(res);
-    console.log("Confirmed picture is of current user, loading image");
   });
 
   app.post("/account/file", fileUploader);
 
   app.post("/account/delete", fileDeleteController);
+
+  app.post("/account/rename", renameController);
 }
 
 export { routes };

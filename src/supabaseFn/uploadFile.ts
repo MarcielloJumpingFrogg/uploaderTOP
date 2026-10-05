@@ -1,29 +1,18 @@
 import { admin_supabase } from "../../config/supabase";
-import { checkExists } from "./checkExists";
-import { updateAvatar } from "./updateAvatar";
-import { decode } from "base64-arraybuffer";
+import { getFileBase64 } from "../fileMethods/getFileBase64";
 
-export async function uploadFile(
-  file: any,
-  bucket: string,
-  name: string,
-  userId: string,
-) {
+export async function uploadFile(file: any, bucket: string, name: string) {
   try {
-    const fileBase64 = decode(file.buffer.toString("base64"));
-    if (await checkExists(name, bucket)) {
-      await updateAvatar(name, fileBase64, file, userId);
-    } else {
-      const result = await admin_supabase.storage
-        .from(bucket)
-        .upload(name, fileBase64, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: file.mimetype,
-        });
+    const fileBase64 = getFileBase64(file);
+    const result = await admin_supabase.storage
+      .from(bucket)
+      .upload(name, fileBase64, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.mimetype,
+      });
 
-      return result;
-    }
+    return result;
   } catch (e) {
     console.error("Error catched: ", e);
   }

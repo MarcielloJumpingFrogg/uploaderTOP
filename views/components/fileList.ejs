@@ -43,20 +43,20 @@
         let finalFileType = file.type
         let finalName=file.name %>
 
-        <div class="itemContainer element<%= file.id %>" id="element<%= file.id %>"  
+      <div class="itemContainer" >
+        <div>
+          <button  class="menuButton" onclick="toggleOptions(this)"><img  src="/static/menuLines.svg" alt="menuButton" width="20px" height="20px"></button>
+            <%- include("editFile", {finalName: finalName, path: path, finalFileType: finalFileType}) %>
+        </div>
+        <div class="item element<%= file.id %>" id="element<%= file.id %>"  
           data-finalname = "<%= finalName %>"
           data-path = "<%=path%>"
-          onclick=" <% if(finalFileType=="folder" || finalFileType=="folder_alt") { %> travelFolder(this ) <% } else { %> toggleShow(this) <% } %>" >
+          onclick=" <% if(finalFileType=="folder" || finalFileType=="folder_alt") { %> travelFolder(this )  <% } %>" >
             <img src=<%= "/static/resources/" + finalFileType + ".svg" %> class="w-20 self-center"  />
             <p><%= finalName %></p>
-            <form action="/account/delete" method="POST">
-              <input type="hidden" name="_method" value="DELETE" />
-              <input type="hidden" name="_currentPath" value="<%=path%>" />
-              <input type="hidden" name="_name" value="<%=finalName%>" />
-              <input type="hidden" name="_type" value="<%=finalFileType%>" />
-              <button type="submit" value="Delete">Delete</button>
-            </form>
+            
         </div>
+      </div>
       <%})
       %>
     <%}%>
@@ -64,6 +64,12 @@
 </div>
 
 <script>
+  
+  function toggleOptions(element) {
+    const editFile = (element.parentElement.querySelector(".editFile"))
+    editFile.classList.toggle("hidden")
+    editFile.classList.toggle("window")
+  }
 
   function toggleShow(element) {
     const children = element.children
@@ -78,29 +84,31 @@
   function travelFolder(element) {
     const path = element.dataset.path.split(",")
     const finalName = element.dataset.finalname
+    console.log(finalName)
     let currentPath = "/account/Home"
     for(let i = 1; i < path.length; i++) {
     currentPath +=  "@" + path[i]
     }
-    if(element.classList.contains("pressed")) {
+    if(element.parentElement.classList.contains("pressed")) {
       location.href = currentPath + "@" + finalName;
     }   
   }
   
   function selected() {
-
-  const elements = document.querySelectorAll(".itemContainer")
-  elements.forEach(e => {
-    e.addEventListener("click", function() {
-      if(e.classList.contains("pressed")) {
-          e.classList.remove("pressed")
-        } else {
-      const prev = document.querySelectorAll(".pressed")
-      prev.forEach(e => {e.classList.remove("pressed")})
-      e.classList.add("pressed")
-        }
+    const elements = document.querySelectorAll(".item")
+    console.log(elements)
+    elements.forEach(e => {
+      const parentE = e.parentElement
+      e.addEventListener("click", function() {
+        if(parentE.classList.contains("pressed")) {
+            parentE.classList.remove("pressed")
+          } else {
+        const prev = document.querySelectorAll(".pressed")
+        prev.forEach(parentE => {parentE.classList.remove("pressed")})
+        parentE.classList.add("pressed")
+          }
+      })
     })
-  })
 
  }
   selected()

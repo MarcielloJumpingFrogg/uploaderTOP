@@ -21,14 +21,12 @@ const signUpController: any = [
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       const newUser = await prisma.users.create({
         data: {
-          // id: crypto.randomUUID(),
           username: req.body.username,
           password: hashedPassword,
         },
       });
       req.login(newUser, (err: any) => {
         if (err) throw err;
-        console.log("newUser: ", newUser);
         req.user = newUser;
         res.redirect("/account");
       });

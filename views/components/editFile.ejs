@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<div class="editFile hidden">
+  <form action="/account/delete" method="POST">
+    <input type="hidden" name="_method" value="DELETE" />
+    <input type="hidden" name="_currentPath" value="<%=path%>" />
+    <input type="hidden" name="_name" value="<%=finalName%>" />
+    <input type="hidden" name="_type" value="<%=finalFileType%>" />
+    <button type="submit" value="Delete">Delete</button>
+  </form>
+  <form action="/account/rename" method="POST" >
+    <input type="hidden" name="_method" value="RENAME" />
+    <input type="hidden" name="_currentPath" value="<%=path%>" />
+    <input type="hidden" name="_name" value="<%=finalName%>" />
+    <input type="hidden" name="_type" value="<%=finalFileType%>" />
+    <label for="newName">New Name:</label>
+    <input type="text" name="newName" />
+    <button type="submit" value="Rename">Rename</button>
+  </form>
+</div>

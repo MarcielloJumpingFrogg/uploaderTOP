@@ -7,5 +7,4 @@ export async function updateAvatarVersion(userId: string) {
     where: { id: userId },
     data: { avatarVersion: avatarVersion + 1 },
   });
-  console.log("result: ", result);
 }

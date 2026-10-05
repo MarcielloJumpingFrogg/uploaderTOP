@@ -16,7 +16,6 @@ async function renderAccount(req: any, res: Response) {
   }
   const avatar = await getAvatar(req.user.id);
   const files = await getFiles(req.user.id, fullPath);
-  // console.log("files: ", files[0].item);
   const fileList: {
     id: string;
     type: string;

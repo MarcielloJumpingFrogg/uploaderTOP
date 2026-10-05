@@ -18,7 +18,7 @@ const avatarUploader = [
 
       const uploadName = "avatars/" + req.user.id;
 
-      await uploadFile(file, "avatar", uploadName, req.user.id);
+      await uploadFile(file, "avatar", uploadName);
     } catch (e) {
       customErrorContainer.multerError(e, 400);
     }

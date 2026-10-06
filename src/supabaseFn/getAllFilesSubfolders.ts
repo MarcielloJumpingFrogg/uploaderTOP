@@ -8,7 +8,6 @@ export async function getAllFilesSubfolders(
 ) {
   const fileList = previousResults;
   const result = await readFolder(path, bucket, "server");
-  console.log("result", result);
 
   for (let i = 0; i < result.length; i++) {
     if (result[i].type === "folder") {

@@ -4,6 +4,7 @@ import type { Response, Request } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import { uploadFile } from "../supabaseFn/uploadFile";
 import { createFolder } from "../supabaseFn/createFolder";
+import { getFullPath } from "../functions/getFullPath";
 
 function folderTreeCreator(newName: string, partialLocation: string) {
   const fullName = newName.split("/");
@@ -38,15 +39,8 @@ const fileUploader = [
       const uploadName = partialLocation + newName;
       await uploadFile(file, "Files", uploadName);
     });
-    const pathArray = req.body._location.split(",");
-    let fullPath = "";
-    for (let i = 0; i < pathArray.length; i++) {
-      if (i != 0) {
-        fullPath += "@";
-      }
-      fullPath += pathArray[i];
-    }
-    res.redirect("/account/" + fullPath);
+    const fullPath = getFullPath(req);
+    res.redirect("/account" + fullPath);
   },
 ];
 export { fileUploader };

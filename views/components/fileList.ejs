@@ -84,7 +84,6 @@
   function travelFolder(element) {
     const path = element.dataset.path.split(",")
     const finalName = element.dataset.finalname
-    console.log(finalName)
     let currentPath = "/account/Home"
     for(let i = 1; i < path.length; i++) {
     currentPath +=  "@" + path[i]
@@ -96,7 +95,6 @@
   
   function selected() {
     const elements = document.querySelectorAll(".item")
-    console.log(elements)
     elements.forEach(e => {
       const parentE = e.parentElement
       e.addEventListener("click", function() {

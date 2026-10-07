@@ -19,14 +19,18 @@ export const downloadController = [
         console.error(error);
       }
       const blob = data;
-      const buffer = Buffer.from(await blob.arrayBuffer());
-      const downloadFolder = path.join(__dirname, "../..", "/downloads");
-      console.log("downloadFolder", downloadFolder);
-      await fs.promises.writeFile(
-        downloadFolder + "/" + req.body._name,
-        buffer,
-      );
-      res.download(downloadFolder + "/" + req.body._name);
+      if (blob) {
+        const buffer = Buffer.from(await blob.arrayBuffer());
+        const downloadFolder = path.join(__dirname, "../..", "/downloads");
+        const fullFileName = downloadFolder + "/" + req.body._name;
+
+        await fs.promises.writeFile(fullFileName, buffer);
+        res.download(fullFileName);
+
+        await new Promise((r) => setTimeout(r, 2000));
+
+        fs.unlinkSync(fullFileName);
+      }
 
       // fs.createReadStream(downloadFolder + "/" + req.body._name).pipe(res);
     } catch (e) {

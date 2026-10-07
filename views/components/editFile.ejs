@@ -18,6 +18,7 @@
     <button type="submit" value="Rename">Rename</button>
   </form>
 
+  <% if(finalFileType !== "folder") {%>
   <div>
     <button onclick="toggleOptions(this, '.infos')">Info</button>
     <div class="infos hidden">
@@ -27,11 +28,12 @@
     </div>
   </div>
   
-  <form action="/account/download" method="POST">
-     <input type="hidden" name="_method" value="DOWNLOAD" />
-    <input type="hidden" name="_location" value="<%=path%>" />
-    <input type="hidden" name="_name" value="<%=finalName%>" />
-    <input type="hidden" name="_id" value="<%= file.id %>" />
-    <button type="submit">Download</button>
-  </form>
+    <form action="/account/download" method="POST">
+       <input type="hidden" name="_method" value="DOWNLOAD" />
+      <input type="hidden" name="_location" value="<%=path%>" />
+      <input type="hidden" name="_name" value="<%=finalName%>" />
+      <input type="hidden" name="_id" value="<%= file.id %>" />
+      <button type="submit">Download</button>
+    </form>
+  <% } %>
 </div>

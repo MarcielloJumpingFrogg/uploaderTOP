@@ -17,7 +17,7 @@ export async function getFileList(files: any) {
       filetype = "folder";
     }
 
-    const size = getSize(item);
+    const size = getSize(element);
 
     // const file: any = element;
     const finalFile = {

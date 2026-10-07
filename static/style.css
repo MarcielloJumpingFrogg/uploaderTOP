@@ -163,7 +163,8 @@ input[type="text"], input[type="password"] {
 }
 
 .itemContainer:hover {
-  transform:scale(1.1);
+  /* transform:scale(1.1); */
+  z-index: 2;
   background-color: hsl(48, 97%, 85%, 100%);
 }
 
@@ -219,6 +220,7 @@ input[type="text"], input[type="password"] {
   flex-direction: column;
   justify-content: center;
   top:20%;
+  z-index: 1;
 
 }
 

@@ -45,8 +45,8 @@
 
       <div class="itemContainer" >
         <div>
-          <button  class="menuButton" onclick="toggleOptions(this)"><img  src="/static/menuLines.svg" alt="menuButton" width="20px" height="20px"></button>
-            <%- include("editFile", {finalName: finalName, path: path, finalFileType: finalFileType}) %>
+          <button  class="menuButton" onclick="toggleOptions(this, '.editFile')"><img  src="/static/menuLines.svg" alt="menuButton" width="20px" height="20px"></button>
+            <%- include("editFile", {finalName: finalName, path: path, finalFileType: finalFileType, file: file}) %>
         </div>
         <div class="item element<%= file.id %>" id="element<%= file.id %>"  
           data-finalname = "<%= finalName %>"
@@ -65,8 +65,8 @@
 
 <script>
   
-  function toggleOptions(element) {
-    const editFile = (element.parentElement.querySelector(".editFile"))
+  function toggleOptions(element, className) {
+    const editFile = (element.parentElement.querySelector(className))
     editFile.classList.toggle("hidden")
     editFile.classList.toggle("window")
   }

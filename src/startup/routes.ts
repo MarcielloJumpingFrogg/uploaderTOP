@@ -12,6 +12,7 @@ import { newFolderController } from "../controllers/newFolderController";
 import { getAvatar } from "../supabaseFn/getAvatar";
 import { fileDeleteController } from "../controllers/fileDeleteController";
 import { renameController } from "../controllers/renameController";
+import { downloadController } from "../controllers/downloadController";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -78,6 +79,8 @@ async function routes(app: Express) {
   app.post("/account/delete", fileDeleteController);
 
   app.post("/account/rename", renameController);
+
+  app.post("/account/download", downloadController);
 }
 
 export { routes };

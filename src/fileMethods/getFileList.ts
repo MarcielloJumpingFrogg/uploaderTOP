@@ -1,8 +1,9 @@
 import { getFileType } from "./getFileType";
+import { getSize } from "./getSize";
 import type { element, item, metadata } from "./fileTypes";
 
 export async function getFileList(files: any) {
-  const loadedFiles: { id: string; type: string; name: string }[] = [];
+  const loadedFiles: item[] = [];
 
   files.forEach((element: element) => {
     const item = element.item;
@@ -16,11 +17,17 @@ export async function getFileList(files: any) {
       filetype = "folder";
     }
 
+    const size = getSize(item);
+
     // const file: any = element;
     const finalFile = {
       id: id,
       type: filetype,
       name: item.name,
+      size: size,
+      updated_at: item.updated_at,
+      created_at: item.created_at,
+      metadata: item.metadata,
     };
 
     loadedFiles.push(finalFile);

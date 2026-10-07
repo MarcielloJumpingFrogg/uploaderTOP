@@ -202,6 +202,9 @@
   .self-center {
     align-self: center;
   }
+  .rounded {
+    border-radius: 0.25rem;
+  }
   .border-2 {
     border-style: var(--tw-border-style);
     border-width: 2px;
@@ -371,7 +374,7 @@ input[type="text"], input[type="password"] {
   position: relative;
 }
 .itemContainer:hover {
-  transform: scale(1.1);
+  z-index: 2;
   background-color: hsl(48, 97%, 85%, 100%);
 }
 .item {
@@ -419,6 +422,7 @@ input[type="text"], input[type="password"] {
   flex-direction: column;
   justify-content: center;
   top: 20%;
+  z-index: 1;
 }
 .menuButton {
   position: absolute;

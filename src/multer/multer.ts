@@ -17,6 +17,7 @@ const fileImageFilter = async (
   cb: any,
 ) => {
   // only images
+  console.log("fileImageFilter", file);
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
@@ -32,6 +33,7 @@ const filesCheck = (req: Request, file: Express.Multer.File, cb: any) => {
 };
 
 function getDestination() {
+  console.log("should Remove This Function");
   if (process.env.NODE_ENV == "test") {
     return "tests/testUploads/";
   } else if (process.env.NODE_ENV == "local") {

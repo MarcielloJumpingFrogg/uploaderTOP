@@ -25,6 +25,7 @@ model Users {
   password String 
   fileList Files[]
   avatarVersion Int  @default(0)
+  shared      ShareSession[]
 } 
 
 model Files {
@@ -36,4 +37,24 @@ model Files {
   uploadTime  DateTime @default(now())
   ownerId     String
   owner       Users   @relation(fields: [ownerId], references: [id])
+}
+
+model ShareSession {
+  id            String @id @default(uuid())
+  originalUser  String
+  creator       Users @relation(fields: [originalUser], references: [id])
+  expiration    DateTime @default(now())
+  filePath      String
+  type          String
+  edit          Boolean
+  sharedFiles   SharedFiles[]
+}
+
+model SharedFiles {
+  id            String @id @default(uuid())
+  originalUser  String
+  destinationUser String  
+  expiration      DateTime
+  sessionId       String
+  session         ShareSession @relation(fields: [sessionId], references: [id])
 }

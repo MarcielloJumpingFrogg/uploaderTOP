@@ -12,6 +12,7 @@ export async function uploadFile(file: any, bucket: string, name: string) {
         contentType: file.mimetype,
       });
 
+    console.log("uploadFile: ", result);
     return result;
   } catch (e) {
     console.error("Error catched: ", e);

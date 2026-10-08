@@ -4,6 +4,7 @@ import { readFolder } from "../supabaseFn/readFolder";
 export async function getFiles(userId: string, currentFolder: string) {
   const name = userId + "/" + currentFolder;
   const result = await readFolder(name, "Files", "user");
+  console.log("getFilesa; ", result);
   return result;
 }
 

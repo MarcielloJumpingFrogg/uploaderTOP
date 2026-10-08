@@ -11,15 +11,16 @@ async function resetDb() {
 }
 
 async function resetUploads() {
-  const dir = __dirname + "/testUploads/";
-  fs.readdir(dir, (err, files) => {
-    if (err) throw err;
-    for (const file of files) {
-      fs.rm(path.join(dir, file), { recursive: true }, (err) => {
-        if (err) throw err;
-      });
-    }
-  });
+  // const dir = __dirname + "/testUploads/";
+  // fs.readdir(dir, (err, files) => {
+  //   if (err) throw err;
+  //   for (const file of files) {
+  //     fs.rm(path.join(dir, file), { recursive: true }, (err) => {
+  //       if (err) throw err;
+  //     });
+  //   }
+  // });
+  console.log("Removed ResetUploads");
 }
 
 export { resetDb, resetUploads };

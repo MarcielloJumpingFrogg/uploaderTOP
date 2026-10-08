@@ -8,6 +8,7 @@ import { uploadFile } from "../supabaseFn/uploadFile";
 const avatarUploader = [
   uploadImage.single("avatar"),
   async (req: any, res: Response, _next: Function) => {
+    console.log("avatarUploader: ", req.file, req.user);
     customErrorContainer.resetError();
 
     try {

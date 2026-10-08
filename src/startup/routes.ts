@@ -81,6 +81,14 @@ async function routes(app: Express) {
   app.post("/account/rename", renameController);
 
   app.post("/account/download", downloadController);
+
+  app.post("/share/add/:shareId", () => {
+    console.log("to implement");
+  });
+
+  app.post("/share/create", () => {
+    console.log("to implement");
+  });
 }
 
 export { routes };

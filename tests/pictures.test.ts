@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
-import fs from "node:fs";
 import { app } from "../app";
 
-import { resetDb, resetUploads } from "./functions";
+import { resetBuckets, resetDb, resetUploads } from "./functions";
 
 beforeEach(async () => {
   await resetUploads();
   await resetDb();
+  await resetBuckets();
 });
 
 describe("Testing Multer", () => {
@@ -53,30 +53,31 @@ describe("picture check", () => {
   it("Change Picture", async () => {
     const cred = { username: "pictureCheck", password: "Password1234!" };
     const agent = request.agent(app);
+    console.log("signUp");
     await agent
       .post("/signUp")
       .type("form")
       .send({ username: cred.username, password: cred.password });
-    // const dir = __dirname + "/testUploads/";
 
-    await agent
-      .post("/account/avatar")
-      .attach("avatar", __dirname + "/testFiles/avatar.jpg")
-      .expect(302);
-
-    // fs.readdir(dir, (err, files) => {
-    //   if (err) throw err;
-    //   expect(files.length).toBe(1);
-    // });
-
+    console.log("first");
     await agent
       .post("/account/avatar")
       .attach("avatar", __dirname + "/testFiles/spiderMan.jpg")
       .expect(302);
 
-    // fs.readdir(dir, (err, files) => {
-    //   if (err) throw err;
-    //   expect(files.length).toBe(1);
-    // });
+    console.log("second");
+    await agent
+      .post("/account/avatar")
+      .attach("avatar", __dirname + "/testFiles/avatar.jpg")
+      .expect(302);
+    const apiResult = await agent.get("/api/user");
+    console.log("apiResult", apiResult._body.user);
+
+    const avatarResponse = await agent.get("/avatar");
+
+    expect(avatarResponse.headers.location).toContain(apiResult._body.user.id);
+    expect(avatarResponse.headers.location).toContain(
+      apiResult._body.user.avatarVersion,
+    );
   });
 });

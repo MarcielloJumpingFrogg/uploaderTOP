@@ -13,6 +13,7 @@ import { getAvatar } from "../supabaseFn/getAvatar";
 import { fileDeleteController } from "../controllers/fileDeleteController";
 import { renameController } from "../controllers/renameController";
 import { downloadController } from "../controllers/downloadController";
+import { shareCreatorController } from "../controllers/shareCreatorController";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -30,7 +31,7 @@ async function routes(app: Express) {
     });
   });
 
-  app.get("/api/login", (req, res) => {
+  app.get("/api/user", (req, res) => {
     res.json({ user: req.user });
   });
 
@@ -64,11 +65,20 @@ async function routes(app: Express) {
   app.get("/account/:path", folderVisualizer);
 
   app.post("/account/avatar", avatarUploader);
+  app.get("/avatar", async (req: any, res) => {
+    if (req.user.id === undefined) {
+      console.error("NO REQ.USER.ID");
+    } else {
+      const avatar = await getAvatar(req.user.id);
+      res.redirect(avatar);
+    }
+  });
 
   app.post("/account/newFolder", newFolderController);
 
   app.get("/img/:imageName", async (req, res) => {
     const imageName = req.params.imageName;
+    console.log("imageName: ", imageName);
     const avatarLink = await getAvatar(imageName);
     const readStream = fs.createReadStream(avatarLink || "");
     readStream.pipe(res);
@@ -86,9 +96,7 @@ async function routes(app: Express) {
     console.log("to implement");
   });
 
-  app.post("/share/create", () => {
-    console.log("to implement");
-  });
+  app.post("/share/create", shareCreatorController);
 }
 
 export { routes };

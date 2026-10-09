@@ -4,11 +4,11 @@ import customErrorContainer from "../customErrors/customErrorContainer";
 import { uploadImage } from "../multer/multer";
 import { decode } from "base64-arraybuffer";
 import { uploadFile } from "../supabaseFn/uploadFile";
+import { uploadAvatar } from "../supabaseFn/uploadAvatar";
 
 const avatarUploader = [
   uploadImage.single("avatar"),
   async (req: any, res: Response, _next: Function) => {
-    console.log("avatarUploader: ", req.file, req.user);
     customErrorContainer.resetError();
 
     try {
@@ -19,7 +19,8 @@ const avatarUploader = [
 
       const uploadName = "avatars/" + req.user.id;
 
-      await uploadFile(file, "avatar", uploadName);
+      // await uploadFile(file, "avatar", uploadName);
+      await uploadAvatar(file, req.user.id);
     } catch (e) {
       customErrorContainer.multerError(e, 400);
     }

@@ -1,7 +1,6 @@
 import { prisma } from "../../lib/prisma";
 
 export async function uploadToDb(file: any, path: string, userId: string) {
-  console.log("file", file);
   const fileName = file.name;
   const result = prisma.files.create({
     data: {
@@ -12,5 +11,5 @@ export async function uploadToDb(file: any, path: string, userId: string) {
       ownerId: userId,
     },
   });
-  console.log(result);
+  return result;
 }

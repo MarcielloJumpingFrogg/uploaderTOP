@@ -1,7 +1,7 @@
 import type { item, element, metadata } from "./fileTypes";
 
 export function getFileType(element: element) {
-  let filetype: string;
+  let filetype;
   const extensions = [
     "ae",
     "avi",

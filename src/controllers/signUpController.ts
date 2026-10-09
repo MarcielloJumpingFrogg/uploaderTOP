@@ -4,7 +4,6 @@ import { validationResult } from "express-validator";
 import { validateUser } from "./validateUser";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "node:fs";
-import { getDestination } from "../multer/multer";
 import path from "node:path";
 
 const signUpController: any = [

@@ -6,9 +6,10 @@ async function createBucket(
   name: string,
   mimetype: Array<string>,
   fileSizeLimit: number,
+  isPublic: boolean,
 ) {
   const result = await admin_supabase.storage.createBucket(name, {
-    public: false,
+    public: isPublic,
     allowedMimeTypes: mimetype,
     fileSizeLimit: fileSizeLimit,
   });
@@ -16,6 +17,6 @@ async function createBucket(
   console.log("bucket result: ", result);
 }
 
-createBucket("avatar", ["image/*"], mb * 5);
+// createBucket("avatar", ["image/*"], mb * 5);
 
 export { createBucket };

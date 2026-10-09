@@ -22,4 +22,14 @@ type metadata = {
   httpStatusCode: number;
 };
 
-export type { element, item, metadata };
+type finalFile = {
+  name: string;
+  id: string;
+  size: string;
+  type: any;
+  updated_at: Date;
+  created_at: Date;
+  metadata: metadata;
+};
+
+export type { element, item, metadata, finalFile };

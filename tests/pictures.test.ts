@@ -53,25 +53,22 @@ describe("picture check", () => {
   it("Change Picture", async () => {
     const cred = { username: "pictureCheck", password: "Password1234!" };
     const agent = request.agent(app);
-    console.log("signUp");
     await agent
       .post("/signUp")
       .type("form")
       .send({ username: cred.username, password: cred.password });
 
-    console.log("first");
     await agent
       .post("/account/avatar")
       .attach("avatar", __dirname + "/testFiles/spiderMan.jpg")
       .expect(302);
 
-    console.log("second");
     await agent
       .post("/account/avatar")
       .attach("avatar", __dirname + "/testFiles/avatar.jpg")
       .expect(302);
     const apiResult = await agent.get("/api/user");
-    console.log("apiResult", apiResult._body.user);
+    // console.log("apiResult", apiResult._body.user);
 
     const avatarResponse = await agent.get("/avatar");
 

@@ -1,6 +1,7 @@
 import { admin_supabase } from "../../config/supabase";
 import { updateAvatarVersion } from "../prismaDb/updateAvatarVersion";
 import { getFileBase64 } from "../fileMethods/getFileBase64";
+import logger from "../../config/logger";
 
 export async function updateAvatar(name: string, newFile: any, userId: string) {
   try {
@@ -14,6 +15,6 @@ export async function updateAvatar(name: string, newFile: any, userId: string) {
     await updateAvatarVersion(userId);
     return result;
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 }

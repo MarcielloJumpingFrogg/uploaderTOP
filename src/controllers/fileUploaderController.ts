@@ -5,6 +5,7 @@ import customErrorContainer from "../customErrors/customErrorContainer";
 import { uploadFile } from "../supabaseFn/uploadFile";
 import { createFolder } from "../supabaseFn/createFolder";
 import { getFullPath } from "../functions/getFullPath";
+import { prisma } from "../../lib/prisma";
 
 function folderTreeCreator(newName: string, partialLocation: string) {
   const fullName = newName.split("/");
@@ -37,10 +38,43 @@ const fileUploader = [
       folderTreeCreator(newName, partialLocation);
 
       const uploadName = partialLocation + newName;
-      await uploadFile(file, "Files", uploadName);
+      const uploadFileResult = await uploadFile(file, "Files", uploadName);
+      const prismaFileList = await prisma.files.create({
+        data: {
+          path: uploadFileResult?.data?.path,
+          fileName: uploadName,
+          fileId: uploadFileResult?.data?.id,
+          mimetype: file.mimetype,
+          size: file.size,
+          currentUser: req.user.id,
+          ownerId: req.user.id,
+        },
+      });
+      // console.log(
+      //   "uploadFileResult",
+      //   uploadFileResult,
+      //   "file",
+      //   file,
+      //   "uploadName",
+      //   uploadName,
+      // );
     });
     const fullPath = getFullPath(req);
     res.redirect("/account" + fullPath);
   },
 ];
 export { fileUploader };
+
+/*
+ * {
+  fileId      String  @id @default(uuid())
+  path        String  @unique
+  fileName    String  //not sure if it's usefull if i already have the id but okay, maybe for the locally saved files
+  mimetype    String
+  size        Int
+  uploadTime  DateTime @default(now())
+  currentUser String
+  ownerId     String
+  owner       Users   @relation(fields: [currentUser], references: [id])
+}
+ * */

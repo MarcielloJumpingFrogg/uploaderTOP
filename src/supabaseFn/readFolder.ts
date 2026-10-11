@@ -1,3 +1,4 @@
+import logger from "../../config/logger";
 import { admin_supabase } from "../../config/supabase";
 
 export async function readFolder(
@@ -14,8 +15,11 @@ export async function readFolder(
         offset: 0,
         sortBy: { column: "name", order: "asc" },
       });
+    console.log("readFolder folder: ", folder);
     // Handle files vs folders
+    console.log("dataa; ", data);
     data?.forEach((item) => {
+      console.log("dataItem: ", item);
       if (item.id !== null) {
         // It's a file
         if (item.name !== ".emptyFolderPlaceholder" || context !== "user") {
@@ -27,7 +31,7 @@ export async function readFolder(
       }
     });
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
   return FullList;
 }

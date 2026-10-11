@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+
+<% if(popUp.title) { %>
+<div>
+  <h1 class=""><%= popUp.title %> </h1>
+  <p id="shareLink" class="link"><%= popUp.text %></p>
+  <button onclick="copyLink()"><img src="/static/copy.svg" width="30px" /></button>
+</div>
+
+<script>
+  function copyLink() {
+  var copyText = document.getElementById("shareLink");
+  navigator.clipboard.writeText(copyText.innerText);
+  copyText.classList.add("bg-red-200")
+}
+</script>
+
+<%}%>

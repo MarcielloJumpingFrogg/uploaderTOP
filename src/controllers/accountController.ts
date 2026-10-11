@@ -3,6 +3,7 @@ import type { Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import { getFiles } from "../dbMethods/getFiles";
 import { getFileList } from "../fileMethods/getFileList";
+import "colors";
 
 async function renderAccount(req: any, res: Response) {
   let tempPath = ["Home"];
@@ -22,6 +23,10 @@ async function renderAccount(req: any, res: Response) {
     name: string;
   }[] = await getFileList(files);
 
+  let popUp = {};
+  if (req.popUp) {
+    popUp = req.popUp;
+  }
   res.status(customErrorContainer.getErrorCode()).render("account", {
     user: req.user,
     files: fileList,
@@ -29,6 +34,7 @@ async function renderAccount(req: any, res: Response) {
     errors: customErrorContainer.getErrorList(),
     avatar: avatar,
     path: tempPath,
+    popUp: popUp,
   });
 }
 

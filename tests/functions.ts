@@ -9,11 +9,11 @@ const mb = 1028 * 1028;
 
 async function resetDb() {
   await prisma.$transaction([
-    prisma.files.deleteMany(),
-    prisma.users.deleteMany(),
-    prisma.session.deleteMany(),
-    prisma.shareSession.deleteMany(),
-    prisma.sharedFiles.deleteMany(),
+    // prisma.sharedFiles.deleteMany(),
+    // prisma.shareSession.deleteMany(),
+    // prisma.files.deleteMany(),
+    // prisma.users.deleteMany(),
+    // prisma.session.deleteMany(),
   ]);
 }
 
@@ -27,7 +27,7 @@ async function resetUploads() {
   //     });
   //   }
   // });
-  console.log("Removed ResetUploads");
+  // console.log("Removed ResetUploads");
 }
 
 async function deleteAndCreateBuckets() {
@@ -42,18 +42,11 @@ async function deleteAndCreateBuckets() {
     true,
   );
   const createFilesResult = await createBucket("Files", [], 5 * mb, false);
-  console.log("deleteAvatarResult", deleteAvatarResult);
-  console.log("deleteFilesResult", deleteFilesResult);
-  console.log("createAvatarResult", createAvatarResult);
-  console.log("createFilesResult", createFilesResult);
 }
 
 async function resetBuckets() {
-  console.log("resetBuckets");
   const resultAvatar = await recursiveDelete("avatars", "avatar");
   const resultFiles = await recursiveDelete("/", "Files");
-  console.log("resultAvatar", resultAvatar);
-  console.log("resultFiles", resultFiles);
 }
 
 export { resetDb, resetUploads, deleteAndCreateBuckets, resetBuckets };

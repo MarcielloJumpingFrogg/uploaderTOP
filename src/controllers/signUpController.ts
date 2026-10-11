@@ -5,6 +5,7 @@ import { validateUser } from "./validateUser";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "node:fs";
 import path from "node:path";
+import logger from "../../config/logger";
 
 const signUpController: any = [
   validateUser,
@@ -40,7 +41,7 @@ const signUpController: any = [
         const genericError =
           "There has been an unexpected error, please try again later";
         customErrorContainer.signUpError(genericError, 400);
-        console.error(e);
+        logger.error(e);
         return res
           .status(customErrorContainer.getErrorCode())
           .render("signUp", { errors: customErrorContainer.getErrorList() });

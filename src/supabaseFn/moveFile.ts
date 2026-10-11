@@ -1,3 +1,4 @@
+import logger from "../../config/logger";
 import { admin_supabase } from "../../config/supabase";
 
 export async function moveFile(
@@ -10,6 +11,6 @@ export async function moveFile(
       .from(bucket)
       .move(oldFileName, newFileName);
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 }

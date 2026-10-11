@@ -1,3 +1,4 @@
+import logger from "../../config/logger";
 import { admin_supabase } from "../../config/supabase";
 import { getFileBase64 } from "../fileMethods/getFileBase64";
 
@@ -14,6 +15,6 @@ export async function uploadFile(file: any, bucket: string, name: string) {
 
     return result;
   } catch (e) {
-    console.error("Error catched: ", e);
+    logger.error("Error catched: ", e);
   }
 }

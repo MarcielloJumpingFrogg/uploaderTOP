@@ -14,6 +14,8 @@ import { fileDeleteController } from "../controllers/fileDeleteController";
 import { renameController } from "../controllers/renameController";
 import { downloadController } from "../controllers/downloadController";
 import { shareCreatorController } from "../controllers/shareCreatorController";
+import { addSharedFileCtrl } from "../controllers/addSharedFileCtrl";
+import logger from "../../config/logger";
 
 async function routes(app: Express) {
   app.get("/", (req, res) => {
@@ -65,9 +67,10 @@ async function routes(app: Express) {
   app.get("/account/:path", folderVisualizer);
 
   app.post("/account/avatar", avatarUploader);
+
   app.get("/avatar", async (req: any, res) => {
     if (req.user.id === undefined) {
-      console.error("NO REQ.USER.ID");
+      logger.error("NO REQ.USER.ID");
     } else {
       const avatar = await getAvatar(req.user.id);
       res.redirect(avatar);
@@ -92,9 +95,7 @@ async function routes(app: Express) {
 
   app.post("/account/download", downloadController);
 
-  app.post("/share/add/:shareId", () => {
-    console.log("to implement");
-  });
+  app.get("/share/add/:shareId", addSharedFileCtrl);
 
   app.post("/share/create", shareCreatorController);
 }

@@ -4,6 +4,7 @@ import { admin_supabase } from "../../config/supabase";
 import { createReadStream, createWriteStream } from "node:fs";
 import fs from "fs";
 import path from "node:path";
+import logger from "../../config/logger";
 
 export const downloadController = [
   async (req: Request, res: Response) => {
@@ -16,7 +17,7 @@ export const downloadController = [
         .download(fullFilePath);
 
       if (error) {
-        console.error(error);
+        logger.error(error);
       }
       const blob = data;
       if (blob) {
@@ -34,7 +35,7 @@ export const downloadController = [
 
       // fs.createReadStream(downloadFolder + "/" + req.body._name).pipe(res);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   },
 ];

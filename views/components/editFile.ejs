@@ -36,4 +36,15 @@
       <button type="submit">Download</button>
     </form>
   <% } %>
+
+  <form action="/share/create" method="POST" >
+    <input type="hidden" name="_location" value="<%= path %>"  />
+    <input type="hidden" name="_name" value="<%=finalName%>" />
+    <input type="hidden" name="_fileType" value="<%=finalFileType%>" />
+    <label for="daysExpiration">Number of days for sharing</label>
+    <input type="number" name="daysExpiration" />
+    <label>Can Be Edited?: </label>
+    <input type="checkbox" name="canEdit" />
+    <button type="submit">Create Link</button>
+  </form>
 </div>

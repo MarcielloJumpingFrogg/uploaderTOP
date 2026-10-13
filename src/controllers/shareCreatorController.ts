@@ -8,7 +8,6 @@ export const shareCreatorController = [
   async (req: Request, res: Response) => {
     try {
       let itemName = "";
-      console.log("req.body.shareCreatorController: ", req.body);
       if (!req.body._path) {
         const currentPath = req.body._location.replaceAll(",", "/");
         itemName = req.user.id + "/" + currentPath + "/" + req.body._name;
@@ -16,14 +15,13 @@ export const shareCreatorController = [
         itemName = req.body._path;
       }
 
-      const pullResult = await admin_supabase.storage
-        .from("Files")
-        .info(itemName);
-
-      logger.error("Gotta change some stuff sleepy");
-      const readFolderResult = await readFolder(itemName, "Files", "user");
-      console.log("readFolderResult", readFolderResult);
-      console.log("pullResult", pullResult);
+      let fileType;
+      if (req.body._fileType) {
+        fileType = req.body._fileType;
+      } else {
+        logger.error("MISSING FILETYPE IN THE REQUEST BODY");
+        fileType = "other";
+      }
 
       const dayInMs = 24 * 60 * 60 * 1000;
       let expiration = 1;
@@ -34,13 +32,12 @@ export const shareCreatorController = [
       const expirationDay = Date.now() + expiration;
 
       const canBeEdited = req.body.canEdit === "on" ? true : false;
-
       const prismaResult = await prisma.shareSession.create({
         data: {
           originalUser: req.user.id,
           filePath: itemName,
           expiration: new Date(expirationDay),
-          type: pullResult.data?.contentType,
+          type: fileType,
           edit: canBeEdited,
         },
       });

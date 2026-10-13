@@ -1,55 +1,54 @@
-import { createRequire } from "node:module"
-const require = createRequire(import.meta.url)
-import { prisma } from "../lib/prisma"
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+import { prisma } from "../lib/prisma";
 
-const passport = require("passport")
-const LocalStrategy = require("passport-local").Strategy
-import bcrypt from "bcryptjs"
-import customErrorContainer from "../src/customErrors/customErrorContainer"
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+import bcrypt from "bcryptjs";
+import customErrorContainer from "../src/customErrors/customErrorContainer";
+import logger from "./logger";
 
+const strategy = new LocalStrategy(
+  async (username: string, password: string, done: Function) => {
+    try {
+      const user = await prisma.users.findFirst({
+        where: {
+          username: username,
+        },
+      });
 
-
-
-const strategy = new LocalStrategy(async (username: string, password: string, done: Function) => {
-  try {
-    const user = await prisma.users.findFirst({
-      where: {
-        "username": username
+      if (!user) {
+        const error = { message: "Incorrect Username" };
+        customErrorContainer.passportError(error, 406);
+        return done(null, false, error);
       }
-    })
-
-    if (!user) {
-      const error = {message: "Incorrect Username"}
-      customErrorContainer.passportError(error, 406)
-      return done(null, false, error)
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) {
+        const error = { message: "Incorrect password" };
+        customErrorContainer.passportError(error, 406);
+        return done(null, false, error);
+      }
+      return done(null, user);
+    } catch (e) {
+      logger.error("Error: ", e);
+      return done(e);
     }
-    const match = await bcrypt.compare(password, user.password)
-    if (!match) {
+  },
+);
 
-      const error = { message: "Incorrect password" }
-      customErrorContainer.passportError(error, 406)
-      return done(null, false, error)
-    }
-    return done(null, user)
-  } catch (e) {
-    console.log("Error: ", e)
-    return done(e)
-  }
-})
-
-passport.use(strategy)
+passport.use(strategy);
 
 passport.serializeUser((user: any, done: Function) => {
-  done(null, user.id)
-})
+  done(null, user.id);
+});
 
 passport.deserializeUser(async (userId: number, done: Function) => {
   try {
-    const user = await prisma.users.findFirst({ where: { "id": userId } })
-    done(null, user)
+    const user = await prisma.users.findFirst({ where: { id: userId } });
+    done(null, user);
   } catch (e) {
-    done(e)
+    done(e);
   }
-})
+});
 
-export { passport }
+export { passport };

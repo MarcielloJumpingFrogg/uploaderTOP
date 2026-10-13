@@ -30,33 +30,14 @@ export const addSharedFileCtrl = [
                 sessionId: shareSession?.id,
               },
             });
-            console.log("shareSession", shareSession);
-            console.log("addSharedFile", addSharedFile);
-            console.log(
-              shareSession.filePath,
-              "\n",
-              shareSession.filePath,
-              "\n",
 
-              shareSession.id,
-              "\n",
-
-              shareSession.type,
-              "\n",
-
-              10,
-              "\n",
-              req.user.id,
-              "\n",
-
-              shareSession.originalUser,
-              "\n",
-            );
+            const pathShareSession = shareSession.filePath.split("/");
+            const fileName = pathShareSession[pathShareSession.length - 1];
             const someResult = await prisma.files.create({
               data: {
                 fileId: shareSession.id,
                 path: shareSession.filePath,
-                fileName: shareSession.filePath + "waa",
+                fileName: fileName,
                 mimetype: shareSession.type,
                 size: 10,
                 uploadTime: new Date(),
@@ -64,8 +45,6 @@ export const addSharedFileCtrl = [
                 ownerId: shareSession.originalUser,
               },
             });
-
-            console.log("addSharedFile: ", addSharedFile);
 
             res.redirect("/account");
           }

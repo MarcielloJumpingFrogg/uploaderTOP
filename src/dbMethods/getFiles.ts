@@ -2,12 +2,11 @@ import { readFile } from "../supabaseFn/readFile";
 import { admin_supabase } from "../../config/supabase";
 import { prisma } from "../../lib/prisma";
 import { readFolder } from "../supabaseFn/readFolder";
+import { getFromPath } from "./getFromPath";
 
 export async function getFiles(userId: string, currentFolder: string) {
   const name = userId + "/" + currentFolder;
-  console.log("name something: ", name);
   const result = await readFolder(name, "Files", "user");
-  console.log("getFiles: ", result);
 
   const fileSharedFromOthers = await prisma.files.findMany({
     where: {
@@ -18,14 +17,13 @@ export async function getFiles(userId: string, currentFolder: string) {
     },
   });
 
-  fileSharedFromOthers.forEach(async (file) => {
-    console.log(file.path);
-    const fileResult = await readFolder(file.path, "Files", "user");
-    console.log(fileResult);
-    result.push(fileResult);
-  });
-
-  console.log("fileSharedFromOthers", fileSharedFromOthers);
+  for (let i = 0; i < fileSharedFromOthers.length; i++) {
+    const file = fileSharedFromOthers[i];
+    const getFromPathResult = await getFromPath(file);
+    for (let j = 0; j < getFromPathResult.length; j++) {
+      result.push(getFromPathResult[j]);
+    }
+  }
 
   return result;
 }

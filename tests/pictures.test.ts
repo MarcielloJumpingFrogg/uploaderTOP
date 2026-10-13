@@ -2,10 +2,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
 import { app } from "../app";
 
-import { resetBuckets, resetDb, resetUploads } from "./functions";
+import { resetBuckets, resetDb } from "./functions";
 
 beforeEach(async () => {
-  await resetUploads();
   await resetDb();
   await resetBuckets();
 });

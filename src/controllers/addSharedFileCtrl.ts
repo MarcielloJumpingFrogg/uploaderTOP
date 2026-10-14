@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import { prisma } from "../../lib/prisma";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import logger from "../../config/logger";
@@ -22,7 +22,7 @@ export const addSharedFileCtrl = [
           if (req.user.id === undefined) {
             throw new Error("!req.user.id");
           } else {
-            const addSharedFile = await prisma.sharedFiles.create({
+            const _addSharedFile = await prisma.sharedFiles.create({
               data: {
                 originalUser: shareSession?.originalUser,
                 destinationUser: req.user.id,

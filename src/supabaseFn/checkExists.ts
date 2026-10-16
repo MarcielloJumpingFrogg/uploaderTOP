@@ -6,10 +6,11 @@ export async function checkExists(fileName: string, bucket: string) {
     const { data, error } = await admin_supabase.storage
       .from(bucket)
       .exists(fileName);
-    return data;
+    if (error === null) {
+      return data;
+    }
   } catch (e) {
     logger.error(e);
-
     return false;
   }
 }

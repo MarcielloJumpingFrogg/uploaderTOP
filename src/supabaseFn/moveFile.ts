@@ -7,7 +7,7 @@ export async function moveFile(
   bucket: string,
 ) {
   try {
-    const result = await admin_supabase.storage
+    const _result = await admin_supabase.storage
       .from(bucket)
       .move(oldFileName, newFileName);
   } catch (e) {

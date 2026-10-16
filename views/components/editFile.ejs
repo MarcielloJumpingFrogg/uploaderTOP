@@ -8,7 +8,7 @@
     <input type="hidden" name="_type" value="<%=finalFileType%>" />
     <button type="submit" value="Delete">Delete</button>
   </form>
-  <form action="/account/rename" method="POST" >
+  <form action="/account/rename" method="POST">
     <input type="hidden" name="_method" value="RENAME" />
     <input type="hidden" name="_location" value="<%=path%>" />
     <input type="hidden" name="_name" value="<%=finalName%>" />
@@ -27,18 +27,18 @@
       <p><b>File Upload Time: </b><%=file.created_at%></p>
     </div>
   </div>
-  
-    <form action="/account/download" method="POST">
-       <input type="hidden" name="_method" value="DOWNLOAD" />
-      <input type="hidden" name="_location" value="<%=path%>" />
-      <input type="hidden" name="_name" value="<%=finalName%>" />
-      <input type="hidden" name="_id" value="<%= file.id %>" />
-      <button type="submit">Download</button>
-    </form>
+
+  <form action="/account/download" method="POST">
+    <input type="hidden" name="_method" value="DOWNLOAD" />
+    <input type="hidden" name="_location" value="<%=path%>" />
+    <input type="hidden" name="_name" value="<%=finalName%>" />
+    <input type="hidden" name="_id" value="<%= file.id %>" />
+    <button type="submit">Download</button>
+  </form>
   <% } %>
 
-  <form action="/share/create" method="POST" >
-    <input type="hidden" name="_location" value="<%= path %>"  />
+  <form action="/share/create" method="POST">
+    <input type="hidden" name="_location" value="<%= path %>" />
     <input type="hidden" name="_name" value="<%=finalName%>" />
     <input type="hidden" name="_fileType" value="<%=finalFileType%>" />
     <label for="daysExpiration">Number of days for sharing</label>

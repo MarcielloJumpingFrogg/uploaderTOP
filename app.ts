@@ -1,5 +1,4 @@
 import express from "express";
-import { result } from "./config/db";
 import { passport } from "./config/passport";
 import { routes } from "./src/startup/routes";
 import type { Express } from "express";

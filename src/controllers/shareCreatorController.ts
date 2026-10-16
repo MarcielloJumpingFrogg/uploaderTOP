@@ -1,9 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
-import { admin_supabase } from "../../config/supabase";
 import logger from "../../config/logger";
 import { renderAccount } from "./accountController";
-import { readFolder } from "../supabaseFn/readFolder";
 export const shareCreatorController = [
   async (req: Request, res: Response) => {
     try {

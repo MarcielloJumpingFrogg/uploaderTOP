@@ -1,4 +1,3 @@
-import { admin_supabase } from "../../config/supabase";
 import { deleteFile } from "./deleteFile";
 import { readFolder } from "./readFolder";
 

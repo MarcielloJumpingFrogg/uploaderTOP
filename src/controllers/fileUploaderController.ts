@@ -39,7 +39,7 @@ const fileUploader = [
 
       const uploadName = partialLocation + newName;
       const uploadFileResult = await uploadFile(file, "Files", uploadName);
-      const prismaFileList = await prisma.files.create({
+      const _prismaFileList = await prisma.files.create({
         data: {
           path: uploadFileResult?.data?.path,
           fileName: uploadName,

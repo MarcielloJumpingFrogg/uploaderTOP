@@ -1,28 +1,41 @@
 <!DOCTYPE html>
 
-
 <header>
-    <a class="text-3xl" href="/account" >Welcome Back <span class="underline italic"><%= user.username %></span></a>
-    <div class="imageContainer">
-      <img src="<%= avatar %>" class="avatar header-avatar" onclick="toggleVisibility()" />
-			<div id="user_modal" class="hidden user_modal" >
-				<div class="user_modal_header flex">
-          <img src="<%= avatar %>" class="avatar menu-avatar" onclick="toggleVisibility()" />
-          <span class="username"><%= user.username %></span>
-        </div>
-        <div class="user_modal_actions">
-          <hr class="solid">
-          <form action="/account/avatar" method="post" enctype="multipart/form-data">
-            <label for="AvatarFile">Upload An Avatar: </label>
-            <input type="file" name="avatar" id="AvatarFile" required />
-            <br />
-            <button type="submit" class="submit-button">Confirm</button>
-          </form>
-        </div>
-        <div class="user_modal_footer">    <hr class="solid">
+  <a class="text-3xl" href="/account"
+    >Welcome Back <span class="underline italic"><%= user.username %></span></a
+  >
+  <div class="imageContainer">
+    <img
+      src="<%= avatar %>"
+      class="avatar header-avatar"
+      onclick="toggleVisibility()"
+    />
+    <div id="user_modal" class="hidden user_modal">
+      <div class="user_modal_header flex">
+        <img
+          src="<%= avatar %>"
+          class="avatar menu-avatar"
+          onclick="toggleVisibility()"
+        />
+        <span class="username"><%= user.username %></span>
+      </div>
+      <div class="user_modal_actions">
+        <hr class="solid" />
+        <form
+          action="/account/avatar"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <label for="AvatarFile">Upload An Avatar: </label>
+          <input type="file" name="avatar" id="AvatarFile" required />
+          <br />
+          <button type="submit" class="submit-button">Confirm</button>
+        </form>
+      </div>
+      <div class="user_modal_footer">
+        <hr class="solid" />
         <a href="/log-out" class="log-out">LOG OUT</a>
-        </div>
       </div>
     </div>
-  </header>
-
+  </div>
+</header>

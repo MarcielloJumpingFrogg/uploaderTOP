@@ -1,10 +1,9 @@
 import { resetDb, resetBuckets } from "./functions";
-import { beforeEach, expect, it, describe } from "vitest";
+import { /*beforeEach,*/ expect, it, describe } from "vitest";
 import { app } from "../app";
 import request from "supertest";
 import { prisma } from "../lib/prisma";
 import { getFiles } from "../src/dbMethods/getFiles";
-import { admin_supabase } from "../config/supabase";
 
 // beforeEach(async () => {
 await resetDb();
@@ -45,6 +44,7 @@ describe("Implementing the functionality of share", async () => {
     .expect(302);
 
   const shareFilePath = firstId + "/Home/newFolder/newFile";
+
   const shareResult = await firstAgent
     .post("/share/create")
     .send({
@@ -59,7 +59,11 @@ describe("Implementing the functionality of share", async () => {
     where: { filePath: shareFilePath },
   });
 
+  if (shareSession === undefined) {
+    throw new Error("shareSession is undefined");
+  }
   expect(shareSession.length).toBe(1);
+
   const idShared = shareSession[0].id;
 
   it("A user logs in and tries to share the file", async () => {
@@ -90,7 +94,7 @@ describe("Implementing the functionality of share", async () => {
   });
 
   it("There are multiple files in a single shared folder: ", async () => {
-    const firstResult = await firstAgent
+    const _firstResult = await firstAgent
       .post("/account/file")
       .type("form")
       .field("newName", "/newFolder/newSubFolder/newFile2")
@@ -113,10 +117,12 @@ describe("Implementing the functionality of share", async () => {
       where: { filePath: secondShareFilePath },
     });
 
+    if (secondShareSession === null) {
+      throw new Error("Second Share Session is null");
+    }
     expect(secondShareResult.text).toContain(
       "/share/add/" + secondShareSession.id,
     );
-
     await secondAgent.get("/share/add/" + secondShareSession.id).expect(302);
 
     const sourceFileSecondShare = await getFiles(firstId, "Home");

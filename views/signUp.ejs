@@ -3,17 +3,32 @@
 <%- include("partials/head", {title: "Create User"}) %>
 
 <header>
-  <H1 class="text-3xl">Sign Up</H1>
+  <h1 class="text-3xl">Sign Up</h1>
   <a href="/login" class="italic underline text-2xl">Login</a>
 </header>
 
-<h1 class="font-bold">PLEASE FOR FUCK SAKE REMOVE NOVALIDATE BEFORE YOU WASTE TIME</h1>
+<h1 class="font-bold">
+  PLEASE FOR FUCK SAKE REMOVE NOVALIDATE BEFORE YOU WASTE TIME
+</h1>
 <%- include("partials/errors") %>
-<form method=POST action="/signUp" novalidate>
+<form method="POST" action="/signUp" novalidate>
   <label for="username">User Name:</label>
-  <input type="text" name="username" id="username" required minlength=3 maxlength=15/>
+  <input
+    type="text"
+    name="username"
+    id="username"
+    required
+    minlength="3"
+    maxlength="15"
+  />
   <label for="password">Password:</label>
-  <input type="password" name="password" id="password" pattern="^(?=(.*[a-z]){1,})(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,})(?=(.*[!-\/]|[:-@]){1,}).{8,}$" required value="Password1234!"/>
+  <input
+    type="password"
+    name="password"
+    id="password"
+    pattern="^(?=(.*[a-z]){1,})(?=(.*[A-Z]){1,})(?=(.*[0-9]){1,})(?=(.*[!-\/]|[:-@]){1,}).{8,}$"
+    required
+    value="Password1234!"
+  />
   <button type="submit">Submit</button>
 </form>
-

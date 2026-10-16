@@ -1,115 +1,113 @@
-<!DOCTYPE html>
-
-<div class="bottomContainer flex flex-col " >
-  <%
-  let back = "/account/Home"
+<div class="bottomContainer flex flex-col">
+  <% let back = "/account/Home"
   let buttonClass = "disabled"
   let text = " <= Back"
   if(path.length > 1) {
-    for (let i = 1; i < path.length - 1; i++){
-      back += "@" + path[i]
-    }
-      buttonClass = "inFolder"
+    for (let i = 1; i < path.length - 1; i++){ back += "@" + path[i] }
+    buttonClass = "inFolder"
   }
   if(buttonClass == "inFolder") { %>
-<button class="buttonClass" onClick="location.href = '<%= back %>'"><%= text %></button>
-<% } else { %>
-    <button class="buttonClass "><p class="<%= buttonClass %> "><%= text %></p></button>
-<% } %>
-    <button class="newFolderButton" onClick="folderFormReveal()" >New Folder </button>
-    <script>
-      function folderFormReveal() {
-        const folderForm = document.getElementById("folderForm")
-        folderForm.classList.toggle("hidden")
-        folderForm.classList.toggle("showFolderForm")
-      }
-    </script>
-    <div id="folderForm" class="hidden">
-      <form action="/account/newFolder" method="POST" >
-        <label for="folderName">Folder Name: </label>
-        <input type="text" name="folderName"/>
-        <input type="hidden" name="_location" value="<%=path%>" />
-        <button type="submit" >Confirm</button>
-      </form>
-    </div>
+  <button class="<%=buttonClass%>" onClick="location.href = '<%= back %>'">
+    <%= text %>
+  </button>
+  <% } else { %>
+  <button class="buttonClass">
+    <p class="<%= buttonClass %>"><%= text %></p>
+  </button>
+  <% } %>
+  <button class="newFolderButton" onClick="folderFormReveal()">
+    New Folder
+  </button>
+  <script>
+    function folderFormReveal() {
+      const folderForm = document.getElementById("folderForm");
+      folderForm.classList.toggle("hidden");
+      folderForm.classList.toggle("showFolderForm");
+    }
+  </script>
+  <div id="folderForm" class="hidden">
+    <form action="/account/newFolder" method="POST">
+      <label for="folderName">Folder Name: </label>
+      <input type="text" name="folderName" />
+      <input type="hidden" name="_location" value="<%=path%>" />
+      <button type="submit">Confirm</button>
+    </form>
+  </div>
 
   <div class="listContainer flex flex-wrap justify-center">
     <% if(files.length == 0 ) { %>
-      <p>No files</p>
-    <%} else { 
+    <p>No files</p>
+    <%} else {
       let loadedFolder=[]
       files.forEach(file=> {
-        let match = true
-        let finalFileType = file.type
+        let match = true;
+        let finalFileType = file.type;
         let finalName=file.name %>
 
-      <div class="itemContainer" >
-        <div>
-          <button  class="menuButton" onclick="toggleOptions(this, '.editFile')"><img  src="/static/menuLines.svg" alt="menuButton" width="20px" height="20px"></button>
-            <%- include("editFile", {finalName: finalName, path: path, finalFileType: finalFileType, file: file}) %>
-        </div>
-        <div class="item element<%= file.id %>" id="element<%= file.id %>"  
-          data-finalname = "<%= finalName %>"
-          data-path = "<%=path%>"
-          onclick=" <% if(finalFileType=="folder" || finalFileType=="folder_alt") { %> travelFolder(this )  <% } %>" >
-            <img src=<%= "/static/resources/" + finalFileType + ".svg" %> class="w-20 self-center"  />
-            <p><%= finalName %></p>
-            
-        </div>
+    <div class="itemContainer">
+      <div>
+        <button class="menuButton" onclick="toggleOptions(this, '.editFile')">
+          <img
+            src="/static/menuLines.svg"
+            alt="menuButton"
+            width="20px"
+            height="20px"
+          />
+        </button>
+        <%- include("editFile", {finalName: finalName, path: path, finalFileType: finalFileType, file: file}) %>
       </div>
-      <%})
-      %>
-    <%}%>
+      <% const fileClass = "item element" + file.id  %>
+      <% let result; if(finalFileType === "folder" || finalFileType === "folder_alt") {result = 'travelFolder(this)'} else {result = ' '} %>
+      <div
+        class="<%= fileClass %>"
+        onclick="<%=result%>" >
+        <% const imageSource = "/static/resources/" + finalFileType + ".svg" %>
+        <img src="<%= imageSource %>" class="w-20 self-center" />
+        <p><%= finalName %></p>
+      <form class="hiddenForm" action="/account/folder" method="POST">
+            <input type="hidden" name="_ownerId" value="<%=file.ownerId%>" />
+            <input type="hidden" name="_currentPath" value="<%=path%>" />
+            <input type="hidden" name="_name" value="<%=finalName%>" />
+
+            <button class="submitTravel" type="submit" hidden></button>
+      </form>
+      </div>
+    </div>
+    <%})}%>
   </div>
 </div>
 
 <script>
-  
   function toggleOptions(element, className) {
-    const editFile = (element.parentElement.querySelector(className))
-    editFile.classList.toggle("hidden")
-    editFile.classList.toggle("window")
-  }
-
-  function toggleShow(element) {
-    const children = element.children
-    for(let i = 0; i < children.length; i++) {
-      if(children[i].classList.contains("onClickAction")){
-        children[i].classList.toggle("hidden")
-        children[i].classList.toggle("show")
-      }
-    }
+    const editFile = element.parentElement.querySelector(className);
+    editFile.classList.toggle("hidden");
+    editFile.classList.toggle("window");
   }
 
   function travelFolder(element) {
-    const path = element.dataset.path.split(",")
-    const finalName = element.dataset.finalname
-    let currentPath = "/account/Home"
-    for(let i = 1; i < path.length; i++) {
-    currentPath +=  "@" + path[i]
+    if (element.parentElement.classList.contains("pressed")) {
+      const hiddenForm =element.querySelector(".hiddenForm")
+      hiddenForm.querySelector(".submitTravel").click()
     }
-    if(element.parentElement.classList.contains("pressed")) {
-      location.href = currentPath + "@" + finalName;
-    }   
   }
-  
+
   function selected() {
-    const elements = document.querySelectorAll(".item")
-    elements.forEach(e => {
-      const parentE = e.parentElement
-      e.addEventListener("click", function() {
-        if(parentE.classList.contains("pressed")) {
-            parentE.classList.remove("pressed")
-          } else {
-        const prev = document.querySelectorAll(".pressed")
-        prev.forEach(parentE => {parentE.classList.remove("pressed")})
-        parentE.classList.add("pressed")
-          }
-      })
-    })
+    const elements = document.querySelectorAll(".item");
+    elements.forEach((e) => {
+      const parentE = e.parentElement;
+      e.addEventListener("click", function () {
+        if (parentE.classList.contains("pressed")) {
+          parentE.classList.remove("pressed");
+        } else {
+          const prev = document.querySelectorAll(".pressed");
+          prev.forEach((parentE) => {
+            parentE.classList.remove("pressed");
+          });
+          parentE.classList.add("pressed");
 
- }
-  selected()
-
-
+        }
+      });
+    });
+  }
+  selected();
 </script>

@@ -14,6 +14,9 @@ const avatarUploader = [
       if (!file) {
         throw new Error("No file");
       }
+      const _uploadName = "avatars/" + req.user.id;
+
+      // await uploadFile(file, "avatar", uploadName);
       await uploadAvatar(file, req.user.id);
     } catch (e) {
       customErrorContainer.multerError(e, 400);

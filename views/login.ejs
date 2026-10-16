@@ -1,18 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-  <%- include("partials/head", {title: title}) %>
-  <%- include("partials/errors")%>
+  <%- include("partials/head", {title: title}) %> <%-
+  include("partials/errors")%>
   <body>
     <header class="">
-    <h1 class="text-3xl">Login</h1>
-    <a href="/signUp" class="italic underline text-2xl">Sign Up</a>
+      <h1 class="text-3xl">Login</h1>
+      <a href="/signUp" class="italic underline text-2xl">Sign Up</a>
     </header>
     <form action="/login" method="post">
       <label for="username">Username:</label>
-      <input type="text" id="username" name="username" class="border-2" required />
+      <input
+        type="text"
+        id="username"
+        name="username"
+        class="border-2"
+        required
+      />
 
       <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required value="Password1234!"/>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required
+        value="Password1234!"
+      />
 
       <button type="submit">Submit</button>
     </form>

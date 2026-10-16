@@ -1,6 +1,7 @@
 import { getFileType } from "./getFileType";
 import { getSize } from "./getSize";
-import type { element, item, metadata, finalFile } from "./fileTypes";
+import type { element, finalFile } from "./fileTypes";
+import logger from "../../config/logger";
 
 export async function getFileList(files: any) {
   const loadedFiles: finalFile[] = [];
@@ -23,6 +24,7 @@ export async function getFileList(files: any) {
     const finalFile = {
       id: id || "0",
       type: filetype,
+      ownerId: element.ownerId,
       name: item.name,
       size: size,
       updated_at: item.updated_at,

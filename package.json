@@ -2,6 +2,10 @@
   "name": "secondexe",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
   "main": "app.ts",
   "scripts": {
     "test": "NODE_ENV=test prisma migrate reset --force && NODE_ENV=test prisma migrate dev --name test && NODE_ENV=test prisma generate && NODE_ENV=test vitest",
@@ -16,10 +20,6 @@
     "tailwindcss": "npx @tailwindcss/cli -i ./static/style.css -o ./static/output.css --watch",
     "reset": "prisma migrate reset --force && tsx deleteUploads.ts && nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx --watch app.ts'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
@@ -54,6 +54,9 @@
     "colors": "^1.4.0",
     "eslint": "^10.12.0",
     "nodemon": "^3.1.14",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "prettier": "^3.9.10",
     "prisma": "^7.9.1",
     "supabase": "^2.118.0",
     "supertest": "^7.2.2",

@@ -1,7 +1,7 @@
 import { admin_supabase } from "../../config/supabase";
 
 export async function createFolder(name: string, bucket: string) {
-  const result = await admin_supabase.storage
+  const _result = await admin_supabase.storage
     .from(bucket)
     .upload(name + "/.emptyFolderPlaceholder", "");
 }

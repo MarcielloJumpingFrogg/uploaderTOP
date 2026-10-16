@@ -1,4 +1,4 @@
-import type { item, element, metadata } from "./fileTypes";
+import type { element } from "./fileTypes";
 
 export function getFileType(element: element) {
   let filetype;

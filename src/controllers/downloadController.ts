@@ -1,7 +1,5 @@
 import type { Request, Response } from "express";
-import { getFullPath } from "../functions/getFullPath";
 import { admin_supabase } from "../../config/supabase";
-import { createReadStream, createWriteStream } from "node:fs";
 import fs from "fs";
 import path from "node:path";
 import logger from "../../config/logger";

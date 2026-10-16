@@ -16,6 +16,9 @@ export async function readFolder(
         offset: 0,
         sortBy: { column: "name", order: "asc" },
       });
+    if (error) {
+      throw new Error(error.message);
+    }
     // Handle files vs folders
     data?.forEach((item) => {
       // console.log("dataItem: ", item);

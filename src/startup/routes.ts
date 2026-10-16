@@ -15,6 +15,7 @@ import { renameController } from "../controllers/renameController";
 import { downloadController } from "../controllers/downloadController";
 import { shareCreatorController } from "../controllers/shareCreatorController";
 import { addSharedFileCtrl } from "../controllers/addSharedFileCtrl";
+import { travelFolderController } from "../controllers/travelFolderController";
 import logger from "../../config/logger";
 
 async function routes(app: Express) {
@@ -65,6 +66,8 @@ async function routes(app: Express) {
   app.get("/account", accountController);
 
   app.get("/account/:path", folderVisualizer);
+
+  app.post("/account/folder", travelFolderController)
 
   app.post("/account/avatar", avatarUploader);
 

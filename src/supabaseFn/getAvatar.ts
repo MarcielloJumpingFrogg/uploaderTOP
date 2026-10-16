@@ -1,4 +1,4 @@
-import { readFile } from "./readFile";
+// import { readFile } from "./readFile";
 import { admin_supabase } from "../../config/supabase";
 import { checkExists } from "./checkExists";
 import { getAvatarVersion } from "../../src/prismaDb/getAvatarVersion";

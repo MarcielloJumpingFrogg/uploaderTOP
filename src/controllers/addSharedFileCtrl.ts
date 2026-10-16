@@ -22,7 +22,7 @@ export const addSharedFileCtrl = [
           if (req.user.id === undefined) {
             throw new Error("!req.user.id");
           } else {
-            const _addSharedFile = await prisma.sharedFiles.create({
+            const __addSharedFile = await prisma.sharedFiles.create({
               data: {
                 originalUser: shareSession?.originalUser,
                 destinationUser: req.user.id,
@@ -33,7 +33,7 @@ export const addSharedFileCtrl = [
 
             const pathShareSession = shareSession.filePath.split("/");
             const fileName = pathShareSession[pathShareSession.length - 1];
-            const someResult = await prisma.files.create({
+            const _someResult = await prisma.files.create({
               data: {
                 fileId: shareSession.id,
                 path: shareSession.filePath,

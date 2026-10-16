@@ -4,6 +4,7 @@ import customErrorContainer from "../customErrors/customErrorContainer";
 import { getFiles } from "../dbMethods/getFiles";
 import { getFileList } from "../fileMethods/getFileList";
 import "colors";
+import logger from "../../config/logger";
 
 async function renderAccount(req: any, res: Response) {
   let tempPath = ["Home"];

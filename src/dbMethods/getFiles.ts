@@ -1,5 +1,5 @@
-import { readFile } from "../supabaseFn/readFile";
-import { admin_supabase } from "../../config/supabase";
+// import { readFile } from "../supabaseFn/readFile";
+// import { admin_supabase } from "../../config/supabase";
 import { prisma } from "../../lib/prisma";
 import { readFolder } from "../supabaseFn/readFolder";
 import { getFromPath } from "./getFromPath";

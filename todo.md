@@ -1,0 +1,5 @@
+- [] the user interface of the "traveling to the folder" does not work since it's tied to the current user's id
+- [] expiration date on both the session and the file
+- [] the ability to make a file read only for user's who don't have the right permissions send through the link
+- [] make the ui less ugly
+- [] finish the project

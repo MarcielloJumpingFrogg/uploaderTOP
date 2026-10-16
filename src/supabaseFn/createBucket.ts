@@ -1,6 +1,6 @@
 import { admin_supabase } from "../../config/supabase";
 
-const mb = 1024 * 1024;
+// const mb = 1024 * 1024;
 
 async function createBucket(
   name: string,

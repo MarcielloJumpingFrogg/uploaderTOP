@@ -1,9 +1,10 @@
-import { readFolder } from "../supabaseFn/readFolder";
+// import { readFolder } from "../supabaseFn/readFolder";
+import logger from "../../config/logger";
 import { admin_supabase } from "../../config/supabase";
 
 export async function getFromPath(file: any) {
   const result = [];
-  let folderResult;
+  // let folderResult;
   let fileResult;
   if (file?.mimetype === "folder") {
     const folderObject = {

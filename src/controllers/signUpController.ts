@@ -1,10 +1,8 @@
-import bcrypt, { hash } from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
 import { validationResult } from "express-validator";
 import { validateUser } from "./validateUser";
 import customErrorContainer from "../customErrors/customErrorContainer";
-import fs from "node:fs";
-import path from "node:path";
 import logger from "../../config/logger";
 
 const signUpController: any = [

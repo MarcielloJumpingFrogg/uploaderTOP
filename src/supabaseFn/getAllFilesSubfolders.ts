@@ -1,4 +1,3 @@
-import { admin_supabase } from "../../config/supabase";
 import { readFolder } from "./readFolder";
 
 export async function getAllFilesSubfolders(

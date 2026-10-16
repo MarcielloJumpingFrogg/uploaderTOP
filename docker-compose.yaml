@@ -10,7 +10,7 @@ services:
     ports:
       - "2345:5432"
     networks:
-        - appnet
+      - appnet
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user123 -d db123"]
       interval: 30s
@@ -33,11 +33,11 @@ services:
       test: ["CMD", "node", "healthcheck.js"]
       interval: 30s
       timeout: 10s
-      retries: 3 
+      retries: 3
       start_period: 40s
 
 networks:
   appnet:
-    driver: bridge   # Specify driver options
-   # driver_opts:
-   #   com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+    driver: bridge # Specify driver options
+    # driver_opts:
+    #   com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"

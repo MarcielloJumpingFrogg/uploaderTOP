@@ -1,37 +1,25 @@
 <!DOCTYPE html>
 
-
-
 <% if(locals.user) {%>
 <%- include("partials/head", {title: user.username}) %>
 
-
 <body>
   <%- include("components/header") %>
-
   <%- include("partials/errors") %>
-
   <%- include("components/fileForm") %>
-
   <%- include("components/fileList", {user: user, files: files}) %>
-
   <%- include("components/popUp" , {popUp: popUp}) %>
-
- 
-
   <%}else {%>
-  <%- include("partials/head", {title: "Error"}) %>
+    <%- include("partials/head", {title: "Error"}) %>
   <h1>There seems to be an error with your account</h1>
   <h2>Please try again later</h2>
   <a href="/">Home</a>
   <%}%>
 </body>
 
-
 <script>
-function toggleVisibility() {
-	document.getElementById("user_modal").classList.toggle("hidden")
-	document.getElementById("user_modal").classList.toggle("visible")
-
-}
+  function toggleVisibility() {
+    document.getElementById("user_modal").classList.toggle("hidden");
+    document.getElementById("user_modal").classList.toggle("visible");
+  }
 </script>

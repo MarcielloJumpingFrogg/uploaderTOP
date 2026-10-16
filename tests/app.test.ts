@@ -1,5 +1,5 @@
 import { app } from "../app";
-import { describe, it, expect, test, beforeEach, afterEach } from "vitest";
+import { expect, test, beforeEach } from "vitest";
 import request from "supertest";
 
 import { resetDb } from "./functions";

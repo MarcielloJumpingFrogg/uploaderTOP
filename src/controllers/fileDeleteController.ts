@@ -1,8 +1,8 @@
-import { admin_supabase } from "../../config/supabase";
+// import { admin_supabase } from "../../config/supabase";
 import { deleteFile } from "../supabaseFn/deleteFile";
 import { recursiveDelete } from "../supabaseFn/recursiveDelete";
 import type { Request, Response } from "express";
-import { uploadFile } from "../supabaseFn/uploadFile";
+// import { uploadFile } from "../supabaseFn/uploadFile";
 
 export const fileDeleteController = [
   async (req: Request, res: Response) => {

@@ -1,15 +1,11 @@
-// import { readFolder } from "../supabaseFn/readFolder";
 import logger from "../../config/logger";
 import { admin_supabase } from "../../config/supabase";
 
 export async function getFromPath(file: any) {
   const result = [];
-  // let folderResult;
-  let fileResult;
-  if (file?.mimetype === "folder") {
     const folderObject = {
-      type: "folder",
-      ownerId: file.ownerId,
+      type: file.fileType,
+      sessionId: file.sessionId,
       item: {
         name: file.fileName,
         version: null,
@@ -24,9 +20,5 @@ export async function getFromPath(file: any) {
       },
     };
     result.push(folderObject);
-  } else {
-    fileResult = await admin_supabase.storage.from("Files").info(file.path);
-    result.push(fileResult);
-  }
   return result;
 }

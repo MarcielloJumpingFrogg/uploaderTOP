@@ -6,6 +6,7 @@ import { uploadFile } from "../supabaseFn/uploadFile";
 import { createFolder } from "../supabaseFn/createFolder";
 import { getFullPath } from "../functions/getFullPath";
 import { prisma } from "../../lib/prisma";
+import logger from "../../config/logger";
 
 function folderTreeCreator(newName: string, partialLocation: string) {
   const fullName = newName.split("/");
@@ -34,8 +35,9 @@ const fileUploader = [
       customErrorContainer.resetError();
       const newName = setNewName(req, file);
       const location = req.body._location.replaceAll(",", "/");
-      const partialLocation = req.user.id + "/" + location + "/";
+      const partialLocation =  location + "/";
       folderTreeCreator(newName, partialLocation);
+
 
       const uploadName = partialLocation + newName;
       const uploadFileResult = await uploadFile(file, "Files", uploadName);
@@ -59,8 +61,8 @@ const fileUploader = [
       //   uploadName,
       // );
     });
-    const fullPath = getFullPath(req);
-    res.redirect("/account" + fullPath);
+    // const fullPath = getFullPath(req);
+    res.redirect("/account" );
   },
 ];
 export { fileUploader };

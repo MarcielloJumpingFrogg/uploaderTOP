@@ -24,6 +24,7 @@ export async function getFileList(files: any) {
     const finalFile = {
       id: id || "0",
       type: filetype,
+      path: element.path,
       ownerId: element.ownerId,
       name: item.name,
       size: size,

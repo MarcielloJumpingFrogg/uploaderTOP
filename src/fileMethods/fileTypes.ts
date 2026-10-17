@@ -1,6 +1,7 @@
 type element = {
   type: string;
   ownerId: string;
+  path: string;
   item: item;
 };
 

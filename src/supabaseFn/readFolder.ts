@@ -1,6 +1,7 @@
 import logger from "../../config/logger";
 import { admin_supabase } from "../../config/supabase";
 
+
 export async function readFolder(
   folder: string,
   bucket: string,
@@ -21,16 +22,18 @@ export async function readFolder(
     }
     // Handle files vs folders
     data?.forEach((item) => {
-      // console.log("dataItem: ", item);
+      const path =  folder + "/" + item.name
+      let currentType
       if (item.id !== null) {
         // It's a file
         if (item.name !== ".emptyFolderPlaceholder" || context !== "user") {
-          FullList.push({ type: "file", ownerId: ownerId, item });
+          currentType = "file"
         }
       } else {
         // It's a folder
-        FullList.push({ type: "folder", ownerId: ownerId, item });
+        currentType = "folder"
       }
+      FullList.push({type: currentType, ownerId: ownerId, path: path, item})
     });
   } catch (e) {
     logger.error(e);

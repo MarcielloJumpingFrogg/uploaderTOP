@@ -7,22 +7,15 @@ import "colors";
 import logger from "../../config/logger";
 
 async function renderAccount(req: any, res: Response) {
-  let tempPath = ["Home"];
+
+  let currentPath = req.user.id + "/Home"
   if (req.currentPath !== undefined) {
-    tempPath = req.currentPath;
+    currentPath = req.currentPath
   }
 
-  let fullPath = "";
-  for (let i = 0; i < tempPath.length; i++) {
-    fullPath += tempPath[i] + "/";
-  }
   const avatar = await getAvatar(req.user.id);
-  const files = await getFiles(req.user.id, fullPath);
-  const fileList: {
-    id: string;
-    type: string;
-    name: string;
-  }[] = await getFileList(files);
+  const files = await getFiles(req.user.id, currentPath);
+  const fileList: any[] = await getFileList(files);
 
   let popUp = {};
   if (req.popUp) {
@@ -34,7 +27,7 @@ async function renderAccount(req: any, res: Response) {
     errorName: customErrorContainer.getErrorName(),
     errors: customErrorContainer.getErrorList(),
     avatar: avatar,
-    path: tempPath,
+    path: currentPath,
     popUp: popUp,
   });
 }

@@ -4,6 +4,7 @@ import { app } from "../app";
 import request from "supertest";
 import { prisma } from "../lib/prisma";
 import { getFiles } from "../src/dbMethods/getFiles";
+import logger from "../config/logger";
 
 // beforeEach(async () => {
 await resetDb();
@@ -38,8 +39,8 @@ describe("Implementing the functionality of share", async () => {
   await firstAgent
     .post("/account/file")
     .type("form")
-    .field("newName", "/newFolder/newFile")
-    .field("_location", "Home")
+    .field("newName", "newFolder/newFile")
+    .field("_location", firstId + "/Home")
     .attach("usrFile", __dirname + "/testFiles/textTest.txt")
     .expect(302);
 
@@ -50,6 +51,7 @@ describe("Implementing the functionality of share", async () => {
     .send({
       _path: shareFilePath,
       _fileType: "plain/text",
+      _name:"newFolder/newFile",
       canEdit: "on",
       daysExpiration: 1,
     })
@@ -58,6 +60,7 @@ describe("Implementing the functionality of share", async () => {
   const shareSession = await prisma.shareSession.findMany({
     where: { filePath: shareFilePath },
   });
+
 
   if (shareSession === undefined) {
     throw new Error("shareSession is undefined");
@@ -97,10 +100,11 @@ describe("Implementing the functionality of share", async () => {
     const _firstResult = await firstAgent
       .post("/account/file")
       .type("form")
-      .field("newName", "/newFolder/newSubFolder/newFile2")
-      .field("_location", "Home")
+      .field("newName", "newFolder/newSubFolder/newFile2")
+      .field("_location", firstId + "Home")
       .attach("usrFile", __dirname + "/testFiles/textTest.txt")
       .expect(302);
+
 
     const secondShareFilePath = firstId + "/Home/newFolder";
     const secondShareResult = await firstAgent
@@ -108,6 +112,7 @@ describe("Implementing the functionality of share", async () => {
       .send({
         _path: secondShareFilePath,
         _fileType: "folder",
+        _name:"newFolder/newSubFolder/newFile2",
         canEdit: "on",
         daysExpiration: 1,
       })

@@ -19,21 +19,21 @@ model Session {
   expiresAt  DateTime
 }
 
-model Users { 
-  id       String    @id @default(uuid()) 
+model Users {
+  id       String    @id @default(uuid())
   username String    @unique
-  password String 
+  password String
   fileList Files[]
   avatarVersion Int  @default(0)
   sharedFiles      ShareSession[]
   receivedFiles    SharedFiles[]
-} 
+}
 
 model Files {
   id          String  @id @default(uuid())
   fileId      String
-  path        String  
-  fileName    String  //not sure if it's usefull if i already have the id but okay, maybe for the locally saved files
+  path        String
+  fileName    String
   mimetype    String
   size        Int
   uploadTime  DateTime @default(now())
@@ -48,6 +48,7 @@ model ShareSession {
   creator       Users @relation(fields: [originalUser], references: [id])
   expiration    DateTime @default(now())
   filePath      String
+  fileName      String
   type          String
   edit          Boolean
   sharedFiles   SharedFiles[]
@@ -56,9 +57,11 @@ model ShareSession {
 model SharedFiles {
   id            String @id @default(uuid())
   originalUser  String
-  destinationUser String  
+  destinationUser String
   userSharedWith  Users @relation(fields: [destinationUser], references: [id])
   expiration      DateTime
+  fileType        String
+  fileName        String
   sessionId       String
   session         ShareSession @relation(fields: [sessionId], references: [id])
 }

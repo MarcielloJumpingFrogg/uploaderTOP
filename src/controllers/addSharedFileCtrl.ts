@@ -27,17 +27,17 @@ export const addSharedFileCtrl = [
                 originalUser: shareSession?.originalUser,
                 destinationUser: req.user.id,
                 expiration: shareSession?.expiration,
+                fileType: shareSession.type,
+                fileName: shareSession.fileName,
                 sessionId: shareSession?.id,
               },
             });
 
-            const pathShareSession = shareSession.filePath.split("/");
-            const fileName = pathShareSession[pathShareSession.length - 1];
             const _someResult = await prisma.files.create({
               data: {
                 fileId: shareSession.id,
                 path: shareSession.filePath,
-                fileName: fileName,
+                fileName: shareSession.fileName,
                 mimetype: shareSession.type,
                 size: 10,
                 uploadTime: new Date(),
@@ -57,31 +57,3 @@ export const addSharedFileCtrl = [
     }
   },
 ];
-
-/*
-model Files {
-  id          String  @id @default(uuid())
-  fileId      String
-  path        String  @unique
-  fileName    String  //not sure if it's usefull if i already have the id but okay, maybe for the locally saved files
-  mimetype    String
-  size        Int
-  uploadTime  DateTime @default(now())
-  currentUser String
-  ownerId     String
-  owner       Users   @relation(fields: [currentUser], references: [id])
-}
-
-
-
-model ShareSession {
-  id            String @id @default(uuid())
-  originalUser  String
-  creator       Users @relation(fields: [originalUser], references: [id])
-  expiration    DateTime @default(now())
-  filePath      String
-  type          String
-  edit          Boolean
-  sharedFiles   SharedFiles[]
-}
- * */

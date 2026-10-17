@@ -9,16 +9,13 @@
   "main": "app.ts",
   "scripts": {
     "test": "NODE_ENV=test prisma migrate reset --force && NODE_ENV=test prisma migrate dev --name test && NODE_ENV=test prisma generate && NODE_ENV=test vitest",
-    "test:vb": "NODE_ENV=test prisma migrate deploy && prisma generate && vitest dev --coverage",
     "dev": "NODE_ENV=docker tsx app.ts",
     "local": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx --watch app.ts'",
-    "local2": "NODE_ENV=local tsx app.ts",
     "localTest": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=test tsx --watch app.ts'",
     "docker": "prisma migrate dev --name init && prisma generate && NODE_ENV=docker tsx app.ts ",
     "migrate": "prisma migrate dev --name init && prisma generate",
     "migrate_local": "NODE_ENV=local prisma migrate deploy && prisma generate",
-    "tailwindcss": "npx @tailwindcss/cli -i ./static/style.css -o ./static/output.css --watch",
-    "reset": "prisma migrate reset --force && tsx deleteUploads.ts && nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx --watch app.ts'"
+    "tailwindcss": "npx @tailwindcss/cli -i ./static/style.css -o ./static/output.css --watch"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

@@ -1,15 +1,5 @@
-import { deleteFile } from "./deleteFile";
-import { readFolder } from "./readFolder";
+import { admin_supabase } from "../../config/supabase";
 
-export async function recursiveDelete(path: string, bucket: string) {
-  const fileList = await readFolder(path, bucket, "server");
-  fileList.forEach(async (file: any) => {
-    if (file.type == "folder") {
-      const newPath = path + "/" + file.item.name;
-      await recursiveDelete(newPath, bucket);
-    } else {
-      const newPath = path + "/" + file.item.name;
-      await deleteFile(newPath, bucket);
-    }
-  });
+export async function recursiveDelete(bucket: string) {
+  await admin_supabase.storage.emptyBucket(bucket)
 }

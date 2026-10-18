@@ -39,19 +39,19 @@ describe("Implementing the functionality of share", async () => {
   await firstAgent
     .post("/account/file")
     .type("form")
-    .field("newName", "newFolder/newFile")
-    .field("_location", firstId + "/Home")
+    .field("newName", "newFolder/newFileForUniqueIdentification")
+    .field("_location", "/Home")
     .attach("usrFile", __dirname + "/testFiles/textTest.txt")
     .expect(302);
 
-  const shareFilePath = firstId + "/Home/newFolder/newFile";
+  const shareFilePath = firstId + "/Home/newFolder/newFileForUniqueIdentification";
 
   const shareResult = await firstAgent
     .post("/share/create")
     .send({
-      _path: shareFilePath,
+      _location: "Home/newFolder",
       _fileType: "plain/text",
-      _name:"newFolder/newFile",
+      _name:"newFileForUniqueIdentification",
       canEdit: "on",
       daysExpiration: 1,
     })
@@ -101,7 +101,7 @@ describe("Implementing the functionality of share", async () => {
       .post("/account/file")
       .type("form")
       .field("newName", "newFolder/newSubFolder/newFile2")
-      .field("_location", firstId + "Home")
+      .field("_location", "Home")
       .attach("usrFile", __dirname + "/testFiles/textTest.txt")
       .expect(302);
 
@@ -110,9 +110,9 @@ describe("Implementing the functionality of share", async () => {
     const secondShareResult = await firstAgent
       .post("/share/create")
       .send({
-        _path: secondShareFilePath,
+        _location: "Home",
         _fileType: "folder",
-        _name:"newFolder/newSubFolder/newFile2",
+        _name:"newFolder",
         canEdit: "on",
         daysExpiration: 1,
       })
@@ -128,13 +128,26 @@ describe("Implementing the functionality of share", async () => {
     expect(secondShareResult.text).toContain(
       "/share/add/" + secondShareSession.id,
     );
-    await secondAgent.get("/share/add/" + secondShareSession.id).expect(302);
+    const secondShareSessionResult = await secondAgent.get("/share/add/" + secondShareSession.id).expect(302);
 
-    const sourceFileSecondShare = await getFiles(firstId, "Home");
+    const homePageSecondAgent = await secondAgent.get("/account").expect(200)
+    expect(homePageSecondAgent.text).toContain("<p>newFolder</p>")
 
-    const secondGetFiles = await getFiles(secondId, "Home");
-    for (let i = 0; i < sourceFileSecondShare.length; i++) {
-      expect(sourceFileSecondShare[i]).toBeOneOf(secondGetFiles);
-    }
+    const multiFilesInSharedFolder = await secondAgent.post("/account/folder").send({
+      _sessionId: secondShareSession.id,
+      _location: "Home",
+      _name: "newFolder"
+    }).expect(200)
+
+    expect(multiFilesInSharedFolder.text).toContain("<p>newFileForUniqueIdentification</p>")
+    expect(multiFilesInSharedFolder.text).toContain("<p>newSubFolder</p>")
+
   });
+
+  it("Travel inside the original user's folder", async () => {
+    const homePage = await firstAgent.get("/account").expect(200)
+    expect( homePage.text ).toContain("<p>newFolder</p>")
+  })
+
+
 });

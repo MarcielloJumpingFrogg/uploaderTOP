@@ -12,8 +12,8 @@ async function resetDb() {
 }
 
 async function resetBuckets() {
-  const _resultAvatar = await recursiveDelete("avatars", "avatar");
-  const _resultFiles = await recursiveDelete("/", "Files");
+  const _resultAvatar = await recursiveDelete("avatar");
+  const _resultFiles = await recursiveDelete("Files");
 }
 
 export { resetDb, resetBuckets };

@@ -4,20 +4,29 @@ import { readFolder } from "../supabaseFn/readFolder";
 import { getFromPath } from "./getFromPath";
 
 export async function getFiles(userId: string, currentFolder: string) {
-  const name = currentFolder;
+  const name = userId + "/" + currentFolder;
   const result = await readFolder(name, "Files", "user");
 
   const fileSharedFromOthers = await prisma.sharedFiles.findMany({
     where: {
-      destinationUser: userId
+      destinationUser: userId,
     }
   })
 
+
+  let getFromPathResult
   for (let i = 0; i < fileSharedFromOthers.length; i++) {
     const file = fileSharedFromOthers[i];
-    const shareSessionResult = await prisma.shareSession.findMany({where:{id: file?.sessionId}})
+    const shareSession = await prisma.shareSession.findUnique({where: {id: file?.sessionId}})
 
-    const getFromPathResult = await getFromPath(file);
+    const targetFilePath = shareSession?.originalUser + "/" + currentFolder
+
+    if (shareSession?.filePath.startsWith(targetFilePath)) {
+      getFromPathResult = await getFromPath(file);
+    } else {
+    }
+
+
     for (let j = 0; j < getFromPathResult.length; j++) {
       result.push(getFromPathResult[j]);
     }

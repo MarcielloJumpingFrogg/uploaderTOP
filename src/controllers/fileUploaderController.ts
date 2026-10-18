@@ -35,7 +35,7 @@ const fileUploader = [
       customErrorContainer.resetError();
       const newName = setNewName(req, file);
       const location = req.body._location.replaceAll(",", "/");
-      const partialLocation =  location + "/";
+      const partialLocation = req.user.id + "/" +  location + "/";
       folderTreeCreator(newName, partialLocation);
 
 

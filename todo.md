@@ -1,5 +1,8 @@
-- [] the user interface of the "traveling to the folder" does not work since it's tied to the current user's id
-- [] expiration date on both the session and the file
-- [] the ability to make a file read only for user's who don't have the right permissions send through the link
-- [] make the ui less ugly
-- [] finish the project
+- [x] the user interface of the "traveling to the folder" does not work since it's tied to the current user's id
+- [ ] the back button does not work at the moment
+- [ ] _MAYBE_ saving the current path in localStorage could make it better for refreshing the page bcs wtf
+- [ ] _ALTERNATIVE_ going back to using the url location to be able to quickly access the folders and save the location on the favourites bar
+- [ ] expiration date on both the session and the file
+- [ ] the ability to make a file read only for user's who don't have the right permissions send through the link
+- [ ] make the ui less ugly
+- [ ] finish the project

@@ -2,7 +2,7 @@ import { round10 } from "../functions/decimalAdjust";
 import type { element } from "./fileTypes";
 
 export function getSize(element: element) {
-  if (element.type !== "folder") {
+  if (element.type !== "folder" && element.sessionId === null) {
     const item = element.item;
 
     const sizeInBit = item.metadata.size;

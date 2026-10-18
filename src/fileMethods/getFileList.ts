@@ -10,12 +10,18 @@ export async function getFileList(files: any) {
     const item = element.item;
     let filetype;
     let id;
-    if (element.type == "file") {
-      id = item.id;
-      filetype = getFileType(element);
-    } else if (element.type == "folder") {
+     if (element.type == "folder") {
       id = "0";
       filetype = "folder";
+    } else {
+       if (element.sessionId == null) {
+        filetype = getFileType(element);
+        id = item.id;
+       } else {
+         filetype = element.type
+
+      }
+
     }
 
     const size = getSize(element);
@@ -24,8 +30,7 @@ export async function getFileList(files: any) {
     const finalFile = {
       id: id || "0",
       type: filetype,
-      path: element.path,
-      ownerId: element.ownerId,
+      sessionId: element.sessionId || "0",
       name: item.name,
       size: size,
       updated_at: item.updated_at,

@@ -33,13 +33,14 @@ export const shareCreatorController = [
       const prismaResult = await prisma.shareSession.create({
         data: {
           originalUser: req.user.id,
-          fileName: "test1",
+          fileName: req.body._name,
           filePath: itemName,
           expiration: new Date(expirationDay),
           type: fileType,
           edit: canBeEdited,
         },
       });
+
 
       req.popUp = {
         title: "Url: ",

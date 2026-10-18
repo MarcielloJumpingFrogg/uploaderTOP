@@ -9,7 +9,6 @@ export async function readFolder(
 ) {
   let FullList: any = [];
   try {
-    const ownerId = folder.split("/")[0];
     const { data, error } = await admin_supabase.storage
       .from(bucket)
       .list(folder, {
@@ -21,20 +20,29 @@ export async function readFolder(
       throw new Error(error.message);
     }
     // Handle files vs folders
-    data?.forEach((item) => {
+    for (let i = 0; i < data.length; i++){
+      const item = data[i]
+      let skipping = false
+      if (item == undefined) {
+        throw new Error("item is undefined")
+      }
       const path =  folder + "/" + item.name
       let currentType
       if (item.id !== null) {
         // It's a file
         if (item.name !== ".emptyFolderPlaceholder" || context !== "user") {
           currentType = "file"
+        } else {
+          skipping = true
         }
       } else {
         // It's a folder
         currentType = "folder"
       }
-      FullList.push({type: currentType, ownerId: ownerId, path: path, item})
-    });
+      if (!skipping) {
+        FullList.push({type: currentType,  item})
+      }
+    }
   } catch (e) {
     logger.error(e);
   }

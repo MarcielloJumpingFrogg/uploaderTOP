@@ -2,12 +2,12 @@
   <% let back = "/account/Home"
   let buttonClass = "disabled"
   let text = " <= Back"
-  if(path.length > 1) {
-    for (let i = 1; i < path.length - 1; i++){ back += "@" + path[i] }
-    buttonClass = "inFolder"
-  }
+  // if(path.length > 1) {
+  //   for (let i = 1; i < path.length - 1; i++){ back += "@" + path[i] }
+  //   buttonClass = "inFolder"
+  // }
   if(buttonClass == "inFolder") { %>
-  <button class="<%=buttonClass%>" onClick="location.href = '<%= back %>'">
+  <button class="<%=buttonClass%>" onClick="location.href = '/account'">
     <%= text %>
   </button>
   <% } else { %>
@@ -65,10 +65,9 @@
         <img src="<%= imageSource %>" class="w-20 self-center" />
         <p><%= finalName %></p>
       <form class="hiddenForm" action="/account/folder" method="POST">
-            <input type="hidden" name="_ownerId" value="<%=file.ownerId%>" />
-            <input type="hidden" name="_currentPath" value="<%=path%>" />
+            <input type="hidden" name="_sessionId" value="<%=file.sessionId%>" />
+            <input type="hidden" name="_location" value="<%=path%>" />
             <input type="hidden" name="_name" value="<%=finalName%>" />
-            <input type="hidden" name="_filePath" value="<%= file.path %>" />
 
             <button class="submitTravel" type="submit" hidden></button>
       </form>

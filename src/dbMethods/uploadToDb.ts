@@ -9,6 +9,7 @@ export async function uploadToDb(file: any, path: string, userId: string) {
       mimetype: file.mimetype,
       size: file.size,
       ownerId: userId,
+      currentUser: userId,
     },
   });
   return result;

@@ -12,11 +12,12 @@ async function renderAccount(req: any, res: Response) {
     currentPath = req.currentPath
   }
 
+  logger.test("helloo ")
   let folderOwner = req.folderOwner || req.user.id
   let pathToExtract = req.pathToExtract || currentPath
 
+
   const avatar = await getAvatar(req.user.id);
-  // const files = await getFiles(req.user.id, currentPath);
   const files = await getFiles(folderOwner, pathToExtract)
   const fileList: any[] = await getFileList(files);
 
@@ -30,6 +31,7 @@ async function renderAccount(req: any, res: Response) {
     errorName: customErrorContainer.getErrorName(),
     errors: customErrorContainer.getErrorList(),
     avatar: avatar,
+    folderOwner: req.user.id === folderOwner ? 0 : folderOwner,
     path: pathToExtract,
     popUp: popUp,
   });

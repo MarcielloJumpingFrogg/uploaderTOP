@@ -1,18 +1,27 @@
 <div class="bottomContainer flex flex-col">
-  <% let back = "/account/Home"
-  let buttonClass = "disabled"
+  <%
+  let buttonClass = "disabledBackButton"
   let text = " <= Back"
-  // if(path.length > 1) {
-  //   for (let i = 1; i < path.length - 1; i++){ back += "@" + path[i] }
-  //   buttonClass = "inFolder"
-  // }
+  let backPath = "/account/" + folderOwner + "/"
+  const splitPath = path.split("/")
+  if(splitPath.length > 1 ){
+    buttonClass = "inFolder"
+  } else {
+    buttonClass = "disabledBackButton"
+  }
+  for(let i = 0; i < splitPath.length - 1; i ++){
+    backPath += splitPath[i]
+    if(i != splitPath.length - 2){
+      backPath += "@"
+    }
+  }
   if(buttonClass == "inFolder") { %>
-  <button class="<%=buttonClass%>" onClick="location.href = '/account'">
+  <button class="backButton <%=buttonClass%>" onClick="location.href = '<%=backPath%>'">
     <%= text %>
   </button>
   <% } else { %>
-  <button class="buttonClass">
-    <p class="<%= buttonClass %>"><%= text %></p>
+  <button class="backButton <%=buttonClass%>" >
+      <%= text %>
   </button>
   <% } %>
   <button class="newFolderButton" onClick="folderFormReveal()">
@@ -65,9 +74,11 @@
         <img src="<%= imageSource %>" class="w-20 self-center" />
         <p><%= finalName %></p>
       <form class="hiddenForm" action="/account/folder" method="POST">
+          <% const pathForThisLink = path.replaceAll("/", "@") %>
             <input type="hidden" name="_sessionId" value="<%=file.sessionId%>" />
             <input type="hidden" name="_location" value="<%=path%>" />
             <input type="hidden" name="_name" value="<%=finalName%>" />
+            <a class="travelLink" href="/account/<%=file.sessionId%>/<%=pathForThisLink%>@<%=finalName%>" hidden></a>
 
             <button class="submitTravel" type="submit" hidden></button>
       </form>
@@ -87,7 +98,7 @@
   function travelFolder(element) {
     if (element.parentElement.classList.contains("pressed")) {
       const hiddenForm =element.querySelector(".hiddenForm")
-      hiddenForm.querySelector(".submitTravel").click()
+      hiddenForm.querySelector(".travelLink").click()
     }
   }
 

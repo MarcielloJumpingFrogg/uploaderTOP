@@ -29,7 +29,10 @@ export const shareCreatorController = [
       expiration = expiration * dayInMs;
       const expirationDay = Date.now() + expiration;
 
-      const canBeEdited = req.body.canEdit === "on" ? true : false;
+      let canBeEdited = false
+      if (req.body.canEdit) {
+        canBeEdited = req.body.canEdit === "on" ? true : false;
+      }
       const prismaResult = await prisma.shareSession.create({
         data: {
           originalUser: req.user.id,

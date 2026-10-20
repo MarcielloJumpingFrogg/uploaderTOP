@@ -133,11 +133,7 @@ describe("Implementing the functionality of share", async () => {
     const homePageSecondAgent = await secondAgent.get("/account").expect(200)
     expect(homePageSecondAgent.text).toContain("<p>newFolder</p>")
 
-    const multiFilesInSharedFolder = await secondAgent.post("/account/folder").send({
-      _sessionId: secondShareSession.id,
-      _location: "Home",
-      _name: "newFolder"
-    }).expect(200)
+    const multiFilesInSharedFolder = await secondAgent.get("/account/"+ secondShareSession.id +"/Home@newFolder").expect(200)
 
     expect(multiFilesInSharedFolder.text).toContain("<p>newFileForUniqueIdentification</p>")
     expect(multiFilesInSharedFolder.text).toContain("<p>newSubFolder</p>")
@@ -147,6 +143,10 @@ describe("Implementing the functionality of share", async () => {
   it("Travel inside the original user's folder", async () => {
     const homePage = await firstAgent.get("/account").expect(200)
     expect( homePage.text ).toContain("<p>newFolder</p>")
+  })
+
+  it("Travel with url: ", async () => {
+    const currentResult = await firstAgent.get("/account/0/Home@newFolder").expect(200)
   })
 
 

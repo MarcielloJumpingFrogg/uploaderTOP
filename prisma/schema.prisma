@@ -31,15 +31,15 @@ model Users {
 
 model Files {
   id          String  @id @default(uuid())
-  fileId      String
   path        String
   fileName    String
   mimetype    String
-  size        Int
+  size        String
   uploadTime  DateTime @default(now())
   currentUser String
   ownerId     String
   owner       Users   @relation(fields: [ownerId], references: [id])
+  sessionId  String
 }
 
 model ShareSession {

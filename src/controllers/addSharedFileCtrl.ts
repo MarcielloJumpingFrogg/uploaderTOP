@@ -33,18 +33,19 @@ export const addSharedFileCtrl = [
               },
             });
 
-            // const _someResult = await prisma.files.create({
-            //   data: {
-            //     fileId: shareSession.id,
-            //     path: shareSession.filePath,
-            //     fileName: shareSession.fileName,
-            //     mimetype: shareSession.type,
-            //     size: 10,
-            //     uploadTime: new Date(),
-            //     currentUser: req.user.id,
-            //     ownerId: shareSession.originalUser,
-            //   },
-            // });
+
+            const _someResult = await prisma.files.create({
+              data: {
+                path: shareSession.filePath,
+                fileName: shareSession.fileName,
+                mimetype: shareSession.type,
+                size: "10",
+                uploadTime: new Date(),
+                currentUser: req.user.id,
+                ownerId: shareSession.originalUser,
+                sessionId: shareSession.id,
+              },
+            });
 
             res.redirect("/account");
           }

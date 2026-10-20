@@ -178,22 +178,23 @@ input[type="password"] {
   text-align: center;
 }
 
-.buttonClass {
+.backButton {
   padding: 20px;
   border: 1px black solid;
   width: 30%;
   align-self: center;
   border-radius: 20px;
   margin: 10px;
+  background-color: white;
 }
 
-.disabled {
+.disabledBackButton {
   cursor: not-allowed;
   color: grey;
+  font-style: italic;
 }
 
 .inFolder {
-  background-color: white;
   cursor: pointer;
   color: black;
 }

@@ -10,7 +10,7 @@
   "scripts": {
     "test": "NODE_ENV=test prisma migrate reset --force && NODE_ENV=test prisma migrate dev --name test && NODE_ENV=test prisma generate && NODE_ENV=test vitest",
     "dev": "NODE_ENV=docker tsx app.ts",
-    "local": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx --watch app.ts'",
+    "local": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx app.ts'",
     "localTest": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=test tsx --watch app.ts'",
     "docker": "prisma migrate dev --name init && prisma generate && NODE_ENV=docker tsx app.ts ",
     "migrate": "prisma migrate dev --name init && prisma generate",

@@ -4,11 +4,11 @@ import type { Response, Request } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import { uploadFile } from "../supabaseFn/uploadFile";
 import { createFolder } from "../supabaseFn/createFolder";
-import { getFullPath } from "../functions/getFullPath";
 import { prisma } from "../../lib/prisma";
 import logger from "../../config/logger";
+import { getSize } from "../fileMethods/getSize";
 
-function folderTreeCreator(newName: string, partialLocation: string) {
+async function folderTreeCreator(newName: string, partialLocation: string, userId: string) {
   const fullName = newName.split("/");
   for (let i = 0; i < fullName.length - 1; i++) {
     let folderLocation = partialLocation;
@@ -16,6 +16,17 @@ function folderTreeCreator(newName: string, partialLocation: string) {
       folderLocation += fullName[j] + "/";
     }
     createFolder(folderLocation, "Files");
+    const _createFolderInFiles = await prisma.files.create({
+      data: {
+        path: folderLocation,
+        fileName: newName,
+        mimetype: "folder",
+        size: "-",
+        currentUser: userId,
+        ownerId: userId,
+        sessionId: "0"
+      }
+    })
   }
 }
 
@@ -31,52 +42,37 @@ const fileUploader = [
   uploadFiles.array("usrFile", 50),
   body("name").escape(),
   async (req: any, res: Response) => {
+    try {
+
     req.files.forEach(async (file: any) => {
       customErrorContainer.resetError();
       const newName = setNewName(req, file);
       const location = req.body._location.replaceAll(",", "/");
       const partialLocation = req.user.id + "/" +  location + "/";
-      folderTreeCreator(newName, partialLocation);
-
+      await folderTreeCreator(newName, partialLocation, req.user.id);
 
       const uploadName = partialLocation + newName;
       const uploadFileResult = await uploadFile(file, "Files", uploadName);
+      if (!uploadFileResult) {
+        throw new Error("No Upload File Result")
+      }
+      const size = getSize(file)
       const _prismaFileList = await prisma.files.create({
         data: {
-          path: uploadFileResult?.data?.path,
+          path: uploadFileResult?.data?.path || "Home",
           fileName: uploadName,
-          fileId: uploadFileResult?.data?.id,
           mimetype: file.mimetype,
-          size: file.size,
+          size: size,
           currentUser: req.user.id,
           ownerId: req.user.id,
+          sessionId: "0",
         },
       });
-      // console.log(
-      //   "uploadFileResult",
-      //   uploadFileResult,
-      //   "file",
-      //   file,
-      //   "uploadName",
-      //   uploadName,
-      // );
     });
-    // const fullPath = getFullPath(req);
+    } catch (e) {
+      logger.error(e)
+    }
     res.redirect("/account" );
   },
 ];
 export { fileUploader };
-
-/*
- * {
-  fileId      String  @id @default(uuid())
-  path        String  @unique
-  fileName    String  //not sure if it's usefull if i already have the id but okay, maybe for the locally saved files
-  mimetype    String
-  size        Int
-  uploadTime  DateTime @default(now())
-  currentUser String
-  ownerId     String
-  owner       Users   @relation(fields: [currentUser], references: [id])
-}
- * */

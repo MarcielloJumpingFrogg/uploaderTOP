@@ -7,7 +7,14 @@ import logger from "../../config/logger";
 export const downloadController = [
   async (req: Request, res: Response) => {
     try {
-      const folderPath = req.body._location.replaceAll(",", "/");
+      // const folderPath = req.body._location.replaceAll(",", "/");
+      let environment = "user"
+      if (req.body._env === "test") {
+        environment = "test"
+      }
+
+      const folderPath = req.body._location
+      logger.test("folderPath: ", folderPath)
       const fullFilePath =
         req.user.id + "/" + folderPath + "/" + req.body._name;
       const { data, error } = await admin_supabase.storage
@@ -20,7 +27,8 @@ export const downloadController = [
       const blob = data;
       if (blob) {
         const buffer = Buffer.from(await blob.arrayBuffer());
-        const downloadFolder = path.join(__dirname, "../..", "/downloads");
+        logger.test("__dirname: ", __dirname)
+        const downloadFolder = path.join(__dirname, "../../temporaryDownloadFolder");
         const fullFileName = downloadFolder + "/" + req.body._name;
 
         await fs.promises.writeFile(fullFileName, buffer);
@@ -28,7 +36,7 @@ export const downloadController = [
 
         await new Promise((r) => setTimeout(r, 2000));
 
-        fs.unlinkSync(fullFileName);
+        fs.rmSync(fullFileName);
       }
 
       // fs.createReadStream(downloadFolder + "/" + req.body._name).pipe(res);

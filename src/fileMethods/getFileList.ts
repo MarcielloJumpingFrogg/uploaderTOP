@@ -10,26 +10,29 @@ export async function getFileList(files: any) {
     const item = element.item;
     let filetype;
     let id;
-     if (element.type == "folder") {
+    if (element.type == "folder") {
       id = "0";
       filetype = "folder";
     } else {
-       if (element.sessionId == null) {
+      if (element.sessionId == null) {
         filetype = getFileType(element);
         id = item.id;
-       } else {
-         filetype = element.type
-
+      } else {
+        filetype = element.type;
       }
-
+    }
+    const size = getSize(element);
+    let mimetype;
+    if (item.metadata !== null) {
+      mimetype = item.metadata.mimetype;
+    } else {
+      mimetype = "folder";
     }
 
-    const size = getSize(element);
-
-    // const file: any = element;
     const finalFile = {
       id: id || "0",
       type: filetype,
+      mimetype: mimetype,
       sessionId: element.sessionId || "0",
       name: item.name,
       size: size,

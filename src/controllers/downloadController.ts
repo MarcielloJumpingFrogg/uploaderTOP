@@ -3,18 +3,17 @@ import { admin_supabase } from "../../config/supabase";
 import fs from "fs";
 import path from "node:path";
 import logger from "../../config/logger";
+import { prisma } from "../../lib/prisma";
 
 export const downloadController = [
   async (req: Request, res: Response) => {
     try {
-      // const folderPath = req.body._location.replaceAll(",", "/");
-      let environment = "user"
+      let environment = "user";
       if (req.body._env === "test") {
-        environment = "test"
+        environment = "test";
       }
 
-      const folderPath = req.body._location
-      logger.test("folderPath: ", folderPath)
+      const folderPath = req.body._location;
       const fullFilePath =
         req.user.id + "/" + folderPath + "/" + req.body._name;
       const { data, error } = await admin_supabase.storage
@@ -25,10 +24,13 @@ export const downloadController = [
         logger.error(error);
       }
       const blob = data;
+
       if (blob) {
         const buffer = Buffer.from(await blob.arrayBuffer());
-        logger.test("__dirname: ", __dirname)
-        const downloadFolder = path.join(__dirname, "../../temporaryDownloadFolder");
+        const downloadFolder = path.join(
+          __dirname,
+          "../../temporaryDownloadFolder",
+        );
         const fullFileName = downloadFolder + "/" + req.body._name;
 
         await fs.promises.writeFile(fullFileName, buffer);
@@ -38,8 +40,6 @@ export const downloadController = [
 
         fs.rmSync(fullFileName);
       }
-
-      // fs.createReadStream(downloadFolder + "/" + req.body._name).pipe(res);
     } catch (e) {
       logger.error(e);
     }

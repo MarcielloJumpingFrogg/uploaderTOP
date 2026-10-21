@@ -7,18 +7,16 @@ import "colors";
 import logger from "../../config/logger";
 
 async function renderAccount(req: any, res: Response) {
-  let currentPath = "Home"
+  let currentPath = "Home";
   if (req.currentPath !== undefined) {
-    currentPath = req.currentPath
+    currentPath = req.currentPath;
   }
 
-  logger.test("helloo ")
-  let folderOwner = req.folderOwner || req.user.id
-  let pathToExtract = req.pathToExtract || currentPath
-
+  let folderOwner = req.folderOwner || req.user.id;
+  let pathToExtract = req.pathToExtract || currentPath;
 
   const avatar = await getAvatar(req.user.id);
-  const files = await getFiles(folderOwner, pathToExtract)
+  const files = await getFiles(folderOwner, pathToExtract);
   const fileList: any[] = await getFileList(files);
 
   let popUp = {};

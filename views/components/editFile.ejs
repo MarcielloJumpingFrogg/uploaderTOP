@@ -33,6 +33,7 @@
     <input type="hidden" name="_location" value="<%=path%>" />
     <input type="hidden" name="_name" value="<%=finalName%>" />
     <input type="hidden" name="_id" value="<%= file.id %>" />
+    <input type="hidden" name="_mimetype" value="<%= file.mimetype %>"/>
     <button type="submit">Download</button>
   </form>
   <% } %>

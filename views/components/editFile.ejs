@@ -6,6 +6,8 @@
     <input type="hidden" name="_location" value="<%=path%>" />
     <input type="hidden" name="_name" value="<%=finalName%>" />
     <input type="hidden" name="_type" value="<%=finalFileType%>" />
+    <input type="hidden" name="_sessionId" value="<%=file.sessionId%>" />
+    <input type="hidden" name="_folderOwner" value="<%=folderOwner %>"/>
     <button type="submit" value="Delete">Delete</button>
   </form>
   <form action="/account/rename" method="POST">
@@ -13,6 +15,9 @@
     <input type="hidden" name="_location" value="<%=path%>" />
     <input type="hidden" name="_name" value="<%=finalName%>" />
     <input type="hidden" name="_type" value="<%=finalFileType%>" />
+    <input type="hidden" name="_folderOwner" value="<%=folderOwner %>"/>
+    <input type="hidden" name="_folderSession" value="<%=folderSession%>"/>
+    <input type="hidden" name="_sessionId" value="<%=file.sessionId%>" />
     <label for="newName">New Name:</label>
     <input type="text" name="newName" />
     <button type="submit" value="Rename">Rename</button>

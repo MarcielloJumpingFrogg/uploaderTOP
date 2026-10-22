@@ -29,7 +29,8 @@ async function renderAccount(req: any, res: Response) {
     errorName: customErrorContainer.getErrorName(),
     errors: customErrorContainer.getErrorList(),
     avatar: avatar,
-    folderOwner: req.user.id === folderOwner ? 0 : folderOwner,
+    folderSession: req.folderSession || "0",
+    folderOwner: req.user.id === folderOwner ? "0" : folderOwner,
     path: pathToExtract,
     popUp: popUp,
   });

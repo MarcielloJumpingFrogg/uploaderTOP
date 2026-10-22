@@ -1,4 +1,10 @@
-import { resetDb, resetBuckets } from "./functions";
+import {
+  resetDb,
+  resetBuckets,
+  signUp,
+  uploadFile,
+  shareFile,
+} from "./functions";
 import { /*beforeEach,*/ expect, it, describe } from "vitest";
 import { app } from "../app";
 import request from "supertest";
@@ -16,51 +22,37 @@ describe("Implementing the functionality of share", async () => {
   const secondAgent = request.agent(app);
   const firstUserCredentials = {
     username: "shareFileUser1",
-    password: "Password1234!",
   };
   const secondUserCredentials = {
     username: "shareFileUser2",
-    password: "Password1234!",
   };
-  await firstAgent.post("/signUp").type("form").send({
-    username: firstUserCredentials.username,
-    password: firstUserCredentials.password,
-  });
-  await secondAgent.post("/signUp").type("form").send({
-    username: secondUserCredentials.username,
-    password: secondUserCredentials.password,
-  });
-
+  await signUp(firstAgent, firstUserCredentials);
+  await signUp(secondAgent, secondUserCredentials);
   const firstUser = await firstAgent.get("/api/user");
   const firstId = firstUser._body.user.id;
   const secondUser = await secondAgent.get("/api/user");
   const secondId = secondUser._body.user.id;
 
-  await firstAgent
-    .post("/account/file")
-    .type("form")
-    .field("newName", "newFolder/newFileForUniqueIdentification")
-    .field("_location", "/Home")
-    .attach("usrFile", __dirname + "/testFiles/textTest.txt")
-    .expect(302);
+  const uniqueFileName = "newFileForUniqueIdentification";
+  const fullUniqueFileName = `newFolder/${uniqueFileName}`;
+  const fileToUpload = "textTest.txt";
+  await uploadFile(firstAgent, fullUniqueFileName, "/Home", fileToUpload);
 
-  const shareFilePath = firstId + "/Home/newFolder/newFileForUniqueIdentification";
+  const shareFilePath =
+    firstId + "/Home/newFolder/newFileForUniqueIdentification";
 
-  const shareResult = await firstAgent
-    .post("/share/create")
-    .send({
-      _location: "Home/newFolder",
-      _fileType: "plain/text",
-      _name:"newFileForUniqueIdentification",
-      canEdit: "on",
-      daysExpiration: 1,
-    })
-    .expect(200);
+  const shareParams = {
+    _location: "Home/newFolder",
+    _fileType: "plain/text",
+    _name: "newFileForUniqueIdentification",
+    canEdit: "on",
+    daysExpiration: 1,
+  };
+  const shareResult = await shareFile(firstAgent, shareParams);
 
   const shareSession = await prisma.shareSession.findMany({
     where: { filePath: shareFilePath },
   });
-
 
   if (shareSession === undefined) {
     throw new Error("shareSession is undefined");
@@ -97,26 +89,24 @@ describe("Implementing the functionality of share", async () => {
   });
 
   it("There are multiple files in a single shared folder: ", async () => {
-    const _firstResult = await firstAgent
-      .post("/account/file")
-      .type("form")
-      .field("newName", "newFolder/newSubFolder/newFile2")
-      .field("_location", "Home")
-      .attach("usrFile", __dirname + "/testFiles/textTest.txt")
-      .expect(302);
+    const secondUploadName = "newFolder/newSubFolder/newFile2";
+    const _firstResult = await uploadFile(
+      firstAgent,
+      secondUploadName,
+      "/Home",
+      fileToUpload,
+    );
 
+    const paramsSecondShare = {
+      _location: "Home",
+      _fileType: "folder",
+      _name: "newFolder",
+      canEdit: "on",
+      daysExpiration: 1,
+    };
 
     const secondShareFilePath = firstId + "/Home/newFolder";
-    const secondShareResult = await firstAgent
-      .post("/share/create")
-      .send({
-        _location: "Home",
-        _fileType: "folder",
-        _name:"newFolder",
-        canEdit: "on",
-        daysExpiration: 1,
-      })
-      .expect(200);
+    const secondShareResult = await shareFile(firstAgent, paramsSecondShare);
 
     const secondShareSession = await prisma.shareSession.findFirst({
       where: { filePath: secondShareFilePath },
@@ -128,26 +118,32 @@ describe("Implementing the functionality of share", async () => {
     expect(secondShareResult.text).toContain(
       "/share/add/" + secondShareSession.id,
     );
-    const secondShareSessionResult = await secondAgent.get("/share/add/" + secondShareSession.id).expect(302);
+    const secondShareSessionResult = await secondAgent
+      .get("/share/add/" + secondShareSession.id)
+      .expect(302);
 
-    const homePageSecondAgent = await secondAgent.get("/account").expect(200)
-    expect(homePageSecondAgent.text).toContain("<p>newFolder</p>")
+    const homePageSecondAgent = await secondAgent.get("/account").expect(200);
+    expect(homePageSecondAgent.text).toContain("<p>newFolder</p>");
 
-    const multiFilesInSharedFolder = await secondAgent.get("/account/"+ secondShareSession.id +"/Home@newFolder").expect(200)
+    const multiFilesInSharedFolder = await secondAgent
+      .get("/account/" + secondShareSession.id + "/Home@newFolder")
+      .expect(200);
 
-    expect(multiFilesInSharedFolder.text).toContain("<p>newFileForUniqueIdentification</p>")
-    expect(multiFilesInSharedFolder.text).toContain("<p>newSubFolder</p>")
-
+    expect(multiFilesInSharedFolder.text).toContain(`<p>${uniqueFileName}</p>`);
+    expect(multiFilesInSharedFolder.text).toContain("<p>newSubFolder</p>");
   });
 
   it("Travel inside the original user's folder", async () => {
-    const homePage = await firstAgent.get("/account").expect(200)
-    expect( homePage.text ).toContain("<p>newFolder</p>")
-  })
+    const homePage = await firstAgent.get("/account").expect(200);
+    expect(homePage.text).toContain("<p>newFolder</p>");
+  });
 
   it("Travel with url: ", async () => {
-    const currentResult = await firstAgent.get("/account/0/Home@newFolder").expect(200)
-  })
+    const currentResult = await firstAgent
+      .get("/account/0/Home@newFolder")
+      .expect(200);
 
-
+    expect(currentResult.text).toContain(`<p>${uniqueFileName}</p>`);
+    expect(currentResult.text).toContain(`<p>newSubFolder</p>`);
+  });
 });

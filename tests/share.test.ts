@@ -38,8 +38,7 @@ describe("Implementing the functionality of share", async () => {
   const fileToUpload = "textTest.txt";
   await uploadFile(firstAgent, fullUniqueFileName, "/Home", fileToUpload);
 
-  const shareFilePath =
-    firstId + "/Home/newFolder/newFileForUniqueIdentification";
+  const shareFilePath = firstId + "/Home/newFolder/";
 
   const shareParams = {
     _location: "Home/newFolder",
@@ -48,10 +47,13 @@ describe("Implementing the functionality of share", async () => {
     canEdit: "on",
     daysExpiration: 1,
   };
-  const shareResult = await shareFile(firstAgent, shareParams);
+  const { shareCreateResult } = await shareFile(firstAgent, shareParams);
 
   const shareSession = await prisma.shareSession.findMany({
-    where: { filePath: shareFilePath },
+    where: {
+      filePath: { startsWith: shareFilePath },
+      fileName: uniqueFileName,
+    },
   });
 
   if (shareSession === undefined) {
@@ -62,7 +64,7 @@ describe("Implementing the functionality of share", async () => {
   const idShared = shareSession[0].id;
 
   it("A user logs in and tries to share the file", async () => {
-    expect(shareResult.text).toContain("/share/add/" + idShared);
+    expect(shareCreateResult.text).toContain("/share/add/" + idShared);
   });
 
   it("A user adds the link and has the file now", async () => {
@@ -105,17 +107,20 @@ describe("Implementing the functionality of share", async () => {
       daysExpiration: 1,
     };
 
-    const secondShareFilePath = firstId + "/Home/newFolder";
+    const secondShareFilePath = firstId + "/Home/";
     const secondShareResult = await shareFile(firstAgent, paramsSecondShare);
 
     const secondShareSession = await prisma.shareSession.findFirst({
-      where: { filePath: secondShareFilePath },
+      where: {
+        filePath: { startsWith: secondShareFilePath },
+        fileName: "newFolder",
+      },
     });
 
     if (secondShareSession === null) {
       throw new Error("Second Share Session is null");
     }
-    expect(secondShareResult.text).toContain(
+    expect(secondShareResult?.shareCreateResult.text).toContain(
       "/share/add/" + secondShareSession.id,
     );
     const secondShareSessionResult = await secondAgent

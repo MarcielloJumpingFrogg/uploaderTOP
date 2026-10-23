@@ -10,22 +10,22 @@ export async function getFiles(userId: string, currentFolder: string) {
   const fileSharedFromOthers = await prisma.sharedFiles.findMany({
     where: {
       destinationUser: userId,
-    }
-  })
+    },
+  });
 
-
-  let getFromPathResult
+  let getFromPathResult;
   for (let i = 0; i < fileSharedFromOthers.length; i++) {
     const file = fileSharedFromOthers[i];
-    const shareSession = await prisma.shareSession.findUnique({where: {id: file?.sessionId}})
+    const shareSession = await prisma.shareSession.findUnique({
+      where: { id: file?.sessionId },
+    });
 
-    const targetFilePath = shareSession?.originalUser + "/" + currentFolder
+    const targetFilePath = shareSession?.originalUser + "/" + currentFolder;
 
     if (shareSession?.filePath.startsWith(targetFilePath)) {
       getFromPathResult = await getFromPath(file);
     } else {
     }
-
 
     for (let j = 0; j < getFromPathResult.length; j++) {
       result.push(getFromPathResult[j]);

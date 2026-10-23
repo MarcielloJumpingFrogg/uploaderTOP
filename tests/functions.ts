@@ -24,10 +24,12 @@ async function signUp(
   agent: request.Agent,
   creadentials: { username: string; password?: string },
 ) {
-  await agent
+  const something = await agent
     .post("/signUp")
     .type("form")
     .send({ username: creadentials.username, password: generalPassword });
+
+  const user = await agent.get("/api/user");
 }
 
 async function uploadFile(
@@ -51,11 +53,32 @@ async function shareFile(
     _location: string;
     _fileType: string;
     _name: string;
-    canEdit: string;
-    daysExpiration: number;
+    canEdit?: string;
+    daysExpiration?: number;
   },
 ) {
-  return await agent.post("/share/create").send(params).expect(200);
+  try {
+    const shareCreateResult = await agent
+      .post("/share/create")
+      .send(params)
+      .expect(200);
+
+    const user = await agent.get("/api/user");
+    const userId = user._body.user.id;
+    const filePath = userId + "/" + params._location + "/" + params._name;
+
+    const shareSession = await prisma.shareSession.findMany({
+      where: { filePath: filePath, originalUser: userId },
+    });
+
+    if (!shareSession) {
+      throw new Error("No share session");
+    }
+
+    return { shareCreateResult, shareSession };
+  } catch (e) {
+    logger.error("Error in shareFile: ", e);
+  }
 }
 
 export { resetDb, resetBuckets, signUp, uploadFile, shareFile };

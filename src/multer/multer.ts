@@ -49,7 +49,7 @@ const uploadFiles = multer({
   limits: {
     fileSize: 1024 * 1024 * 5,
     files: 100,
-    fields: 2,
+    fields: 3,
     fieldNestingDepth: 3,
   },
 });

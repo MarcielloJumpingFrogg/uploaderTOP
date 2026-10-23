@@ -8,7 +8,7 @@ export const shareCreatorController = [
       let itemName = "";
       if (!req.body._path) {
         const currentPath = req.body._location.replaceAll(",", "/");
-        itemName = req.user.id + "/" + currentPath + "/" + req.body._name;
+        itemName = req.user.id + "/" + currentPath + "/";
       } else {
         itemName = req.body._path;
       }
@@ -29,7 +29,7 @@ export const shareCreatorController = [
       expiration = expiration * dayInMs;
       const expirationDay = Date.now() + expiration;
 
-      let canBeEdited = false
+      let canBeEdited = false;
       if (req.body.canEdit) {
         canBeEdited = req.body.canEdit === "on" ? true : false;
       }
@@ -43,7 +43,6 @@ export const shareCreatorController = [
           edit: canBeEdited,
         },
       });
-
 
       req.popUp = {
         title: "Url: ",

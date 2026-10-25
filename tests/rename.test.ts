@@ -9,7 +9,6 @@ import {
   shareFile,
 } from "./functions";
 import { prisma } from "../lib/prisma";
-import { SessionScalarFieldEnum } from "../generated/prisma/internal/prismaNamespace";
 import logger from "../config/logger";
 
 await resetBuckets();
@@ -24,9 +23,9 @@ describe("Controllig that rename works properly", async () => {
   await signUp(ownerAgent, ownerParams);
   await signUp(sharedAgent, sharedParams);
 
-  const _apiOwner = await ownerAgent.get("/api/user");
+  const _apiOwner: any = await ownerAgent.get("/api/user");
   const ownerId = _apiOwner._body.user.id;
-  const _apiShared = await sharedAgent.get("/api/user");
+  const _apiShared: any = await sharedAgent.get("/api/user");
   const sharedId = _apiShared._body.user.id;
 
   const oldUniqueName = "fileToBeChanged.txt";
@@ -34,7 +33,6 @@ describe("Controllig that rename works properly", async () => {
   const fileToUpload = "textTest.txt";
 
   const secondName = "changedUniqueName";
-  const thirdName = "againChangedUniqueNameForTheSecondTime";
 
   async function upload() {
     const uploadResult = await uploadFile(
@@ -120,7 +118,7 @@ describe("Controllig that rename works properly", async () => {
     const firstPull = await ownerAgent.get("/account");
 
     expect(firstPull.text).toContain(`<p>${secondName}</p>`);
-    // await resetBuckets();
+    await resetBuckets();
   });
 
   it("user that has the file shared with will rename something inside the folder", async () => {
@@ -129,23 +127,21 @@ describe("Controllig that rename works properly", async () => {
     const uploadResult = await uploadFile(
       ownerAgent,
       "firstToBeChanged",
-      "Home",
+      "Home/someFolder",
       fileToUpload,
     );
     expect(uploadResult.statusCode).toBe(302);
     await shareFile(ownerAgent, {
-      _location: "Home/newFolder",
+      _location: "Home/someFolder",
       _fileType: "folder",
       _name: "firstToBeChanged",
       canEdit: "on",
       daysExpiration: 1,
     });
 
-    const shareSession = await prisma.shareSession.findMany({
+    const shareSession: any = await prisma.shareSession.findMany({
       where: { originalUser: ownerId, fileName: "firstToBeChanged" },
     });
-
-    logger.test("shareSessions: ", shareSession);
 
     if (!shareSession) {
       throw new Error("No Share Session");
@@ -154,41 +150,21 @@ describe("Controllig that rename works properly", async () => {
     const sharedHomeBefore = await sharedAgent.get("/account");
     expect(sharedHomeBefore.text).toContain(`<p>firstToBeChanged</p>`);
 
-    // await fileRename(
-    //   sharedAgent,
-    //   oldUniqueName,
-    //   secondName,
-    //   "Home",
-    //   shareSession.id,
-    //   "0",
-    // );
-    //
-    console.log(
-      "_location:     ",
-      "Home",
-      "_name:         ",
-      oldUniqueName,
-      "_type:         ",
-      "file",
-      "newName:       ",
-      secondName,
-      "_sessionId:    ",
-      shareSession.id,
-      "_folderSession:",
-      "0",
-    );
-
-    const result = await sharedAgent.post("/account/rename").type("form").send({
+    // const result =
+    await sharedAgent.post("/account/rename").type("form").send({
       _location: "Home",
       _name: "firstToBeChanged",
       _type: "file",
       newName: "secondlyInserted",
-      _sessionId: shareSession.id,
+      _sessionId: shareSession[0].id,
       _folderSession: "0",
     });
     const sharedHome = await sharedAgent.get("/account");
     expect(sharedHome.text).toContain(`<p>secondlyInserted</p>`);
+    // expect(sharedHome.text).toContain(`<p>`);
   });
+
+  it("a folder is shared and rename inside it ", async () => {});
 
   it("shared user cannot rename homeFolder", async () => {});
 

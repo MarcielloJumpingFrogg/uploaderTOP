@@ -10,7 +10,7 @@ export async function moveFile(
     const { data, error } = await admin_supabase.storage
       .from(bucket)
       .move(oldFileName, newFileName);
-    logger.test("data: ", data);
+    // logger.test("data: ", data);
     if (error) {
       logger.error("error", error);
     }

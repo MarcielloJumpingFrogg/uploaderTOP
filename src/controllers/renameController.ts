@@ -4,6 +4,8 @@ import { getAllFilesSubfolders } from "../supabaseFn/getAllFilesSubfolders";
 import logger from "../../config/logger";
 import { prisma } from "../../lib/prisma";
 import { admin_supabase } from "../../config/supabase";
+import customErrorContainer from "../customErrors/customErrorContainer";
+import { exit } from "process";
 
 async function updateDb(oldPath: string, newNamePath: string, newName: string) {
   const fulldb = await prisma.shareSession.findMany({});
@@ -39,65 +41,94 @@ async function fileUpdateDb(id: string, newName: string) {
   return result;
 }
 
+function isShared(req: any) {
+  const fileSessionId = req.body._sessionId;
+  const folderSessionId = req.body._folderSession;
+  if (fileSessionId !== "0" && fileSessionId !== undefined) {
+    //this means the fileSessionId is the main provider
+    logger.test("fileSessionId", fileSessionId);
+    return fileSessionId;
+  } else if (
+    folderSessionId !== "0" &&
+    folderSessionId !== undefined &&
+    (fileSessionId === "0" || fileSessionId === undefined)
+  ) {
+    //this means the folderSession is the main provider
+    logger.test("folderSessionId", folderSessionId);
+    return folderSessionId;
+  } else {
+    return false;
+  }
+}
+
+async function getIds(req: any) {
+  let session;
+  let owner;
+  let foundSession;
+  // const fileSessionId = req.body._sessionId;
+  // const folderSessionId = req.body._folderSession;
+
+  const isFileShared = isShared(req);
+  if (isFileShared) {
+    session = isFileShared;
+  } else {
+    owner = req.user.id;
+    session = "0";
+  }
+  if (session !== "0") {
+    foundSession = await prisma.shareSession.findUnique({
+      where: { id: session },
+    });
+    owner = foundSession?.originalUser;
+  }
+  return { session, owner, foundSession };
+}
+
 const renameController = [
   async (req: any, res: Response) => {
     try {
+      logger.test("body: ", req.body);
       const locationPath = req.body._location.replaceAll(",", "/");
 
-      let owner;
-      let session;
-      let foundSession;
+      const { owner, foundSession } = await getIds(req);
 
-      const fileSessionId = req.body._sessionId;
-      const folderSessionId = req.body._folderSession;
-
-      if (
-        fileSessionId !== "0" &&
-        fileSessionId !== undefined &&
-        (folderSessionId === "0" || folderSessionId === undefined)
-      ) {
-        //this means the fileSessionId is the main provider
-        session = fileSessionId;
-      } else if (
-        folderSessionId !== "0" &&
-        folderSessionId !== undefined &&
-        (fileSessionId === "0" || fileSessionId === undefined)
-      ) {
-        //this means the folderSession is the main provider
-        session = folderSessionId;
-      } else {
-        owner = req.user.id;
-        session = "0";
-      }
-      if (session !== "0") {
-        foundSession = await prisma.shareSession.findUnique({
-          where: { id: session },
-        });
-        owner = foundSession?.originalUser;
+      if (owner !== req.user.id && foundSession?.edit === false) {
+        customErrorContainer.renameError(401, "Not allowed to edit");
+        res.redirect("/account");
+        return;
       }
 
       const partialPath = owner + "/" + locationPath + "/";
       let oldPath;
       let newPath;
+      // logger.test("foundSession.fileapath: ", foundSession);
       if (
         foundSession !== undefined &&
         foundSession?.filePath !== undefined &&
         foundSession.fileName !== undefined
       ) {
-        oldPath = foundSession?.filePath + foundSession?.fileName;
-        newPath = foundSession?.filePath + req.body.newName;
+        if (foundSession.type === "folder") {
+          oldPath =
+            foundSession.filePath +
+            foundSession.fileName +
+            "/" +
+            req.body._name;
+          newPath =
+            foundSession.filePath +
+            foundSession.fileName +
+            "/" +
+            req.body.newName;
+        } else {
+          oldPath = foundSession.filePath + foundSession.fileName;
+          newPath = foundSession.filePath + req.body.newName;
+        }
       } else {
         oldPath = partialPath + req.body._name;
         newPath = partialPath + req.body.newName;
       }
       if (req.body._type !== "folder") {
-        logger.toImplement(
-          "NEED TO ADD THE CHECK FOR EACH FILE THAT GETS MODIFIED IF THE USER IS ALLOWED",
-        );
-        logger.toImplement(
-          "PROBABLY SHOULD ALSO FIGURE OUT THIS STUFF WITH THE PRISMA.FILES",
-        );
-        logger.toImplement("WOULD ALSO LIKE A REFACTORING ");
+        // logger.test("oldPath: ", oldPath);
+        // logger.test("newPath: ", newPath);
         await moveFile(oldPath, newPath, "Files");
         await fileUpdateDb(req.body._sessionId, req.body.newName);
       } else {

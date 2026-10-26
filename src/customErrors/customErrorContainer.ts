@@ -36,6 +36,12 @@ class CustomErrorContainer {
     this.errors.push({ message: error });
   }
 
+  renameError(errorCode: number, error: string) {
+    this.resetError();
+    this.errorCode = errorCode;
+    this.errors.push({ message: error });
+  }
+
   resetError() {
     this.errorCode = 200;
     this.errors = [];

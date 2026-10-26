@@ -63,14 +63,17 @@ async function shareFile(
       .send(params)
       .expect(200);
 
-    const user = await agent.get("/api/user");
+    const user: any = await agent.get("/api/user");
     const userId = user._body.user.id;
-    const filePath = userId + "/" + params._location + "/" + params._name;
+    const filePath = userId + "/" + params._location + "/";
 
     const shareSession = await prisma.shareSession.findMany({
-      where: { filePath: filePath, originalUser: userId },
+      where: {
+        filePath: filePath,
+        originalUser: userId,
+        fileName: params._name,
+      },
     });
-
     if (!shareSession) {
       throw new Error("No share session");
     }

@@ -1,49 +1,7 @@
-<div class="bottomContainer flex flex-col">
-  <%
-  let buttonClass = "disabledBackButton"
-  let text = " <= Back"
-  let backPath = "/account/" + folderOwner + "/"
-  const splitPath = path.split("/")
-  if(splitPath.length > 1 ){
-    buttonClass = "inFolder"
-  } else {
-    buttonClass = "disabledBackButton"
-  }
-  for(let i = 0; i < splitPath.length - 1; i ++){
-    backPath += splitPath[i]
-    if(i != splitPath.length - 2){
-      backPath += "@"
-    }
-  }
-  if(buttonClass == "inFolder") { %>
-  <button class="backButton <%=buttonClass%>" onClick="location.href = '<%=backPath%>'">
-    <%= text %>
-  </button>
-  <% } else { %>
-  <button class="backButton <%=buttonClass%>" >
-      <%= text %>
-  </button>
-  <% } %>
-  <button class="newFolderButton" onClick="folderFormReveal()">
-    New Folder
-  </button>
-  <script>
-    function folderFormReveal() {
-      const folderForm = document.getElementById("folderForm");
-      folderForm.classList.toggle("hidden");
-      folderForm.classList.toggle("showFolderForm");
-    }
-  </script>
-  <div id="folderForm" class="hidden">
-    <form action="/account/newFolder" method="POST">
-      <label for="folderName">Folder Name: </label>
-      <input type="text" name="folderName" />
-      <input type="hidden" name="_location" value="<%=path%>" />
-      <button type="submit">Confirm</button>
-    </form>
-  </div>
+<!DOCTYPE html>
+<div class="bottomContainer flex flex-col bg-gray-100 min-h-full m-3 p-2 rounded-2xl">
 
-  <div class="listContainer flex flex-wrap justify-center">
+  <div class="listContainer flex flex-wrap justify-center min-h-full">
     <% if(files.length == 0 ) { %>
     <p>No files</p>
     <%} else {
@@ -53,7 +11,7 @@
         let finalFileType = file.type;
         let finalName=file.name %>
 
-    <div class="itemContainer">
+    <div class="itemContainer bgAmber">
       <div>
         <button class="menuButton" onclick="toggleOptions(this, '.editFile')">
           <img

@@ -10,12 +10,15 @@
       "Courier New", monospace;
     --color-red-200: oklch(88.5% 0.062 18.334);
     --color-amber-100: oklch(96.2% 0.059 95.617);
+    --color-gray-100: oklch(96.7% 0.003 264.542);
+    --color-white: #fff;
     --spacing: 0.25rem;
     --text-2xl: 1.5rem;
     --text-2xl--line-height: calc(2 / 1.5);
     --text-3xl: 1.875rem;
     --text-3xl--line-height: calc(2.25 / 1.875);
     --font-weight-bold: 700;
+    --radius-lg: 0.5rem;
     --radius-2xl: 1rem;
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
@@ -179,6 +182,15 @@
   .static {
     position: static;
   }
+  .m-2 {
+    margin: calc(var(--spacing) * 2);
+  }
+  .m-3 {
+    margin: calc(var(--spacing) * 3);
+  }
+  .mx-4 {
+    margin-inline: calc(var(--spacing) * 4);
+  }
   .block {
     display: block;
   }
@@ -188,14 +200,42 @@
   .hidden {
     display: none;
   }
+  .size-10 {
+    width: calc(var(--spacing) * 10);
+    height: calc(var(--spacing) * 10);
+  }
+  .min-h-full {
+    min-height: 100%;
+  }
+  .w-1\/7 {
+    width: calc(1 / 7 * 100%);
+  }
+  .w-1\/9 {
+    width: calc(1 / 9 * 100%);
+  }
   .w-20 {
     width: calc(var(--spacing) * 20);
+  }
+  .min-w-20 {
+    min-width: calc(var(--spacing) * 20);
+  }
+  .min-w-50 {
+    min-width: calc(var(--spacing) * 50);
+  }
+  .transform {
+    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
   .flex-col {
     flex-direction: column;
   }
+  .flex-row {
+    flex-direction: row;
+  }
   .flex-wrap {
     flex-wrap: wrap;
+  }
+  .justify-between {
+    justify-content: space-between;
   }
   .justify-center {
     justify-content: center;
@@ -206,12 +246,43 @@
   .rounded {
     border-radius: 0.25rem;
   }
+  .rounded-2xl {
+    border-radius: var(--radius-2xl);
+  }
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+  .border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
   .border-2 {
     border-style: var(--tw-border-style);
     border-width: 2px;
   }
+  .bg-gray-100 {
+    background-color: var(--color-gray-100);
+  }
   .bg-red-200 {
     background-color: var(--color-red-200);
+  }
+  .bg-white {
+    background-color: var(--color-white);
+  }
+  .p-2 {
+    padding: calc(var(--spacing) * 2);
+  }
+  .px-2 {
+    padding-inline: calc(var(--spacing) * 2);
+  }
+  .px-5 {
+    padding-inline: calc(var(--spacing) * 5);
+  }
+  .py-1 {
+    padding-block: var(--spacing);
+  }
+  .py-2 {
+    padding-block: calc(var(--spacing) * 2);
   }
   .text-2xl {
     font-size: var(--text-2xl);
@@ -239,8 +310,13 @@
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
 }
+html {
+  min-height: 100vh;
+}
 body {
-  background-color: hsl(0, 90%, 20%);
+  background-color: hsl(0, 0%, 100%);
+  min-height: 75vh;
+  height: 75vh;
 }
 .error {
   color: red;
@@ -382,7 +458,7 @@ input[type="text"], input[type="password"] {
 }
 .itemContainer:hover {
   z-index: 2;
-  background-color: hsl(48, 97%, 85%, 100%);
+  background-color: hsl(43 100 75);
 }
 .item {
   height: 100%;
@@ -396,16 +472,17 @@ input[type="text"], input[type="password"] {
 .backButton {
   padding: 20px;
   border: 1px black solid;
-  width: 30%;
+  width: 100%;
   align-self: center;
   border-radius: 20px;
   margin: 10px;
-  background-color: white;
+  background-color: hsl(43 100 75);
 }
 .disabledBackButton {
   cursor: not-allowed;
   color: grey;
   font-style: italic;
+  background-color: hsl(43 100 85);
 }
 .inFolder {
   cursor: pointer;
@@ -448,6 +525,29 @@ input[type="text"], input[type="password"] {
   border-radius: 10px;
   background-color: white;
   border: 1px grey solid;
+}
+.bgAmber {
+  background-color: hsl(43 100 85);
+}
+@property --tw-rotate-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-z {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-y {
+  syntax: "*";
+  inherits: false;
 }
 @property --tw-border-style {
   syntax: "*";
@@ -526,6 +626,11 @@ input[type="text"], input[type="password"] {
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
     *, ::before, ::after, ::backdrop {
+      --tw-rotate-x: initial;
+      --tw-rotate-y: initial;
+      --tw-rotate-z: initial;
+      --tw-skew-x: initial;
+      --tw-skew-y: initial;
       --tw-border-style: solid;
       --tw-font-weight: initial;
       --tw-shadow: 0 0 #0000;

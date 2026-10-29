@@ -1,5 +1,36 @@
 <!DOCTYPE html>
-<div>
+<div class="flex flex-row justify-between bg-white ">
+<div class="w-1/7 min-w-20">
+  <%
+  let buttonClass = "disabledBackButton"
+  let text = " <= Back"
+  let backPath = "/account/" + folderOwner + "/"
+  const splitPath = path.split("/")
+  if(splitPath.length > 1 ){
+    buttonClass = "inFolder"
+  } else {
+    buttonClass = "disabledBackButton"
+  }
+  for(let i = 0; i < splitPath.length - 1; i ++){
+    backPath += splitPath[i]
+    if(i != splitPath.length - 2){
+      backPath += "@"
+    }
+  }
+  if(buttonClass == "inFolder") { %>
+  <button class="backButton <%=buttonClass%>" onClick="location.href = '<%=backPath%>'">
+    <%= text %>
+  </button>
+  <% } else { %>
+  <button class="backButton <%=buttonClass%>" >
+      <%= text %>
+  </button>
+  <% } %>
+</div>
+
+<div class="w-1/9 min-w-50 flex flex-row justify-center px-5 py-2 border mx-4 rounded-2xl bgAmber" >
+  <button class="bg-white rounded-lg px-2 py-1 m-2 border " onclick="toggleOptions(this, '.submitNewFile')"><img class="size-10" src="/static/add-file.svg" alt="add-new-file"></button>
+  <div class="submitNewFile hidden">
   <form action="/account/file" method="post" enctype="multipart/form-data">
     <label for="file">New File: </label>
     <input type="file" name="usrFile" id="file" required multiple />
@@ -10,4 +41,17 @@
     <br />
     <button type="submit">Submit</button>
   </form>
+  </div>
+
+  <button class="bg-white rounded-lg px-2 py-1 m-2 border" onclick="toggleOptions(this, '.submitNewFolder')"><img class="size-10" src="/static/add-folder.svg" alt="add-new-file"></button>
+  <div id="folderForm" class="submitNewFolder hidden">
+    <form action="/account/newFolder" method="POST">
+      <label for="folderName">Folder Name: </label>
+      <input type="text" name="folderName" />
+      <input type="hidden" name="_location" value="<%=path%>" />
+      <button type="submit">Confirm</button>
+    </form>
+  </div>
+</div>
+
 </div>

@@ -1,7 +1,13 @@
 @import "tailwindcss";
 
+
+html {
+  min-height: 100vh;
+}
 body {
-  background-color: hsl(0, 90%, 20%);
+  background-color: hsl(0, 0%, 100%);
+  min-height: 75vh;
+  height: 75vh;
 }
 
 .error {
@@ -165,7 +171,7 @@ input[type="password"] {
 
 .itemContainer:hover {
   z-index: 2;
-  background-color: hsl(48, 97%, 85%, 100%);
+  background-color: hsl(43 100 75);
 }
 
 .item {
@@ -181,17 +187,18 @@ input[type="password"] {
 .backButton {
   padding: 20px;
   border: 1px black solid;
-  width: 30%;
+  width: 100%;
   align-self: center;
   border-radius: 20px;
   margin: 10px;
-  background-color: white;
+  background-color: hsl(43 100 75);
 }
 
 .disabledBackButton {
   cursor: not-allowed;
   color: grey;
   font-style: italic;
+  background-color: hsl(43 100 85)
 }
 
 .inFolder {
@@ -240,4 +247,8 @@ input[type="password"] {
   border-radius: 10px;
   background-color: white;
   border: 1px grey solid;
+}
+
+.bgAmber{
+  background-color: hsl(43 100 85);
 }

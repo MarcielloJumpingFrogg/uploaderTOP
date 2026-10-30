@@ -7,19 +7,13 @@ import {
   signUp,
   uploadFile,
   shareFile,
+  softReset,
 } from "./functions";
 import { prisma } from "../lib/prisma";
 import logger from "../config/logger";
 
 await resetBuckets();
 await resetDb();
-
-async function softReset() {
-  await prisma.sharedFiles.deleteMany();
-  await prisma.shareSession.deleteMany();
-  await prisma.files.deleteMany();
-  await resetBuckets();
-}
 
 describe("Controllig that rename works properly", async () => {
   afterEach(async () => {

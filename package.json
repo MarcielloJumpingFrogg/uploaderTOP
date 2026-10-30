@@ -8,7 +8,7 @@
   "type": "module",
   "main": "app.ts",
   "scripts": {
-    "test": "NODE_ENV=test prisma migrate reset --force && NODE_ENV=test prisma migrate dev --name test && NODE_ENV=test prisma generate && NODE_ENV=test vitest",
+    "test": "NODE_ENV=test prisma migrate reset --force && NODE_ENV=test prisma generate && NODE_ENV=test vitest",
     "dev": "NODE_ENV=docker tsx app.ts",
     "local": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx app.ts'",
     "localTest": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=test tsx --watch app.ts'",
@@ -30,11 +30,13 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "express-validator": "^7.3.2",
+    "file-type": "^22.3.0",
     "multer": "^2.2.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "^8.22.0",
     "pg-pool": "^3.14.0",
+    "read-chunk": "^5.0.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.0"
   },

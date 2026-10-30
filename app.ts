@@ -1,4 +1,5 @@
 import express from "express";
+import "dotenv/config";
 import { passport } from "./config/passport";
 import { routes } from "./src/startup/routes";
 import type { Express } from "express";
@@ -20,12 +21,14 @@ const require = createRequire(import.meta.url);
 
 require("dotenv/config");
 
+const month = 1000 * 60 * 60 * 24 * 30;
+
 app.use(
   expressSession({
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000 * 365, // ms
+      maxAge: month,
     },
-    secret: "a santa at nasa",
+    secret: process.env.EXPRESS_SESSION || "blank",
     resave: true,
     saveUninitialized: true,
     store: new PrismaSessionStore(prisma, {

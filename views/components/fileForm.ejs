@@ -4,18 +4,11 @@
   <%
   let buttonClass = "disabledBackButton"
   let text = " <= Back"
-  let backPath = "/account/" + folderOwner + "/"
-  const splitPath = path.split("/")
-  if(splitPath.length > 1 ){
+  let backPath = "/account/" + locals.isOwner + "/" + locals.parentFolderId || "Home"
+  if( locals.parentFolderId !== "Home" && locals.parentFolderId !== undefined ){
     buttonClass = "inFolder"
   } else {
     buttonClass = "disabledBackButton"
-  }
-  for(let i = 0; i < splitPath.length - 1; i ++){
-    backPath += splitPath[i]
-    if(i != splitPath.length - 2){
-      backPath += "@"
-    }
   }
   if(buttonClass == "inFolder") { %>
   <button class="backButton <%=buttonClass%>" onClick="location.href = '<%=backPath%>'">
@@ -33,11 +26,12 @@
   <div class="submitNewFile hidden">
   <form action="/account/file" method="post" enctype="multipart/form-data">
     <label for="file">New File: </label>
-    <input type="file" name="usrFile" id="file" required multiple />
+    <input type="file" name="usrFile" id="file" required />
     <label for="newName">New Name for your file</label>
     <input type="text" name="newName" id="newName" />
-    <input type="hidden" name="_location" value="<%=path%>" />
-    <input type="hidden" name="_folderSession" value="<%=folderSession%>"/>
+    <input type="hidden" name="_isOwner" value="<%= locals.isOwner %>" />
+    <input type="hidden" name="_parentFolderId" value="<%= locals.parentFolderId %>" />
+    <input type="hidden" name="_currentFolderId" value="<%= locals.currentFolderId %>" />
     <br />
     <button type="submit">Submit</button>
   </form>
@@ -48,7 +42,7 @@
     <form action="/account/newFolder" method="POST">
       <label for="folderName">Folder Name: </label>
       <input type="text" name="folderName" />
-      <input type="hidden" name="_location" value="<%=path%>" />
+      <input type="hidden" name="_location" value="Home" />
       <button type="submit">Confirm</button>
     </form>
   </div>

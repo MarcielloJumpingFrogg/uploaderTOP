@@ -3,21 +3,10 @@
 <div class="editFile hidden">
   <form action="/account/delete" method="POST">
     <input type="hidden" name="_method" value="DELETE" />
-    <input type="hidden" name="_location" value="<%=path%>" />
-    <input type="hidden" name="_name" value="<%=finalName%>" />
-    <input type="hidden" name="_type" value="<%=finalFileType%>" />
-    <input type="hidden" name="_sessionId" value="<%=file.sessionId%>" />
-    <input type="hidden" name="_folderOwner" value="<%=folderOwner %>"/>
     <button type="submit" value="Delete">Delete</button>
   </form>
   <form action="/account/rename" method="POST">
     <input type="hidden" name="_method" value="RENAME" />
-    <input type="hidden" name="_location" value="<%=path%>" />
-    <input type="hidden" name="_name" value="<%=finalName%>" />
-    <input type="hidden" name="_type" value="<%=finalFileType%>" />
-    <input type="hidden" name="_folderOwner" value="<%=folderOwner %>"/>
-    <input type="hidden" name="_folderSession" value="<%=folderSession%>"/>
-    <input type="hidden" name="_sessionId" value="<%=file.sessionId%>" />
     <label for="newName">New Name:</label>
     <input type="text" name="newName" />
     <button type="submit" value="Rename">Rename</button>
@@ -27,26 +16,17 @@
   <div>
     <button onclick="toggleOptions(this, '.infos')">Info</button>
     <div class="infos hidden">
-      <p><b>File Name: </b><%=file.name%></p>
-      <p><b>File Size: </b><%=file.size%></p>
-      <p><b>File Upload Time: </b><%=file.created_at%></p>
+      <p>need to add them back</p>
     </div>
   </div>
 
   <form action="/account/download" method="POST">
     <input type="hidden" name="_method" value="DOWNLOAD" />
-    <input type="hidden" name="_location" value="<%=path%>" />
-    <input type="hidden" name="_name" value="<%=finalName%>" />
-    <input type="hidden" name="_id" value="<%= file.id %>" />
-    <input type="hidden" name="_mimetype" value="<%= file.mimetype %>"/>
     <button type="submit">Download</button>
   </form>
   <% } %>
 
   <form action="/share/create" method="POST">
-    <input type="hidden" name="_location" value="<%= path %>" />
-    <input type="hidden" name="_name" value="<%=finalName%>" />
-    <input type="hidden" name="_fileType" value="<%=finalFileType%>" />
     <label for="daysExpiration">Number of days for sharing</label>
     <input type="number" name="daysExpiration" />
     <label>Can Be Edited?: </label>

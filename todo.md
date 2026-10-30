@@ -1,7 +1,9 @@
 - [x] the user interface of the "traveling to the folder" does not work since it's tied to the current user's id
-- [x] the back button does not work at the moment
+- [ ] the back button does not work at the moment
+- [ ] get filetype does not work anymore, whoopsie
+- [ ] fixing the whole database thing, which means the whole project ._.
 - [ ] need to add the option to upload files to a shared folder
-- [x] _ALTERNATIVE_ going back to using the url location to be able to quickly access the folders and save the location on the favourites bar
+- [ ] _ALTERNATIVE_ going back to using the url location to be able to quickly access the folders and save the location on the favourites bar
 - [ ] expiration date on both the session and the file
 - [ ] the ability to make a file read only for user's who don't have the right permissions send through the link
 - [ ] make the ui less ugly

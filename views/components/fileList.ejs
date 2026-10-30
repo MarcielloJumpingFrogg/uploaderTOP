@@ -2,15 +2,13 @@
 <div class="bottomContainer flex flex-col bg-gray-100 min-h-full m-3 p-2 rounded-2xl">
 
   <div class="listContainer flex flex-wrap justify-center min-h-full">
-    <% if(files.length == 0 ) { %>
     <p>No files</p>
-    <%} else {
+    <%
       let loadedFolder=[]
-      files.forEach(file=> {
-        let match = true;
-        let finalFileType = file.type;
-        let finalName=file.name %>
-
+      let match = true;
+      let finalFileType = "placeHolder";
+      let finalName="namePlaceHolder"; 
+    %>
     <div class="itemContainer bgAmber">
       <div>
         <button class="menuButton" onclick="toggleOptions(this, '.editFile')">
@@ -21,28 +19,22 @@
             height="20px"
           />
         </button>
-        <%- include("editFile", {finalName: finalName, path: path, finalFileType: finalFileType, file: file}) %>
+        <%- include("editFile", {finalFileType: finalFileType}) %>
       </div>
-      <% const fileClass = "item element" + file.id  %>
       <% let result; if(finalFileType === "folder" || finalFileType === "folder_alt") {result = 'travelFolder(this)'} else {result = ' '} %>
-      <div
-        class="<%= fileClass %>"
-        onclick="<%=result%>" >
+      <div class=" fileClass " >
         <% const imageSource = "/static/resources/" + finalFileType + ".svg" %>
         <img src="<%= imageSource %>" class="w-20 self-center" />
         <p><%= finalName %></p>
-      <form class="hiddenForm" action="/account/folder" method="POST">
-          <% const pathForThisLink = path.replaceAll("/", "@") %>
-            <input type="hidden" name="_sessionId" value="<%=file.sessionId%>" />
-            <input type="hidden" name="_location" value="<%=path%>" />
-            <input type="hidden" name="_name" value="<%=finalName%>" />
-            <a class="travelLink" href="/account/<%=file.sessionId%>/<%=pathForThisLink%>@<%=finalName%>" hidden></a>
+        <form class="hiddenForm" action="/account/folder" method="POST">
+            <% const pathForThisLink = "placeHolderPath"  %>
+              <input type="hidden" name="_name" value="<%=finalName%>" />
+              <a class="travelLink" href="/account//<%=pathForThisLink%>@<%=finalName%>" hidden></a>
 
-            <button class="submitTravel" type="submit" hidden></button>
-      </form>
+              <button class="submitTravel" type="submit" hidden></button>
+        </form>
       </div>
     </div>
-    <%})}%>
   </div>
 </div>
 

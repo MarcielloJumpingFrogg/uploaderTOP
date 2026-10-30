@@ -33,16 +33,14 @@ export const shareCreatorController = [
       if (req.body.canEdit) {
         canBeEdited = req.body.canEdit === "on" ? true : false;
       }
-      const prismaResult = await prisma.shareSession.create({
-        data: {
-          originalUser: req.user.id,
-          fileName: req.body._name,
-          filePath: itemName,
-          expiration: new Date(expirationDay),
-          type: fileType,
-          edit: canBeEdited,
-        },
-      });
+      logger.toImplement("prisma.shareSession.create is missing");
+      // const prismaResult = await prisma.shareSession.create({
+      //   data: {
+      //     originalUser: req.user.id,
+      //     expiration: new Date(expirationDay),
+      //     edit: canBeEdited,
+      //   },
+      // });
 
       req.popUp = {
         title: "Url: ",

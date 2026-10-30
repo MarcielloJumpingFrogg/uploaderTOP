@@ -35,16 +35,27 @@ async function signUp(
 async function uploadFile(
   agent: request.Agent,
   uploadName: string,
-  location: string,
+  parentFolder: string,
   fileToUpload: string,
 ) {
   return await agent
     .post("/account/file")
     .type("form")
     .field("newName", uploadName)
-    .field("_location", location)
+    .field("_location", parentFolder)
     .attach("usrFile", __dirname + "/testFiles/" + fileToUpload)
     .expect(302);
+}
+
+async function createFolder(
+  agent: request.Agent,
+  name: string,
+  parentFolder: string,
+) {
+  agent
+    .post("/account/newFolder")
+    .type("form")
+    .send({ _parentFolder: "Home", newFolderName: name, _owner: "0" });
 }
 
 async function shareFile(
@@ -84,4 +95,19 @@ async function shareFile(
   }
 }
 
-export { resetDb, resetBuckets, signUp, uploadFile, shareFile };
+async function softReset() {
+  await prisma.sharedFiles.deleteMany();
+  await prisma.shareSession.deleteMany();
+  await prisma.files.deleteMany();
+  await resetBuckets();
+}
+
+export {
+  resetDb,
+  resetBuckets,
+  signUp,
+  uploadFile,
+  shareFile,
+  softReset,
+  createFolder,
+};

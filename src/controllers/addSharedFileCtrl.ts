@@ -22,30 +22,28 @@ export const addSharedFileCtrl = [
           if (req.user.id === undefined) {
             throw new Error("!req.user.id");
           } else {
-            const __addSharedFile = await prisma.sharedFiles.create({
-              data: {
-                originalUser: shareSession?.originalUser,
-                destinationUser: req.user.id,
-                expiration: shareSession?.expiration,
-                fileType: shareSession.type,
-                fileName: shareSession.fileName,
-                sessionId: shareSession?.id,
-              },
-            });
+            logger.toImplement(
+              "missing prisma.sharedFiles.mockCreate 'add;sharedFileCtrl'",
+            );
+            // const __addSharedFile = await prisma.sharedFiles.create({
+            //   data: {
+            //     destinationUser: req.user.id,
+            //     sessionId: shareSession?.id,
+            //   },
+            // });
 
-
-            const _someResult = await prisma.files.create({
-              data: {
-                path: shareSession.filePath,
-                fileName: shareSession.fileName,
-                mimetype: shareSession.type,
-                size: "10",
-                uploadTime: new Date(),
-                currentUser: req.user.id,
-                ownerId: shareSession.originalUser,
-                sessionId: shareSession.id,
-              },
-            });
+            // const _someResult = await prisma.files.create({
+            //   data: {
+            //     path: shareSession.filePath,
+            //     fileName: shareSession.fileName,
+            //     mimetype: shareSession.type,
+            //     size: "10",
+            //     uploadTime: new Date(),
+            //     currentUser: req.user.id,
+            //     ownerId: shareSession.originalUser,
+            //     sessionId: shareSession.id,
+            //   },
+            // });
 
             res.redirect("/account");
           }

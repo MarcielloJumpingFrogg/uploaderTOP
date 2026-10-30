@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<% try { %>
+
 
 <% if(locals.user) {%>
 <%- include("partials/head", {title: user.username}) %>
@@ -7,7 +9,7 @@
   <%- include("components/header") %>
   <%- include("partials/errors") %>
   <%- include("components/fileForm") %>
-  <%- include("components/fileList", {user: user, files: files}) %>
+  <%- include("components/fileList") %>
   <%- include("components/popUp" , {popUp: popUp}) %>
   <%}else {%>
     <%- include("partials/head", {title: "Error"}) %>
@@ -23,3 +25,5 @@
     document.getElementById("user_modal").classList.toggle("visible");
   }
 </script>
+<%} catch (e) { console.log("error:", e) }%>
+

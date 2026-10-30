@@ -1,7 +1,16 @@
-import type { element } from "./fileTypes";
+import { fileTypeFromBuffer } from "file-type";
+import logger from "../../config/logger";
 
-export function getFileType(element: element) {
+type FileMulter = {
+  buffer: Buffer;
+};
+
+export async function getFileType(file: FileMulter) {
   let filetype;
+  const type = await fileTypeFromBuffer(file.buffer);
+  logger.test("file: ", Buffer.from(file.buffer));
+  logger.test("type: ", type);
+
   const extensions = [
     "ae",
     "avi",
@@ -26,27 +35,20 @@ export function getFileType(element: element) {
     "x-eps",
     "zip",
   ];
-  const mimetype = element.item.metadata.mimetype.split("/") || [
-    "other",
-    "other",
-  ];
-  let first: any = mimetype[0];
-  let second: any = mimetype[1];
-  if (first == "text") {
-    filetype = "txt";
-  }
-  if (second == "octet-stream") {
+  // const mimetype = element.item.metadata.mimetype.split("/") || [
+  //   "other",
+  //   "other",
+  // ];
+
+  if (extensions.includes(type?.ext)) {
+    filetype = type?.ext;
+  } else {
     filetype = "other";
   }
-  const splitElement = second.split(".");
-  for (let i = 0; i < splitElement.length; i++) {
-    if (extensions.includes(splitElement[i])) {
-      filetype = splitElement[i];
-    }
-  }
-  if (element.type == "folder") {
-    filetype = "folder";
-  }
+
+  // if (element.type == "folder") {
+  //   filetype = "folder";
+  // }
   if (!filetype) {
     //catch situation
     filetype = "other";

@@ -30,38 +30,33 @@ model Users {
 }
 
 model Files {
-  id          String  @id @default(uuid())
-  path        String
-  fileName    String
-  mimetype    String
-  size        String
-  uploadTime  DateTime @default(now())
-  currentUser String
-  ownerId     String
-  owner       Users   @relation(fields: [ownerId], references: [id])
-  sessionId  String
+  id           String  @id @default(uuid())
+  ownerId      String
+  parentFolder String
+  fileName     String
+  type         String
+  size         String  @default("-")
+  updated_at   DateTime @default(now())
+  created_at   DateTime @default(now())
+  referenceOwnerId       Users   @relation(fields: [ownerId], references: [id])
+  sessionId    ShareSession[]
 }
 
 model ShareSession {
   id            String @id @default(uuid())
   originalUser  String
-  creator       Users @relation(fields: [originalUser], references: [id])
+  originalFile  String 
   expiration    DateTime @default(now())
-  filePath      String
-  fileName      String
-  type          String
   edit          Boolean
   sharedFiles   SharedFiles[]
+  originalFileRelation   Files @relation(fields: [originalFile], references: [id])
+  originalUserRelation   Users @relation(fields: [originalUser], references: [id])
 }
 
 model SharedFiles {
   id            String @id @default(uuid())
-  originalUser  String
   destinationUser String
   userSharedWith  Users @relation(fields: [destinationUser], references: [id])
-  expiration      DateTime
-  fileType        String
-  fileName        String
   sessionId       String
   session         ShareSession @relation(fields: [sessionId], references: [id])
 }

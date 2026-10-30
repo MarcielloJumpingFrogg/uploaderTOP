@@ -6,7 +6,7 @@ import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "fs";
 // import { isPicOfUser } from "../databaseMethods/isPicOfUser";
 import { avatarUploader } from "../controllers/avatarUploader";
-import { fileUploader } from "../controllers/fileUploaderController";
+import { fileUploader } from "../controllers/uploaderController";
 import { folderVisualizer } from "../controllers/folderVisualizer";
 import { newFolderController } from "../controllers/newFolderController";
 import { getAvatar } from "../supabaseFn/getAvatar";
@@ -65,7 +65,7 @@ async function routes(app: Express) {
 
   app.get("/account", accountController);
 
-  app.get("/account/:id/:path", folderVisualizer);
+  app.get("/account/:owned/:folderId", folderVisualizer);
 
   // app.post("/account/folder", travelFolderController)
 

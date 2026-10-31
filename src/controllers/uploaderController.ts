@@ -8,30 +8,9 @@ import { prisma } from "../../lib/prisma";
 import logger from "../../config/logger";
 import { getSize } from "../fileMethods/getSize";
 import { getFileType } from "../fileMethods/getFileType";
-
-// async function folderTreeCreator(
-//   newName: string,
-//   partialLocation: string,
-//   userId: string,
-// ) {
-//   const fullName = newName.split("/");
-//   for (let i = 0; i < fullName.length - 1; i++) {
-//     let folderLocation = partialLocation;
-//     for (let j = 0; j <= i; j++) {
-//       folderLocation += fullName[j] + "/";
-//     }
-//     logger.test("folderLocation: ", folderLocation);
-//     createFolder(folderLocation, "Files");
-//     const _createFolderInFiles = await prisma.files.create({
-//       data: {
-//         path: folderLocation,
-//         fileName: newName,
-//         type: "folder",
-//         ownerId: userId,
-//       },
-//     });
-//   }
-// }
+import { tryCatch } from "../customErrors/tryCatch";
+import { fileTypeFromBuffer } from "file-type";
+import { getFromSharedFile } from "../dbMethods/getFromSharedFile";
 
 function setNewName(req: Request, file: any) {
   if (req.body.newName) {
@@ -41,104 +20,64 @@ function setNewName(req: Request, file: any) {
   }
 }
 
-async function setOwnerId(req: any, folderSession: string) {
-  let ownerId;
-  if (folderSession != req.user.id) {
-    const _temp = await prisma.shareSession.findFirst({
-      where: { id: folderSession },
-    });
-    ownerId = _temp?.originalUser;
-  } else {
-    ownerId = req.user.id;
-  }
-  return ownerId;
-}
-
-function setFolderSession(req: any) {
-  let folderSession;
-  if (
-    req.body._folderSession === "0" ||
-    req.body._folderSession === undefined
-  ) {
-    folderSession = req.user.id;
-  } else {
-    folderSession = req.body._folderSession;
-  }
-
-  return folderSession;
-}
-
 const fileUploader = [
   uploadFiles.single("usrFile"),
   body("name").escape(),
   async (req: any, res: Response) => {
     try {
       const file = req.file;
-      if (!file) {
-        throw new Error("There is no file");
+      if (!file || file.size == 0) {
+        throw new Error("Insert a non empty file");
       }
       const size = getSize(file.size);
 
       const newName = setNewName(req, file);
       const isOwner = req.body._isOwner || true;
+      const ownerRedirect = isOwner ? "0" : "1";
       const currentFolderId = req.body._currentFolderId || "Home";
+      let uploadFolderId: string = "";
 
-      let currentFolder;
       let owner;
-
-      logger.test("QeQU");
-
-      logger.test("file: ", file);
-      let fileType = await getFileType(file);
-      logger.test("fileType: ", fileType);
-
-      logger.test("QUQU");
+      const { data: fileType, error: fileTypeError } = await tryCatch(
+        getFileType(file),
+      ); //does not return type folder
+      if (fileTypeError) {
+        throw new Error("FileTypeError: ", fileTypeError);
+      }
 
       if (isOwner) {
-        logger.test("QaQU");
-        currentFolder = await prisma.files.findUniqueOrThrow({
-          where: { ownerId: req.user.id, id: currentFolderId },
-        });
         owner = req.user.id;
+        uploadFolderId = currentFolderId;
       } else {
-        logger.test("QUQo");
-        const sharedFile = await prisma.sharedFiles.findUniqueOrThrow({
-          where: { id: currentFolder },
-        });
-        const session = await prisma.shareSession.findUniqueOrThrow({
-          where: { id: sharedFile?.sessionId },
-        });
-        currentFolder = await prisma.files.findUniqueOrThrow({
-          where: { id: session?.originalFile },
-        });
-        owner = currentFolder.ownerId;
+        const { data: allInfo, error: currentFolderError } = await tryCatch(
+          getFromSharedFile(currentFolderId),
+        );
+        if (currentFolderError) return { error: currentFolderError };
+        owner = allInfo?.owner;
+        uploadFolderId = allInfo.originalFolder.id;
       }
-      logger.test("currentFolder: ", currentFolder);
 
-      // const location = req.body._location.replaceAll(",", "/");
-      // const partialLocation = ownerId + "/" + location + "/";
-      // await folderTreeCreator(newName, partialLocation, ownerId);
-
-      const uploadName = newName;
-      // const uploadFileResult = await uploadFile(file, "Files", uploadName);
-
-      // if (!uploadFileResult) {
-      //   throw new Error("No Upload File Result");
-      // }
-      const _prismaFileList = await prisma.files.create({
+      const prismaFileList = await prisma.files.create({
         data: {
           ownerId: owner,
-          fileName: uploadName,
+          fileName: newName,
           type: fileType,
           size: size,
-          parentFolder: currentFolder.id,
+          parentFolder: uploadFolderId,
         },
       });
-      logger.test("_prismaFileList", _prismaFileList);
+
+      const name = `${owner}/Storage/${uploadFolderId}/${prismaFileList.id}`;
+      const { data: uploadResult, error: uploadError } = await tryCatch(
+        uploadFile(file, "Files", name),
+      );
+      if (uploadError) throw new Error("Error While uploading");
+
+      logger.test("_prismaFileList", prismaFileList);
+      res.redirect(`/account/${ownerRedirect}/${uploadFolderId}`);
     } catch (e) {
       logger.error(e);
     }
-    res.redirect("/account");
   },
 ];
 export { fileUploader };

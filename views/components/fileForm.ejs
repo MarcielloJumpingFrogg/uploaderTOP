@@ -4,8 +4,10 @@
   <%
   let buttonClass = "disabledBackButton"
   let text = " <= Back"
-  let backPath = "/account/" + locals.isOwner + "/" + locals.parentFolderId || "Home"
-  if( locals.parentFolderId !== "Home" && locals.parentFolderId !== undefined ){
+  let ownerRedirect = locals.isOwner ? "0" : "1";
+  let folderRedirect = locals.parentFolderId || "Home"
+  let backPath = `/account/${ownerRedirect}/${folderRedirect}`
+  if( locals.currentFolder !== "Home" && locals.parentFolderId !== undefined ){
     buttonClass = "inFolder"
   } else {
     buttonClass = "disabledBackButton"
@@ -30,7 +32,6 @@
     <label for="newName">New Name for your file</label>
     <input type="text" name="newName" id="newName" />
     <input type="hidden" name="_isOwner" value="<%= locals.isOwner %>" />
-    <input type="hidden" name="_parentFolderId" value="<%= locals.parentFolderId %>" />
     <input type="hidden" name="_currentFolderId" value="<%= locals.currentFolderId %>" />
     <br />
     <button type="submit">Submit</button>
@@ -42,7 +43,8 @@
     <form action="/account/newFolder" method="POST">
       <label for="folderName">Folder Name: </label>
       <input type="text" name="folderName" />
-      <input type="hidden" name="_location" value="Home" />
+    <input type="hidden" name="_isOwner" value="<%= locals.isOwner %>" />
+    <input type="hidden" name="_currentFolderId" value="<%= locals.currentFolderId %>" />
       <button type="submit">Confirm</button>
     </form>
   </div>

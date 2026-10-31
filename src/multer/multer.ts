@@ -3,6 +3,9 @@ import customErrorContainer from "../customErrors/customErrorContainer";
 import multer from "multer";
 // import { viewFiles } from "../databaseMethods/viewFiles";
 import { renderAccount } from "../controllers/accountController";
+import { tryCatch } from "../customErrors/tryCatch";
+import { fileTypeFromBuffer } from "file-type";
+import logger from "../../config/logger";
 
 class FieldTypeError extends Error {
   constructor(message: any) {
@@ -17,6 +20,7 @@ const fileImageFilter = async (
   cb: any,
 ) => {
   // only images
+  logger.test("file: ", file);
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {

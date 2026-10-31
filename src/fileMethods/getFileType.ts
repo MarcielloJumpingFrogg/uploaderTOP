@@ -1,57 +1,55 @@
-import { fileTypeFromBuffer } from "file-type";
 import logger from "../../config/logger";
 
-type FileMulter = {
-  buffer: Buffer;
-};
+export async function getFileType(file: Express.Multer.File) {
+  try {
+    let filetype: string = "";
+    const extensions = [
+      "ae",
+      "avi",
+      "css",
+      "csv",
+      "excel",
+      "file",
+      "html",
+      "illustrator",
+      "jpeg",
+      "mpeg",
+      "ms-powerpoint",
+      "other",
+      "pdf",
+      "photoshop",
+      "png",
+      "quicktime",
+      "rar",
+      "txt",
+      "wave",
+      "word",
+      "x-eps",
+      "zip",
+    ];
+    const mimetype = file.mimetype.split("/") || ["other", "other"];
+    let first: any = mimetype[0];
+    let second: any = mimetype[1];
+    if (first == "text") {
+      filetype = "txt";
+    }
+    if (second == "octet-stream") {
+      filetype = "other";
+    }
+    const splitElement = second.split(".");
+    for (let i = 0; i < splitElement.length; i++) {
+      if (extensions.includes(splitElement[i])) {
+        filetype = splitElement[i];
+      }
+    }
 
-export async function getFileType(file: FileMulter) {
-  let filetype;
-  const type = await fileTypeFromBuffer(file.buffer);
-  logger.test("file: ", Buffer.from(file.buffer));
-  logger.test("type: ", type);
-
-  const extensions = [
-    "ae",
-    "avi",
-    "css",
-    "csv",
-    "excel",
-    "file",
-    "html",
-    "illustrator",
-    "jpeg",
-    "mpeg",
-    "ms-powerpoint",
-    "other",
-    "pdf",
-    "photoshop",
-    "png",
-    "quicktime",
-    "rar",
-    "txt",
-    "wave",
-    "word",
-    "x-eps",
-    "zip",
-  ];
-  // const mimetype = element.item.metadata.mimetype.split("/") || [
-  //   "other",
-  //   "other",
-  // ];
-
-  if (extensions.includes(type?.ext)) {
-    filetype = type?.ext;
-  } else {
-    filetype = "other";
+    if (!filetype) {
+      //catch situation
+      filetype = "other";
+    }
+    return filetype;
+  } catch (e: any) {
+    logger.error(e);
+    throw new Error("getFileType Error: ", e);
   }
-
-  // if (element.type == "folder") {
-  //   filetype = "folder";
-  // }
-  if (!filetype) {
-    //catch situation
-    filetype = "other";
-  }
-  return filetype;
 }

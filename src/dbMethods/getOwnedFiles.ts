@@ -16,7 +16,7 @@ export async function getOwnedFiles(owner: string, currentFolderId: string) {
     where: { ownerId: userId, parentFolder: currentFolderId },
   });
 
-  logger.test("ownedFiles: ", result);
+  // logger.test("ownedFiles: ", result);
   // const path = await getPath(currentFolderId);
 
   return result;

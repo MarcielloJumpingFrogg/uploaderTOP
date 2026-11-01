@@ -27,10 +27,31 @@
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
     // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options
     "strict": true,
+
+    "paths": {
+      "@/*" : ["./src/*"] 
+      "@prisma": ["./lib/prisma"]
+    },
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnusedLabels": false,
+    "noUncheckedSideEffectsImports": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnreachableCode": false,
+    
+    "noUncheckedIndexedAccess": true
+    "noPropertyAccessFromIndexSignature": true,
+    "erasableSyntaxOnly": true,
+
+
+    "noImplicitOverride": true, //precede with "override"
+    "noErrorTruncation": false,  //maybe
+
+    
     // "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,

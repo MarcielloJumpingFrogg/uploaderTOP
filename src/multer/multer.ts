@@ -1,10 +1,8 @@
 import type { Request, Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import multer from "multer";
-// import { viewFiles } from "../databaseMethods/viewFiles";
 import { renderAccount } from "../controllers/accountController";
-import { tryCatch } from "../customErrors/tryCatch";
-import { fileTypeFromBuffer } from "file-type";
+// import { tryCatch } from "../customErrors/tryCatch";
 import logger from "../../config/logger";
 
 class FieldTypeError extends Error {
@@ -30,7 +28,7 @@ const fileImageFilter = async (
   cb(null, true);
 };
 
-const filesCheck = (req: Request, file: Express.Multer.File, cb: any) => {
+const filesCheck = (_req: Request, _file: Express.Multer.File, cb: any) => {
   //most stuff
   cb(null, true);
 };

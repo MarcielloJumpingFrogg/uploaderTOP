@@ -1,8 +1,7 @@
 import { prisma } from "../../lib/prisma";
 
 export async function getFromSharedFile(currentFolderId: string) {
-  let currentFolder;
-  let owner;
+  let owner: string = "";
 
   try {
     const sharedFile = await prisma.sharedFiles.findUniqueOrThrow({

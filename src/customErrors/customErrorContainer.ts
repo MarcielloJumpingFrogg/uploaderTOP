@@ -42,6 +42,16 @@ class CustomErrorContainer {
     this.errors.push({ message: error });
   }
 
+  fileError(error: string) {
+    this.errorCode = 400;
+    this.errors.push({ message: error });
+  }
+
+  genericError() {
+    const errorString = "There was an unexpected error, please try again later";
+    ((this.errorCode = 400), this.errors.push({ message: errorString }));
+  }
+
   resetError() {
     this.errorCode = 200;
     this.errors = [];

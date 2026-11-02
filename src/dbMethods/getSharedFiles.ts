@@ -8,7 +8,10 @@ export async function getSharedFiles(userId: string, currentFolderId: string) {
       where: { destinationUser: userId },
     }),
   );
-  if (fileError) throw new Error("Error during sharedFile.find : ", fileError);
+  if (fileError) {
+    logger.error("fileError", fileError);
+    throw new Error("Error during sharedFile.find : ", fileError);
+  }
 
   const foundFiles: {
     id: string;
@@ -28,20 +31,27 @@ export async function getSharedFiles(userId: string, currentFolderId: string) {
 
     const { data: originalFile, error: fileError } = await tryCatch(
       prisma.files.findFirst({
-        where: { id: shareSession?.originalFile },
+        where: {
+          id: shareSession?.originalFile,
+          parentFolder: currentFolderId,
+        },
       }),
     );
 
-    if (fileError)
+    if (fileError) {
+      logger.error("fileError: ", fileError);
       throw new Error(
         "Error from prisma.files of shareSession.originalFile: ",
         fileError,
       );
+    }
 
-    if (originalFile == null)
+    if (originalFile == null) {
+      logger.error("fileError: ", fileError);
       throw new Error(
         "Error: the 'originalFile' is null, could not push it to foundFiles",
       );
+    }
     foundFiles.push(originalFile);
   });
 

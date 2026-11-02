@@ -10,7 +10,7 @@ import { getFileType } from "../fileMethods/getFileType";
 import { tryCatch } from "../customErrors/tryCatch";
 import { getFromSharedFile } from "../dbMethods/getFromSharedFile";
 
-function setNewName(req: customRequest, file: any) {
+function setNewName(req: Request, file: any) {
   if (req.body.newName) {
     return req.body.newName;
   } else {
@@ -18,13 +18,7 @@ function setNewName(req: customRequest, file: any) {
   }
 }
 
-interface customRequest extends Omit<Request, "user"> {
-  user: {
-    id: string;
-  };
-}
-
-async function fileUploaderFunction(req: customRequest, res: Response) {
+async function fileUploaderFunction(req: Request, res: Response) {
   try {
     const file = req.file;
     if (!file || file.size == 0) {
@@ -106,10 +100,11 @@ async function fileUploaderFunction(req: customRequest, res: Response) {
 const fileUploader = [
   uploadFiles.single("usrFile"),
   body("name").escape(),
-  async (req: customRequest, res: Response) => {
+  async (req: Request, res: Response) => {
     const error = await fileUploaderFunction(req, res);
     if (error) {
       logger.error("Caught an error before redirecting: ", error);
+      customErrorContainer.genericError();
       res.redirect("/account");
     }
   },

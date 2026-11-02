@@ -6,8 +6,17 @@ declare global {
     interface Request {
       session?: session;
       passport?: passport;
-      user?: string;
+      params?: {
+        shareId: string;
+      };
+      user?: {
+        id: string;
+      };
       logout?: class;
+      popUp?: {
+        title: string;
+        text: string;
+      };
     }
   }
 }

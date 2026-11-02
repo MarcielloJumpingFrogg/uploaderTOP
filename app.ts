@@ -22,7 +22,7 @@ app.use(
     cookie: {
       maxAge: month,
     },
-    secret: process.env.EXPRESS_SESSION || "blank",
+    secret: process.env["EXPRESS_SESSION"] || "blank",
     resave: true,
     saveUninitialized: true,
     store: new PrismaSessionStore(prisma, {

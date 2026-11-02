@@ -1,3 +1,5 @@
+import type { Response } from "express";
+import logger from "../../config/logger";
 class CustomErrorContainer {
   errorName: any;
   errors: Array<object>;
@@ -36,7 +38,7 @@ class CustomErrorContainer {
     this.errors.push({ message: error });
   }
 
-  renameError(errorCode: number, error: string) {
+  renameError(error: string, errorCode: number) {
     this.resetError();
     this.errorCode = errorCode;
     this.errors.push({ message: error });
@@ -45,6 +47,22 @@ class CustomErrorContainer {
   fileError(error: string) {
     this.errorCode = 400;
     this.errors.push({ message: error });
+  }
+
+  userError(res: Response) {
+    const error =
+      "The user session appears to have encountered an error, please try again later";
+    this.errorCode = 400;
+    logger.error("No user");
+    this.errors.push({ message: error });
+    res.redirect("/");
+  }
+
+  databaseError(res: Response, link?: string) {
+    const error = `There appears to be an error with the request, please try again later`;
+    this.errorCode = 500;
+    this.errors.push({ message: error });
+    res.redirect(link || "/");
   }
 
   genericError() {

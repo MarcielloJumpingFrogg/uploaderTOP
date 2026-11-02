@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 
 <% if(popUp.title) { %>
-<div>
-  <h1 class=""><%= popUp.title %></h1>
+<div class="popUp" >
+<div class="closingButton absolute right-5 top-2">
+  <button  onclick="this.parentElement.parentElement.classList.remove('popUp');this.parentElement.classList.toggle('hidden')">X</button>
+  </div>
+  <h1 ><%= popUp.title %></h1>
   <p id="shareLink" class="link"><%= popUp.text %></p>
   <button onclick="copyLink()">
     <img src="/static/copy.svg" width="30px" />
   </button>
+
 </div>
 
 <script>

@@ -176,11 +176,20 @@
   .visible {
     visibility: visible;
   }
+  .absolute {
+    position: absolute;
+  }
   .relative {
     position: relative;
   }
   .static {
     position: static;
+  }
+  .top-2 {
+    top: calc(var(--spacing) * 2);
+  }
+  .right-5 {
+    right: calc(var(--spacing) * 5);
   }
   .m-2 {
     margin: calc(var(--spacing) * 2);
@@ -528,6 +537,17 @@ input[type="text"], input[type="password"] {
 }
 .bgAmber {
   background-color: hsl(43 100 85);
+}
+.popUp {
+  background-color: hsla(43, 100%, 85%, 50%);
+  padding: 20px;
+  border: 1px solid black;
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
 }
 @property --tw-rotate-x {
   syntax: "*";

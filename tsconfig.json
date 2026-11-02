@@ -32,7 +32,7 @@
     "strict": true,
 
     "paths": {
-      "@/*" : ["./src/*"] 
+      "@/*" : ["./src/*"] ,
       "@prisma": ["./lib/prisma"]
     },
 
@@ -43,13 +43,13 @@
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false,
     
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
     "noPropertyAccessFromIndexSignature": true,
     "erasableSyntaxOnly": true,
 
 
     "noImplicitOverride": true, //precede with "override"
-    "noErrorTruncation": false,  //maybe
+    "noErrorTruncation": true,  //maybe
 
     
     // "jsx": "react-jsx",

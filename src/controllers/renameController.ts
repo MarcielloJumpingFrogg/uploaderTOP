@@ -93,7 +93,7 @@ const renameController = [
       const { owner, foundSession } = await getIds(req);
 
       if (owner !== req.user.id && foundSession?.edit === false) {
-        customErrorContainer.renameError(401, "Not allowed to edit");
+        customErrorContainer.renameError("Not allowed to edit", 401);
         res.redirect("/account");
         return;
       }
@@ -102,6 +102,7 @@ const renameController = [
       let oldPath;
       let newPath;
       // logger.test("foundSession.fileapath: ", foundSession);
+      logger.toImplement("Big issue here");
       if (
         foundSession !== undefined &&
         foundSession?.filePath !== undefined &&

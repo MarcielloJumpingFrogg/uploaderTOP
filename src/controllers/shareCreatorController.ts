@@ -2,23 +2,17 @@ import type { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
 import logger from "../../config/logger";
 import { renderAccount } from "./accountController";
+import customErrorContainer from "@/customErrors/customErrorContainer";
+import { tryCatch } from "@/customErrors/tryCatch";
+
 export const shareCreatorController = [
   async (req: Request, res: Response) => {
     try {
-      let itemName = "";
-      if (!req.body._path) {
-        const currentPath = req.body._location.replaceAll(",", "/");
-        itemName = req.user.id + "/" + currentPath + "/";
-      } else {
-        itemName = req.body._path;
-      }
-
-      let fileType;
-      if (req.body._fileType) {
-        fileType = req.body._fileType;
-      } else {
-        logger.error("MISSING FILETYPE IN THE REQUEST BODY");
-        fileType = "other";
+      if (!req.user) {
+        logger.error("No user");
+        customErrorContainer.passportError("No user", 400);
+        res.redirect("/account");
+        return;
       }
 
       const dayInMs = 24 * 60 * 60 * 1000;
@@ -29,22 +23,50 @@ export const shareCreatorController = [
       expiration = expiration * dayInMs;
       const expirationDay = Date.now() + expiration;
 
-      let canBeEdited = false;
-      if (req.body.canEdit) {
-        canBeEdited = req.body.canEdit === "on" ? true : false;
+      const canBeEdited = req.body.canEdit === "on" ? true : false;
+
+      const { data: dbOriginalFile, error: dbError } = await tryCatch(
+        prisma.files.findUnique({
+          where: {
+            ownerId: req.user.id,
+            id: req.body._fileId,
+            parentFolder: req.body._parentFolder,
+          },
+        }),
+      );
+
+      if (dbError || !dbOriginalFile) {
+        logger.error("Error while getting the db's original file: ", dbError);
+        customErrorContainer.genericError();
+        res.redirect("/account");
+        return;
       }
-      logger.toImplement("prisma.shareSession.create is missing");
-      // const prismaResult = await prisma.shareSession.create({
-      //   data: {
-      //     originalUser: req.user.id,
-      //     expiration: new Date(expirationDay),
-      //     edit: canBeEdited,
-      //   },
-      // });
+
+      const { data: shareSessionResult, error: shareSessionError } =
+        await tryCatch(
+          prisma.shareSession.create({
+            data: {
+              originalUser: req.user.id,
+              originalFile: dbOriginalFile.id,
+              expiration: new Date(expirationDay),
+              edit: canBeEdited,
+            },
+          }),
+        );
+
+      if (shareSessionError || !shareSessionResult) {
+        logger.error(
+          "Error while creating a shareSession: ",
+          shareSessionError || null,
+        );
+        customErrorContainer.genericError();
+        res.redirect("/");
+        return;
+      }
 
       req.popUp = {
         title: "Url: ",
-        text: "http://localhost:8080/share/add/" + prismaResult.id,
+        text: "http://localhost:8080/share/add/" + shareSessionResult.id,
       };
     } catch (e) {
       logger.error("Error: ", e);

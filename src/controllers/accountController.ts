@@ -48,8 +48,10 @@ async function renderAccount(req: any, res: Response) {
     const { data: sharedFiles, error: sharedFilesError } = await tryCatch(
       getSharedFiles(user, currentFolderId),
     );
-    if (sharedFilesError)
+    if (sharedFilesError) {
+      logger.error(sharedFilesError);
       throw new Error("sharedFileError: ", sharedFilesError);
+    }
     //
 
     //folder:

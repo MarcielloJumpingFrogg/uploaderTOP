@@ -29,8 +29,17 @@
   <form action="/share/create" method="POST">
     <label for="daysExpiration">Number of days for sharing</label>
     <input type="number" name="daysExpiration" />
+
     <label>Can Be Edited?: </label>
     <input type="checkbox" name="canEdit" />
+
+    <input type="hidden" name="_method" value="SHARE" />
+
+    <input type="hidden" name="_fileId" value="<%=file.id%>" />
+
+    <input type="hidden" name="_parentFolder" value="<%=parentFolderId%>" />
+
+
     <button type="submit">Create Link</button>
   </form>
 </div>

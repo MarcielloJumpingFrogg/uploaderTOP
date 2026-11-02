@@ -23,7 +23,7 @@
             height="20px"
           />
         </button>
-        <%- include("editFile", {finalFileType: finalFileType}) %>
+        <%- include("editFile", {finalFileType: finalFileType, file: file}) %>
       </div>
         <%const fileClass = 'item' %>
       <% let result; if(finalFileType === "folder" || finalFileType === "folder_alt") {result = 'travelFolder(this)'} else {result = ' '} %>

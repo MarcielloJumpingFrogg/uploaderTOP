@@ -4,7 +4,6 @@ import { signUpController } from "../controllers/signUpController";
 import { accountController } from "../controllers/accountController";
 import customErrorContainer from "../customErrors/customErrorContainer";
 import fs from "fs";
-// import { isPicOfUser } from "../databaseMethods/isPicOfUser";
 import { avatarUploader } from "../controllers/avatarUploader";
 import { fileUploader } from "../controllers/uploaderController";
 import { folderVisualizer } from "../controllers/folderVisualizer";
@@ -15,7 +14,6 @@ import { renameController } from "../controllers/renameController";
 import { downloadController } from "../controllers/downloadController";
 import { shareCreatorController } from "../controllers/shareCreatorController";
 import { addSharedFileCtrl } from "../controllers/addSharedFileCtrl";
-import { travelFolderController } from "../controllers/travelFolderController";
 import logger from "../../config/logger";
 
 async function routes(app: Express) {
@@ -67,8 +65,6 @@ async function routes(app: Express) {
 
   app.get("/account/:owned/:folderId", folderVisualizer);
 
-  // app.post("/account/folder", travelFolderController)
-
   app.post("/account/avatar", avatarUploader);
 
   app.get("/avatar", async (req: any, res) => {
@@ -80,8 +76,6 @@ async function routes(app: Express) {
     }
   });
 
-  app.post("/account/newFolder", newFolderController);
-
   app.get("/img/:imageName", async (req, res) => {
     const imageName = req.params.imageName;
     console.log("imageName: ", imageName);
@@ -91,6 +85,8 @@ async function routes(app: Express) {
   });
 
   app.post("/account/file", fileUploader);
+
+  app.post("/account/newFolder", newFolderController);
 
   app.post("/account/delete", fileDeleteController);
 

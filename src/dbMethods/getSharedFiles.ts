@@ -1,11 +1,15 @@
 import logger from "../../config/logger";
-import { prisma } from "../../lib/prisma";
+import type { Files } from "../../generated/prisma/client";
+import { prisma } from "@prisma";
 import { tryCatch } from "../customErrors/tryCatch";
 
-export async function getSharedFiles(userId: string, currentFolderId: string) {
+export async function getSharedFiles(
+  userId: string,
+  currentFolder: string,
+): Promise<Files[]> {
   const { data: files, error: fileError } = await tryCatch(
     prisma.sharedFiles.findMany({
-      where: { destinationUser: userId },
+      where: { destinationUser: userId, parentFolder: currentFolder },
     }),
   );
   if (fileError) {
@@ -13,48 +17,45 @@ export async function getSharedFiles(userId: string, currentFolderId: string) {
     throw new Error("Error during sharedFile.find : ", fileError);
   }
 
-  const foundFiles: {
-    id: string;
-    ownerId: string;
-    parentFolder: string;
-    fileName: string;
-    type: string;
-    size: string;
-    updated_at: Date;
-    created_at: Date;
-  }[] = [];
+  const foundFiles: Files[] = [];
 
-  files.forEach(async (file) => {
-    const shareSession = await prisma.shareSession.findUnique({
-      where: { id: file.sessionId },
-    });
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    if (!file) {
+      return [];
+    }
+
+    const { data: shareSession, error: shareSessionError } = await tryCatch(
+      prisma.shareSession.findUnique({
+        where: { id: file.sessionId },
+      }),
+    );
+
+    if (shareSessionError || !shareSession) {
+      logger.error("ShareSessionError: ", shareSessionError);
+      throw new Error(
+        `ShareSessionError: ${shareSessionError || "No shareSession"}`,
+      );
+    }
 
     const { data: originalFile, error: fileError } = await tryCatch(
       prisma.files.findFirst({
         where: {
           id: shareSession?.originalFile,
-          parentFolder: currentFolderId,
+          parentFolder: currentFolder,
         },
       }),
     );
 
-    if (fileError) {
+    if (fileError || !originalFile) {
       logger.error("fileError: ", fileError);
       throw new Error(
-        "Error from prisma.files of shareSession.originalFile: ",
-        fileError,
+        `Error from prisma.files of shareSession.originalFile: ${fileError || "No originalFile"} `,
       );
     }
 
-    if (originalFile == null) {
-      logger.error("fileError: ", fileError);
-      throw new Error(
-        "Error: the 'originalFile' is null, could not push it to foundFiles",
-      );
-    }
     foundFiles.push(originalFile);
-  });
+  }
 
   return foundFiles;
-  // logger.test("foundFiles", foundFiles);
 }

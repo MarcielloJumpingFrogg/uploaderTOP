@@ -71,6 +71,7 @@ export const shareCreatorController = [
     } catch (e) {
       logger.error("Error: ", e);
     }
+    res.location("/account/0/Home");
     renderAccount(req, res);
   },
 ];

@@ -9,7 +9,7 @@
   <%- include("components/header") %>
   <%- include("partials/errors") %>
   <%- include("components/fileForm") %>
-  <%- include("components/fileList") %>
+  <%- include("components/fileList", {ownedFiles: ownedFiles, sharedFiles: sharedFiles}) %>
   <%- include("components/popUp" , {popUp: popUp}) %>
   <%}else {%>
     <%- include("partials/head", {title: "Error"}) %>

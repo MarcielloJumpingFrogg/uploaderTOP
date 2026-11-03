@@ -1,60 +1,51 @@
 import { admin_supabase } from "../../config/supabase";
 import logger from "../../config/logger";
 import { prisma } from "../../lib/prisma";
-import { getFromSharedFile } from "../dbMethods/getFromSharedFile";
+import { getFromCurrentFolderId } from "../dbMethods/getFromCurrentFolderId";
 import { tryCatch } from "../customErrors/tryCatch";
+import type { Request, Response } from "express";
+import customErrorContainer from "@/customErrors/customErrorContainer";
 
 export async function createFolder(
   owner: boolean,
-  requestUser: string,
-  currentFolder: string,
+  req: Request,
+  res: Response,
+  bodyFolderId: string,
   newFolderName: string,
   bucket: string,
 ) {
   try {
     let currentFolderId: string = "";
-    let ownerId: string = "";
-    let skipping = false;
-    if (currentFolder == "Home") {
-      if (requestUser == undefined) throw new Error("No request User");
-      ownerId = requestUser;
-      currentFolderId = "Home";
-      skipping = true;
+    logger.toImplement("Need to refactor");
+    if (!req.user) {
+      customErrorContainer.userError(res);
+      return;
     }
-    if (owner && !skipping) {
-      const { data: folder, error: folderError } = await tryCatch(
-        prisma.files.findFirst({
-          where: { id: currentFolder },
-        }),
+    const user = req.user.id;
+
+    //getting current folder's id {{{
+    logger.test("currentFolderaid: ", bodyFolderId);
+    if (!owner) {
+      const { data: currentFolder, error: errorCurrentFolder } = await tryCatch(
+        getFromCurrentFolderId(bodyFolderId, !owner, user),
       );
-      if (folderError)
-        throw new Error("folderError in createFolder: ", folderError);
-
-      logger.test("folder: ", folder);
-      if (folder === null || folder.id === undefined)
-        throw new Error("folder is undefined or null");
-
-      ownerId = folder?.ownerId;
-      currentFolderId = folder?.id;
-    } else if (!skipping) {
-      const { data: result, error: getFromSharedFileError } = await tryCatch(
-        getFromSharedFile(currentFolder),
-      );
-      if (getFromSharedFileError)
-        throw new Error(
-          "getFromSharedFileError in createFolder: ",
-          getFromSharedFileError,
-        );
-
-      const { originalFolder, owner } = result;
-      ownerId = owner;
-      currentFolderId = originalFolder.id;
+      if (errorCurrentFolder || !currentFolder) {
+        logger.error("Error: no currentFolder in createFolder function");
+        customErrorContainer.genericError();
+        res.redirect("/");
+        return;
+      }
+      currentFolderId = currentFolder.id;
+    } else {
+      currentFolderId = bodyFolderId;
     }
+    //}}}
 
+    //creating folder {{{
     const { data: folderCreation, error: folderCreationError } = await tryCatch(
       prisma.files.create({
         data: {
-          ownerId: ownerId,
+          ownerId: user,
           parentFolder: currentFolderId,
           fileName: newFolderName,
           type: "folder",
@@ -62,16 +53,31 @@ export async function createFolder(
         },
       }),
     );
+    if (folderCreationError) {
+      logger.error("error creating the folder");
+      customErrorContainer.genericError();
+      res.redirect("/");
+      return;
+    }
+    //}}}
 
-    if (folderCreationError)
-      throw new Error("folderCreation error in the db: ", folderCreationError);
+    const name = `${user}/Storage/${folderCreation.id}`;
+    const { data: creationResult, error: errorCreatingFolder } = await tryCatch(
+      admin_supabase.storage
+        .from(bucket)
+        .upload(name + "/.emptyFolderPlaceholder", ""),
+    ); //last argument empty because the file is empty, just a placeHolder for the folder
+    if (errorCreatingFolder) {
+      logger.error("could not create the folder");
+      logger.toImplement(
+        "need to delete the folder from the database as well, to make sure they are in sync",
+      );
+      customErrorContainer.genericError();
+      res.redirect("/");
+      return;
+    }
 
-    const name = `${ownerId}/Storage/${folderCreation.id}`; //ownerId + "//" + folderCreation.id;
-    const _result = await admin_supabase.storage
-      .from(bucket)
-      .upload(name + "/.emptyFolderPlaceholder", ""); //last argument empty because the file is empty, just a placeHolder for the folder
-
-    logger.test("result:", _result);
+    logger.test("result:", creationResult);
   } catch (e: any) {
     logger.error("Error in createFolder: ", e);
   }

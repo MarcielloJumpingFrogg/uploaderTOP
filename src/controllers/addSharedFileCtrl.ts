@@ -28,12 +28,23 @@ export const addSharedFileCtrl = [
         customErrorContainer.userError(res);
         return;
       }
+
+      const { data: originalFile, error: err } = await tryCatch(
+        prisma.files.findFirst({ where: { id: shareSession.originalFile } }),
+      );
+      if (err || !originalFile) {
+        throw new Error(
+          "Could not get the original file from the current session",
+        );
+      }
+
       const { data: createdShareFile, error: failedToCreateShareFile } =
         await tryCatch(
           prisma.sharedFiles.create({
             data: {
               destinationUser: req.user.id,
               sessionId: shareSession?.id,
+              parentFolder: originalFile.parentFolder,
             },
           }),
         );
@@ -43,12 +54,11 @@ export const addSharedFileCtrl = [
         customErrorContainer.genericError();
         return;
       }
-
-      res.redirect(`/account`);
     } catch (e) {
-      logger.error(e);
+      logger.error(`Unhandled error caught: `, e);
       customErrorContainer.passportError(e, 400);
-      res.redirect(`/account`);
     }
+
+    res.redirect(`/account`);
   },
 ];

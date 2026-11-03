@@ -8,7 +8,7 @@ import logger from "../../config/logger";
 import { getSize } from "../fileMethods/getSize";
 import { getFileType } from "../fileMethods/getFileType";
 import { tryCatch } from "../customErrors/tryCatch";
-import { getFromSharedFile } from "../dbMethods/getFromSharedFile";
+import { getUserAndOriginalFolderId } from "@/dbMethods/getUserAndOriginalFolderId";
 
 function setNewName(req: Request, file: any) {
   if (req.body.newName) {
@@ -28,12 +28,10 @@ async function fileUploaderFunction(req: Request, res: Response) {
     const size = getSize(file.size);
 
     const newName = setNewName(req, file);
-    const isOwner = req.body._isOwner || true;
-    const ownerRedirect = isOwner ? "0" : "1";
+    logger.toImplement("need to add validator to the name of the new file");
     const currentFolderId = req.body._currentFolderId || "Home";
-    let uploadFolderId: string = "";
 
-    let owner: string = "";
+    //Get file type {{{
     const { data: fileType, error: fileTypeError } = await tryCatch(
       getFileType(file),
     ); //does not return type folder
@@ -42,45 +40,58 @@ async function fileUploaderFunction(req: Request, res: Response) {
       logger.error("There was an error with the filetype");
       return fileTypeError;
     }
+    //}}}
 
-    if (!req.user || req.user.id == undefined) {
+    //Getting the user and original folder id, both if user is or is not the owner {{{
+    const { data: objectData, error: errorData } = await tryCatch(
+      getUserAndOriginalFolderId(req, res, currentFolderId),
+    );
+    if (
+      errorData ||
+      objectData.error ||
+      !objectData.userId ||
+      !objectData.originalFolderId ||
+      !objectData.userIsOwner
+    ) {
       customErrorContainer.genericError();
-      logger.error("No user");
-      return "No user";
-    }
-
-    if (isOwner) {
-      owner = req.user.id;
-      uploadFolderId = currentFolderId;
-    } else {
-      const { data: allInfo, error: currentFolderError } = await tryCatch(
-        getFromSharedFile(currentFolderId),
+      logger.error(
+        "error getting user and og folder: ",
+        errorData || objectData.error,
       );
-      if (
-        currentFolderError ||
-        !allInfo ||
-        !allInfo.owner ||
-        !allInfo.originalFolder
-      ) {
-        customErrorContainer.genericError();
-        logger.error("current Folder Error: ", currentFolderError);
-        return currentFolderError;
-      }
-      owner = allInfo?.owner;
-      uploadFolderId = allInfo.originalFolder.id;
+      res.redirect("/");
+      return;
     }
+    const { userId, userIsOwner, originalFolderId } = objectData;
+    //}}}
 
-    const prismaFileList = await prisma.files.create({
-      data: {
-        ownerId: owner,
-        fileName: newName,
-        type: fileType,
-        size: size,
-        parentFolder: uploadFolderId,
-      },
-    });
+    const ownerRedirect = userIsOwner ? "0" : "1";
 
-    const name = `${owner}/Storage/${uploadFolderId}/${prismaFileList.id}`;
+    //Creating for prisma the file and handling error{{{
+    const { data: prismaFileList, error: errorPrismaFileList } = await tryCatch(
+      prisma.files.create({
+        data: {
+          ownerId: userId,
+          fileName: newName,
+          type: fileType,
+          size: size,
+          parentFolder: originalFolderId,
+        },
+      }),
+    );
+    if (errorPrismaFileList || !prismaFileList) {
+      customErrorContainer.genericError();
+      logger.error(
+        `Error creating the file with prisma: ${errorPrismaFileList || "No value"}`,
+      );
+      return errorPrismaFileList || "Not created";
+    }
+    //}}}
+
+    //Creating the file for supabaes and handling the error {{{
+    const name = `${userId}/Storage/${originalFolderId}/${prismaFileList.id}`;
+    logger.toImplement(
+      "NEED TO MAKE SURE THE UPLOAD IS DELETED FROM THE SERVER IF THE SUPABASE UPLOAD FAILS",
+    );
     const { data: _uploadResult, error: uploadError } = await tryCatch(
       uploadFile(file, "Files", name),
     );
@@ -89,9 +100,10 @@ async function fileUploaderFunction(req: Request, res: Response) {
       customErrorContainer.genericError();
       return uploadError;
     }
+    //}}}
 
     logger.test("_prismaFileList", prismaFileList);
-    res.redirect(`/account/${ownerRedirect}/${uploadFolderId}`);
+    res.redirect(`/account/${ownerRedirect}/${originalFolderId}`);
   } catch (e) {
     logger.error(e);
   }

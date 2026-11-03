@@ -3,15 +3,17 @@
 
   <div class="listContainer flex flex-wrap justify-center min-h-full">
     <%
-    const files = (locals.ownedFiles).concat(locals.sharedFiles)
+    const files = (locals.ownedFiles).concat(sharedFiles)
     if(!files) { %>
       <p>No files</p>
     <%} else {
+    const endOfOwnedFiles = locals.ownedFiles.length - 1
+    console.log("endOfOwnedFiles",endOfOwnedFiles)
     for(let i = 0; i < files.length; i++){
       const file = files[i]
       let finalFileType = file.type;
       let finalName=file.fileName; 
-      const travelUser = isOwner ? '0' : '1';
+      const travelUser = i > endOfOwnedFiles ? '1' : '0';
       %>
     <div class="itemContainer bgAmber">
       <div>
@@ -25,7 +27,7 @@
         </button>
         <%- include("editFile", {finalFileType: finalFileType, file: file}) %>
       </div>
-        <%const fileClass = 'item' %>
+        <%const fileClass = 'item'; console.log("i: ", i, " travelUser: ", travelUser) %>
       <% let result; if(finalFileType === "folder" || finalFileType === "folder_alt") {result = 'travelFolder(this)'} else {result = ' '} %>
       <div class=" <%= fileClass %> " onclick="<%=result%>" >
         <% const imageSource = "/static/resources/" + finalFileType + ".svg" %>

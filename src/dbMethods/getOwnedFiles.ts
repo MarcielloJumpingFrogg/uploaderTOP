@@ -1,23 +1,23 @@
-import logger from "../../config/logger";
+import { tryCatch } from "@/customErrors/tryCatch";
 import { prisma } from "../../lib/prisma";
-// import { getPath } from "./getPath";
+import type { Files } from "../../generated/prisma/client";
 
-export async function getOwnedFiles(owner: string, currentFolderId: string) {
-  let userId;
-  if (owner == "0") {
-    let file = await prisma.files.findFirst({
-      where: { parentFolder: currentFolderId },
-    });
-    userId = file?.id;
+export async function getOwnedFiles(
+  userId: string,
+  currentFolderId: string,
+  userIsOwner: boolean,
+): Promise<Files[] | [] | null> {
+  if (userIsOwner) {
+    const { data: result, error: err } = await tryCatch(
+      prisma.files.findMany({
+        where: { ownerId: userId, parentFolder: currentFolderId },
+      }),
+    );
+    if (err) {
+      throw new Error("Error while pulling the files of the user: ", err);
+    }
+    return result;
   } else {
-    userId = owner;
+    return [];
   }
-  const result = await prisma.files.findMany({
-    where: { ownerId: userId, parentFolder: currentFolderId },
-  });
-
-  // logger.test("ownedFiles: ", result);
-  // const path = await getPath(currentFolderId);
-
-  return result;
 }

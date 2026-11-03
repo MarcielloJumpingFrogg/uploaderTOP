@@ -1,13 +1,15 @@
-import { session } from "express-session";
+import type { Session } from "express-session";
 import { passport } from "passport";
 
 declare global {
   namespace Express {
     interface Request {
-      session?: session;
+      session?: Session;
       passport?: passport;
       params?: {
-        shareId: string;
+        shareId?: string;
+        folderId?: string;
+        owned?: "0" | "1";
       };
       user?: {
         id: string;
@@ -17,6 +19,8 @@ declare global {
         title: string;
         text: string;
       };
+      currentFolderId?: string;
+      userIsOwner?: boolean;
     }
   }
 }

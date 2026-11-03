@@ -1,25 +1,45 @@
 import { createFolder } from "../supabaseFn/createFolder";
+import type { Request, Response } from "express";
 import logger from "../../config/logger";
+import customErrorContainer from "@/customErrors/customErrorContainer";
 
 const newFolderController = [
-  async (req: any, res: any) => {
+  async (req: Request, res: Response) => {
     try {
-      const currentFolder = req.body._currentFolderId;
-      if (!currentFolder)
-        throw new Error("currentFolder does not exist in newFolderController");
-
+      const currentFolder: string = req.body._currentFolderId;
+      if (!currentFolder) {
+        logger.error("No currentFolder in req.body");
+        customErrorContainer.inputError(
+          "There has been and error with your request",
+        );
+        res.redirect("/");
+        return;
+      }
       const newFolderName = req.body.folderName;
-      if (!newFolderName)
-        throw new Error("newFolderName does not exist in newFolderController");
-
+      logger.toImplement("need to add validatin to the name of the folder");
+      if (!newFolderName) {
+        logger.error("No New folder name in req.body");
+        customErrorContainer.inputError(
+          "Your need to specify a name for your new folder",
+        );
+        res.redirect("/");
+        return;
+      }
       const owner = req.body._isOwner;
-      if (!owner)
-        throw new Error("owner does not exist in newFolderController");
+      if (!owner) {
+        logger.error("No owner in req.body");
+        customErrorContainer.inputError(
+          "There has been and error with your request",
+        );
+        res.redirect("/");
+        return;
+      }
 
       // const fullPath = req.user.id + "/" + location + "/" + req.body.folderName;
       await createFolder(
         owner,
-        req.user.id,
+        req,
+        res,
         currentFolder,
         newFolderName,
         "Files",

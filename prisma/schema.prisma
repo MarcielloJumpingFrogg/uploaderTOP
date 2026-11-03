@@ -59,4 +59,5 @@ model SharedFiles {
   userSharedWith  Users @relation(fields: [destinationUser], references: [id])
   sessionId       String
   session         ShareSession @relation(fields: [sessionId], references: [id])
+  parentFolder    String
 }

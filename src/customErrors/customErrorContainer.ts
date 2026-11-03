@@ -49,6 +49,11 @@ class CustomErrorContainer {
     this.errors.push({ message: error });
   }
 
+  inputError(error: string) {
+    this.errorCode = 500;
+    this.errors.push({ message: error });
+  }
+
   userError(res: Response) {
     const error =
       "The user session appears to have encountered an error, please try again later";

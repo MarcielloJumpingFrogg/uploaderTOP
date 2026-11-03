@@ -1,0 +1,42 @@
+import { tryCatch } from "@/customErrors/tryCatch";
+import logger from "../../config/logger";
+import { prisma } from "@prisma";
+import type { Files } from "../../generated/prisma/client";
+
+export async function getInsideSharedFolder(
+  currentFolderId: string,
+  userIsOwner: boolean,
+  userId: string,
+) {
+  if (userIsOwner) return [];
+  let originalFolder: { ownerId: string; id: string } | Files = {
+    ownerId: userId,
+    id: currentFolderId,
+  };
+
+  logger.test("originalFolder", originalFolder);
+
+  const originalFolderId = originalFolder.id;
+  const originalUserId = originalFolder.ownerId;
+
+  const { data: ogFiles, error: ogError } = await tryCatch(
+    prisma.files.findMany({
+      where: { ownerId: originalUserId, parentFolder: originalFolderId },
+    }),
+  );
+
+  const fileList: Files[] = [];
+
+  if (ogError) {
+    throw new Error("Error finding the original folder's files");
+  }
+
+  for (let i = 0; i < ogFiles.length; i++) {
+    const file = ogFiles[i];
+    if (file) {
+      fileList.push(file);
+    }
+  }
+
+  return fileList;
+}

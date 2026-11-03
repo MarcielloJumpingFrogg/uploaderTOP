@@ -1,30 +1,47 @@
 import { getAvatar } from "../supabaseFn/getAvatar";
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import customErrorContainer from "../customErrors/customErrorContainer";
-import "colors";
 import logger from "../../config/logger";
-import { getOwnedFiles } from "../dbMethods/getOwnedFiles";
-import { getSharedFiles } from "../dbMethods/getSharedFiles";
-import { prisma } from "../../lib/prisma";
 import { tryCatch } from "../customErrors/tryCatch";
+import { getAllFiles } from "@/dbMethods/getAllFiles";
+import { getUserAndOriginalFolderId } from "@/dbMethods/getUserAndOriginalFolderId";
+import { prisma } from "@prisma";
 
-async function renderAccount(req: any, res: Response) {
+async function renderAccount(req: Request, res: Response) {
   try {
-    //refresh cookies
-    const month = 1000 * 60 * 60 * 24 * 30;
-    req.session.cookie.maxAge = month;
-
-    //approximate the currentFolder's id
-    let currentFolderId = req.currentFolderId || "Home";
-
-    //user
-    let user;
-    if (req.userOwner) {
-      user = req.userOwner == true ? req.user.id : "0";
-    } else {
-      user = req.user.id;
+    const { data: objectData, error: errorData } = await tryCatch(
+      getUserAndOriginalFolderId(req, res, req.currentFolderId),
+    );
+    if (
+      errorData ||
+      objectData.error ||
+      !objectData.userId ||
+      !objectData.originalFolderId ||
+      !objectData.userIsOwner
+    ) {
+      customErrorContainer.genericError();
+      logger.error(
+        "error getting user and og folder: ",
+        errorData || objectData.error,
+      );
+      res.redirect("/");
+      return;
     }
-    //
+    const { userId, userIsOwner, originalFolderId } = objectData;
+    logger.test("objectData: ", objectData);
+
+    //refresh cookies
+    try {
+      const month = 1000 * 60 * 60 * 24 * 30;
+      req.session.cookie.maxAge = month;
+    } catch (e) {
+      throw Error(`could not update cookie maxAge: ${e}`);
+    }
+
+    if (!req.user) {
+      customErrorContainer.userError(res);
+      return;
+    }
 
     //avatar
     const { data: avatar, error: avatarError } = await tryCatch(
@@ -33,58 +50,41 @@ async function renderAccount(req: any, res: Response) {
     if (avatarError) throw new Error("error getting avatar: ", avatarError);
     //
 
-    //ownedFiles:
-    const { data: ownedFiles, error: ownedFilesError } = await tryCatch(
-      getOwnedFiles(user, currentFolderId),
+    const { data: allfiles, error: errorWithFiles } = await tryCatch(
+      getAllFiles(req, res),
     );
-    if (ownedFilesError)
-      throw new Error(
-        "Error getting the files owned by the user",
-        ownedFilesError,
-      );
-    //
-
-    //sharedFiles:
-    const { data: sharedFiles, error: sharedFilesError } = await tryCatch(
-      getSharedFiles(user, currentFolderId),
-    );
-    if (sharedFilesError) {
-      logger.error(sharedFilesError);
-      throw new Error("sharedFileError: ", sharedFilesError);
+    if (errorWithFiles || !allfiles) {
+      logger.error(`error getting 'allFiles': ${errorWithFiles || "empty"}`);
+      customErrorContainer.genericError();
+      res.redirect("/");
+      return;
     }
-    //
+
+    const { finalSharedFiles, ownedFiles } = allfiles;
 
     //folder:
-    let folder;
-    if (currentFolderId == "Home") {
-      folder = currentFolderId;
-    } else {
-      let { data: parentFolder, error: parentFolderError } = await tryCatch(
-        prisma.files.findFirst({
-          where: { id: currentFolderId, ownerId: user },
-        }),
-      );
-      if (parentFolderError)
-        throw new Error(
-          "Could not find parentFolder's id: ",
-          parentFolderError,
-        );
-      if (parentFolder == undefined || parentFolder.parentFolder == undefined)
-        throw new Error("No parent folder found");
-      folder = parentFolder.parentFolder;
+    let parentFolderId;
+    const { data: orginalFolder, error: errorOriginalFolder } = await tryCatch(
+      prisma.files.findUnique({ where: { id: originalFolderId } }),
+    );
+    if (errorOriginalFolder) {
+      logger.error("Error getting originalFolder: ", errorOriginalFolder);
+      customErrorContainer.genericError();
+      res.redirect("/");
+      return;
     }
-    //
+    parentFolderId = orginalFolder?.parentFolder || "Home";
 
     let popUp = req.popUp || {};
 
     res.status(customErrorContainer.getErrorCode()).render("account", {
       //user and file data
       user: req.user,
-      isOwner: req.userOwner || true,
+      isOwner: req.userIsOwner || true,
       ownedFiles: ownedFiles,
-      sharedFiles: sharedFiles,
-      parentFolderId: folder,
-      currentFolderId: currentFolderId,
+      sharedFiles: finalSharedFiles,
+      parentFolderId: parentFolderId,
+      currentFolderId: req.currentFolderId || "Home",
       avatar: avatar,
       popUp: popUp,
 
@@ -92,6 +92,7 @@ async function renderAccount(req: any, res: Response) {
       errorName: customErrorContainer.getErrorName(),
       errors: customErrorContainer.getErrorList(),
     });
+    customErrorContainer.resetError();
   } catch (e) {
     logger.error("Error:", e);
   }

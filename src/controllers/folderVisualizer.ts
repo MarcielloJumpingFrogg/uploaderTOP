@@ -1,16 +1,23 @@
 import { renderAccount } from "./accountController";
-import { prisma } from "../../lib/prisma";
 import type { Request, Response } from "express";
 import logger from "../../config/logger";
 
 const folderVisualizer = [
-  async (req: any, res: Response) => {
+  async (req: Request, res: Response) => {
     try {
-      const folderId = req.params.folderId;
-      const owned = req.params.owned;
-      let userOwner = owned == "0" ? true : false;
+      let folderId = req.params[`folderId`];
+      const owned = req.params[`owned`];
+      let userIsOwner;
+      if (owned === "0") {
+        userIsOwner = true;
+      } else if (owned === "1") {
+        userIsOwner = false;
+      }
+      if (!folderId || Array.isArray(folderId)) {
+        folderId = "Home";
+      }
       req.currentFolderId = folderId;
-      req.userOwner = userOwner;
+      req.userIsOwner = userIsOwner;
       renderAccount(req, res);
     } catch (e) {
       logger.error(e);

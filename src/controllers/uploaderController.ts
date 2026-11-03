@@ -102,7 +102,6 @@ async function fileUploaderFunction(req: Request, res: Response) {
     }
     //}}}
 
-    logger.test("_prismaFileList", prismaFileList);
     res.redirect(`/account/${ownerRedirect}/${originalFolderId}`);
   } catch (e) {
     logger.error(e);

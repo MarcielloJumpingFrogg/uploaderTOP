@@ -5,7 +5,6 @@ import logger from "../../config/logger";
 import { prisma } from "../../lib/prisma";
 import { admin_supabase } from "../../config/supabase";
 import customErrorContainer from "../customErrors/customErrorContainer";
-import { exit } from "process";
 
 async function updateDb(oldPath: string, newNamePath: string, newName: string) {
   const fulldb = await prisma.shareSession.findMany({});
@@ -46,7 +45,6 @@ function isShared(req: any) {
   const folderSessionId = req.body._folderSession;
   if (fileSessionId !== "0" && fileSessionId !== undefined) {
     //this means the fileSessionId is the main provider
-    logger.test("fileSessionId", fileSessionId);
     return fileSessionId;
   } else if (
     folderSessionId !== "0" &&
@@ -54,7 +52,6 @@ function isShared(req: any) {
     (fileSessionId === "0" || fileSessionId === undefined)
   ) {
     //this means the folderSession is the main provider
-    logger.test("folderSessionId", folderSessionId);
     return folderSessionId;
   } else {
     return false;
@@ -87,7 +84,6 @@ async function getIds(req: any) {
 const renameController = [
   async (req: any, res: Response) => {
     try {
-      logger.test("body: ", req.body);
       const locationPath = req.body._location.replaceAll(",", "/");
 
       const { owner, foundSession } = await getIds(req);

@@ -24,7 +24,6 @@ export async function createFolder(
     const user = req.user.id;
 
     //getting current folder's id {{{
-    logger.test("currentFolderaid: ", bodyFolderId);
     if (!owner) {
       const { data: currentFolder, error: errorCurrentFolder } = await tryCatch(
         getFromCurrentFolderId(bodyFolderId, !owner, user),
@@ -76,8 +75,6 @@ export async function createFolder(
       res.redirect("/");
       return;
     }
-
-    logger.test("result:", creationResult);
   } catch (e: any) {
     logger.error("Error in createFolder: ", e);
   }

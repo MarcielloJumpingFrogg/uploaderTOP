@@ -14,8 +14,6 @@ export async function getInsideSharedFolder(
     id: currentFolderId,
   };
 
-  logger.test("originalFolder", originalFolder);
-
   const originalFolderId = originalFolder.id;
   const originalUserId = originalFolder.ownerId;
 

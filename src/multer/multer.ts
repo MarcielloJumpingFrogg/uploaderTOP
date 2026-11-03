@@ -18,7 +18,6 @@ const fileImageFilter = async (
   cb: any,
 ) => {
   // only images
-  logger.test("file: ", file);
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {

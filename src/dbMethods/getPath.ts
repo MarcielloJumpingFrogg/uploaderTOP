@@ -10,12 +10,10 @@ export async function getPath(parentFolderId: string) {
   let temp = file;
   while (temp?.parentFolder !== "Home" && temp) {
     path.push(temp?.parentFolder);
-    logger.test("indeed", temp);
     temp = await prisma.files.findFirst({
       where: { ownerId: owner, id: parentFolderId },
     });
   }
 
-  logger.test("path: ", path);
   return path;
 }

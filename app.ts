@@ -9,7 +9,6 @@ import { handleMulterError } from "./src/multer/multer";
 import logger from "./config/logger";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 
-//test
 const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

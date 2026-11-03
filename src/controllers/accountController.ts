@@ -28,7 +28,6 @@ async function renderAccount(req: Request, res: Response) {
       return;
     }
     const { userId, userIsOwner, originalFolderId } = objectData;
-    logger.test("objectData: ", objectData);
 
     //refresh cookies
     try {

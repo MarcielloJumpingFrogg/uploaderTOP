@@ -22,8 +22,6 @@ export async function getFromCurrentFolderId(
     });
 
     if (!sharedFile) {
-      logger.test("file");
-
       return null;
     }
 
@@ -35,7 +33,6 @@ export async function getFromCurrentFolderId(
     });
 
     if (!originalFolder) {
-      logger.test("folder");
       return null;
     }
 

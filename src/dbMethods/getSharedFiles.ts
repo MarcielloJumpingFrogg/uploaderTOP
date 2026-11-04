@@ -7,7 +7,7 @@ export async function getSharedFiles(
   userId: string,
   currentFolder: string,
 ): Promise<Files[]> {
-  const { data: files, error: fileError } = await tryCatch(
+  const { data: sharedFiles, error: fileError } = await tryCatch(
     prisma.sharedFiles.findMany({
       where: { destinationUser: userId, parentFolder: currentFolder },
     }),
@@ -19,8 +19,8 @@ export async function getSharedFiles(
 
   const foundFiles: Files[] = [];
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+  for (let i = 0; i < sharedFiles.length; i++) {
+    const file = sharedFiles[i];
     if (!file) {
       return [];
     }
@@ -54,7 +54,10 @@ export async function getSharedFiles(
       );
     }
 
-    foundFiles.push(originalFile);
+    let safeGuardedId = originalFile;
+    safeGuardedId.id = file.id;
+
+    foundFiles.push(safeGuardedId);
   }
 
   return foundFiles;

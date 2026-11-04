@@ -55,7 +55,7 @@ async function fileUploaderFunction(req: Request, res: Response) {
     ) {
       customErrorContainer.genericError();
       logger.error(
-        "error getting user and og folder: ",
+        "error getting user and og folder in fileUploaderFunction : ",
         errorData || objectData.error,
       );
       res.redirect("/");

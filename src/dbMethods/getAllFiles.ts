@@ -18,11 +18,11 @@ export async function getAllFiles(req: Request, res: Response) {
     objectData.error ||
     !objectData.userId ||
     !objectData.originalFolderId ||
-    !objectData.userIsOwner
+    objectData.userIsOwner == undefined
   ) {
     customErrorContainer.genericError();
     logger.error(
-      "error getting user and og folder: ",
+      "error getting user and og folder in getAllFiles: ",
       errorData || objectData.error,
     );
     res.redirect("/");

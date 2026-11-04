@@ -17,12 +17,11 @@ async function renderAccount(req: Request, res: Response) {
       objectData.error ||
       !objectData.userId ||
       !objectData.originalFolderId ||
-      !objectData.userIsOwner
+      objectData.userIsOwner == undefined
     ) {
       customErrorContainer.genericError();
       logger.error(
-        "error getting user and og folder: ",
-        errorData || objectData.error,
+        `error getting user and og folder in accountController: ${errorData} \nobjectData: ${objectData?.error}`,
       );
       res.redirect("/");
       return;
@@ -79,7 +78,7 @@ async function renderAccount(req: Request, res: Response) {
     res.status(customErrorContainer.getErrorCode()).render("account", {
       //user and file data
       user: req.user,
-      isOwner: req.userIsOwner || true,
+      isOwner: userIsOwner,
       ownedFiles: ownedFiles,
       sharedFiles: finalSharedFiles,
       parentFolderId: parentFolderId,

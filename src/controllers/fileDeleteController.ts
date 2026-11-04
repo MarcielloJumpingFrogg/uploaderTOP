@@ -1,12 +1,12 @@
 // import { admin_supabase } from "../../config/supabase";
 import { deleteFile } from "../supabaseFn/deleteFile";
 import { recursiveDelete } from "../supabaseFn/recursiveDelete";
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import logger from "../../config/logger";
 import { prisma } from "../../lib/prisma";
 
 export const fileDeleteController = [
-  async (req: any, res: Response) => {
+  async (req: Request, res: Response) => {
     if (req.body._sessionId === "0" || !req.body._sessionId) {
       const location = req.body._location.replaceAll(",", "/");
       let owner;

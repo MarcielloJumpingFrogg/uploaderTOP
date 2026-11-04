@@ -14,6 +14,8 @@ export async function getInsideSharedFolder(
     id: currentFolderId,
   };
 
+  logger.test("original folder: ", originalFolder);
+
   const originalFolderId = originalFolder.id;
   const originalUserId = originalFolder.ownerId;
 
@@ -26,7 +28,7 @@ export async function getInsideSharedFolder(
   const fileList: Files[] = [];
 
   if (ogError) {
-    throw new Error("Error finding the original folder's files");
+    throw new Error("Error finding the original folder's files", ogError);
   }
 
   for (let i = 0; i < ogFiles.length; i++) {

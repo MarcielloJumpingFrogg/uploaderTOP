@@ -30,6 +30,7 @@ export async function getUserAndOriginalFolderId(
     userIsOwner = true;
   } else {
     userIsOwner = false;
+    logger.test(`userIsOwner: ${userIsOwner}`);
     const { data, error } = await tryCatch(
       getFromCurrentFolderId(currentFolder, userIsOwner, req.user.id),
     );

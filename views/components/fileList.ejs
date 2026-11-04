@@ -8,12 +8,13 @@
       <p>No files</p>
     <%} else {
     const endOfOwnedFiles = locals.ownedFiles.length - 1
-    console.log("endOfOwnedFiles",endOfOwnedFiles)
     for(let i = 0; i < files.length; i++){
       const file = files[i]
       let finalFileType = file.type;
       let finalName=file.fileName; 
-      const travelUser = i > endOfOwnedFiles ? '1' : '0';
+      const ownerOfThisFile = i > endOfOwnedFiles ? false : true;
+      const travelUser = ownerOfThisFile ? "0" : "1";
+
       %>
     <div class="itemContainer bgAmber">
       <div>
@@ -25,9 +26,9 @@
             height="20px"
           />
         </button>
-        <%- include("editFile", {finalFileType: finalFileType, file: file}) %>
+        <%- include("editFile", {finalFileType: finalFileType, file: file, ownerOfThisFile: ownerOfThisFile}) %>
       </div>
-        <%const fileClass = 'item'; console.log("i: ", i, " travelUser: ", travelUser) %>
+        <%const fileClass = 'item';  %>
       <% let result; if(finalFileType === "folder" || finalFileType === "folder_alt") {result = 'travelFolder(this)'} else {result = ' '} %>
       <div class=" <%= fileClass %> " onclick="<%=result%>" >
         <% const imageSource = "/static/resources/" + finalFileType + ".svg" %>

@@ -8,3 +8,4 @@
 - [ ] the ability to make a file read only for user's who don't have the right permissions send through the link
 - [ ] make the ui less ugly
 - [ ] finish the project
+- [ ] redirect on all POST Methods

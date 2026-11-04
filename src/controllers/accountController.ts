@@ -9,6 +9,7 @@ import { prisma } from "@prisma";
 
 async function renderAccount(req: Request, res: Response) {
   try {
+    //getting informations about the userId, the original folder id and if the user is also the owner: {{{
     const { data: objectData, error: errorData } = await tryCatch(
       getUserAndOriginalFolderId(req, res, req.currentFolderId),
     );
@@ -26,28 +27,31 @@ async function renderAccount(req: Request, res: Response) {
       res.redirect("/");
       return;
     }
+    //}}}
     const { userId, userIsOwner, originalFolderId } = objectData;
 
-    //refresh cookies
+    //refresh cookies {{{
     try {
       const month = 1000 * 60 * 60 * 24 * 30;
       req.session.cookie.maxAge = month;
     } catch (e) {
       throw Error(`could not update cookie maxAge: ${e}`);
     }
+    //}}}
 
     if (!req.user) {
       customErrorContainer.userError(res);
       return;
     }
 
-    //avatar
+    //avatar {{{
     const { data: avatar, error: avatarError } = await tryCatch(
       getAvatar(req.user.id),
     );
     if (avatarError) throw new Error("error getting avatar: ", avatarError);
-    //
+    //}}}
 
+    //Getting all the files, both the originated by the user and the shared with {{{
     const { data: allfiles, error: errorWithFiles } = await tryCatch(
       getAllFiles(req, res),
     );
@@ -57,10 +61,10 @@ async function renderAccount(req: Request, res: Response) {
       res.redirect("/");
       return;
     }
-
     const { finalSharedFiles, ownedFiles } = allfiles;
+    // }}}
 
-    //folder:
+    //Getting the parent folder, used for the creation of new folders and travel to the previous one: {{{
     let parentFolderId;
     const { data: orginalFolder, error: errorOriginalFolder } = await tryCatch(
       prisma.files.findUnique({ where: { id: originalFolderId } }),
@@ -72,11 +76,12 @@ async function renderAccount(req: Request, res: Response) {
       return;
     }
     parentFolderId = orginalFolder?.parentFolder || "Home";
+    //}}}
 
     let popUp = req.popUp || {};
 
     res.status(customErrorContainer.getErrorCode()).render("account", {
-      //user and file data
+      //user and file data {{{
       user: req.user,
       isOwner: userIsOwner,
       ownedFiles: ownedFiles,
@@ -89,6 +94,7 @@ async function renderAccount(req: Request, res: Response) {
       //error management
       errorName: customErrorContainer.getErrorName(),
       errors: customErrorContainer.getErrorList(),
+      //}}}
     });
     customErrorContainer.resetError();
   } catch (e) {

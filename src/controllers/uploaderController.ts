@@ -51,7 +51,7 @@ async function fileUploaderFunction(req: Request, res: Response) {
       objectData.error ||
       !objectData.userId ||
       !objectData.originalFolderId ||
-      !objectData.userIsOwner
+      objectData.userIsOwner == undefined
     ) {
       customErrorContainer.genericError();
       logger.error(

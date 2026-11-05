@@ -1,12 +1,12 @@
 import logger from "../../config/logger";
-import type { Files } from "../../generated/prisma/client";
+import type { Items } from "../../generated/prisma/client";
 import { prisma } from "@prisma";
 import { tryCatch } from "../customErrors/tryCatch";
 
 export async function getSharedFiles(
   userId: string,
   currentFolder: string,
-): Promise<Files[]> {
+): Promise<Items[]> {
   const { data: sharedFiles, error: fileError } = await tryCatch(
     prisma.sharedFiles.findMany({
       where: { destinationUser: userId, parentFolder: currentFolder },
@@ -17,7 +17,7 @@ export async function getSharedFiles(
     throw new Error("Error during sharedFile.find : ", fileError);
   }
 
-  const foundFiles: Files[] = [];
+  const foundFiles: Items[] = [];
 
   for (let i = 0; i < sharedFiles.length; i++) {
     const file = sharedFiles[i];
@@ -39,7 +39,7 @@ export async function getSharedFiles(
     }
 
     const { data: originalFile, error: fileError } = await tryCatch(
-      prisma.files.findFirst({
+      prisma.items.findFirst({
         where: {
           id: shareSession?.originalFile,
           parentFolder: currentFolder,
@@ -50,7 +50,7 @@ export async function getSharedFiles(
     if (fileError || !originalFile) {
       logger.error("fileError: ", fileError);
       throw new Error(
-        `Error from prisma.files of shareSession.originalFile: ${fileError || "No originalFile"} `,
+        `Error from prisma.items of shareSession.originalFile: ${fileError || "No originalFile"} `,
       );
     }
 

@@ -67,7 +67,7 @@ async function renderAccount(req: Request, res: Response) {
     //Getting the parent folder, used for the creation of new folders and travel to the previous one: {{{
     let parentFolderId;
     const { data: orginalFolder, error: errorOriginalFolder } = await tryCatch(
-      prisma.files.findUnique({ where: { id: originalFolderId } }),
+      prisma.items.findUnique({ where: { id: originalFolderId } }),
     );
     if (errorOriginalFolder) {
       logger.error("Error getting originalFolder: ", errorOriginalFolder);

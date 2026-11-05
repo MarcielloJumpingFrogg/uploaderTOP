@@ -26,7 +26,7 @@ export const shareCreatorController = [
       const canBeEdited = req.body.canEdit === "on" ? true : false;
 
       const { data: dbOriginalFile, error: dbError } = await tryCatch(
-        prisma.files.findUnique({
+        prisma.items.findUnique({
           where: {
             ownerId: req.user.id,
             id: req.body._fileId,

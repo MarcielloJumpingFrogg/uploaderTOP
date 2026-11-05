@@ -68,7 +68,7 @@ async function fileUploaderFunction(req: Request, res: Response) {
 
     //Creating for prisma the file and handling error{{{
     const { data: prismaFileList, error: errorPrismaFileList } = await tryCatch(
-      prisma.files.create({
+      prisma.items.create({
         data: {
           ownerId: userId,
           fileName: newName,

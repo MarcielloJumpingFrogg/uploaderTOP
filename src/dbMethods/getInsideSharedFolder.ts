@@ -1,7 +1,7 @@
 import { tryCatch } from "@/customErrors/tryCatch";
 import logger from "../../config/logger";
 import { prisma } from "@prisma";
-import type { Files } from "../../generated/prisma/client";
+import type { Items } from "../../generated/prisma/client";
 
 export async function getInsideSharedFolder(
   currentFolderId: string,
@@ -9,7 +9,7 @@ export async function getInsideSharedFolder(
   userId: string,
 ) {
   if (userIsOwner) return [];
-  let originalFolder: { ownerId: string; id: string } | Files = {
+  let originalFolder: { ownerId: string; id: string } | Items = {
     ownerId: userId,
     id: currentFolderId,
   };
@@ -20,7 +20,7 @@ export async function getInsideSharedFolder(
   const originalUserId = originalFolder.ownerId;
 
   const { data: ogFiles, error: ogError } = await tryCatch(
-    prisma.files.findMany({
+    prisma.items.findMany({
       where: { ownerId: originalUserId, parentFolder: originalFolderId },
     }),
   );

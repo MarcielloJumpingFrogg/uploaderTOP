@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import type { Files } from "../../generated/prisma/client";
+import type { Items } from "../../generated/prisma/client";
 import logger from "../../config/logger";
 
 export async function getFromCurrentFolderId(
@@ -33,7 +33,7 @@ export async function getFromCurrentFolderId(
       where: { id: sharedFile?.sessionId },
     });
     logger.test("session: ", session);
-    const originalFolder: Files = await prisma.files.findUniqueOrThrow({
+    const originalFolder: Items = await prisma.items.findUniqueOrThrow({
       where: { id: session?.originalFile },
     });
     logger.test("originalFolder: ", originalFolder);

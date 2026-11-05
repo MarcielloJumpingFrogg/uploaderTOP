@@ -20,37 +20,38 @@ model Session {
 }
 
 model Users {
-  id       String    @id @default(uuid())
-  username String    @unique
-  password String
-  fileList Files[]
-  avatarVersion Int  @default(0)
-  sharedFiles      ShareSession[]
-  receivedFiles    SharedFiles[]
+  id                 String         @id @default(uuid())
+  username           String         @unique
+  password           String
+  fileList           Items[]
+  avatarVersion      Int            @default(0)
+  sharedFiles        ShareSession[]
+  receivedFiles      SharedFiles[]
 }
 
-model Files {
-  id           String  @id @default(uuid())
-  ownerId      String
-  parentFolder String
-  fileName     String
-  type         String
-  size         String  @default("-")
-  updated_at   DateTime @default(now())
-  created_at   DateTime @default(now())
-  referenceOwnerId       Users   @relation(fields: [ownerId], references: [id])
-  sessionId    ShareSession[]
+model Items {
+  id                        String         @id @default(uuid())
+  ownerId                   String
+  parentFolderId            String   
+  fileName                  String
+  type                      Type           @default(FILE)
+  fileType                  String
+  size                      String         @default("-")
+  updated_at                DateTime       @default(now())
+  created_at                DateTime       @default(now())
+  referenceOwnerId          Users          @relation(fields: [ownerId], references: [id])
+  sessionId                 ShareSession[]
 }
 
 model ShareSession {
-  id            String @id @default(uuid())
-  originalUser  String
-  originalFile  String 
-  expiration    DateTime @default(now())
-  edit          Boolean
-  sharedFiles   SharedFiles[]
-  originalFileRelation   Files @relation(fields: [originalFile], references: [id])
-  originalUserRelation   Users @relation(fields: [originalUser], references: [id])
+  id                      String @id @default(uuid())
+  originalUser            String
+  originalFile            String 
+  expiration              DateTime @default(now())
+  edit                    Boolean
+  sharedFiles             SharedFiles[]
+  originalFileRelation    Items @relation(fields: [originalFile], references: [id])
+  originalUserRelation    Users @relation(fields: [originalUser], references: [id])
 }
 
 model SharedFiles {
@@ -60,4 +61,10 @@ model SharedFiles {
   sessionId       String
   session         ShareSession @relation(fields: [sessionId], references: [id])
   parentFolder    String
+}
+
+
+enum Type {
+  FILE
+  FOLDER
 }

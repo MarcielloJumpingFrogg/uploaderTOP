@@ -42,12 +42,13 @@ export async function createFolder(
 
     //creating folder {{{
     const { data: folderCreation, error: folderCreationError } = await tryCatch(
-      prisma.files.create({
+      prisma.items.create({
         data: {
           ownerId: user,
           parentFolder: currentFolderId,
           fileName: newFolderName,
-          type: "folder",
+          type: "FOLDER",
+          filetype: "folder",
           size: "-",
         },
       }),

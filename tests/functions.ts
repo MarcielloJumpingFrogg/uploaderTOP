@@ -7,7 +7,7 @@ async function resetDb() {
   await prisma.$transaction([
     prisma.sharedFiles.deleteMany(),
     prisma.shareSession.deleteMany(),
-    prisma.files.deleteMany(),
+    prisma.items.deleteMany(),
     prisma.users.deleteMany(),
     prisma.session.deleteMany(),
   ]);
@@ -98,7 +98,7 @@ async function shareFile(
 async function softReset() {
   await prisma.sharedFiles.deleteMany();
   await prisma.shareSession.deleteMany();
-  await prisma.files.deleteMany();
+  await prisma.items.deleteMany();
   await resetBuckets();
 }
 

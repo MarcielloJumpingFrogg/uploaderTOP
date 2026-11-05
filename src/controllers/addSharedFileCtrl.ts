@@ -14,7 +14,7 @@ async function getSubFiles(folder: string | undefined, currentList: Items[]) {
   if (errorGettingFilesInFolder)
     throw new Error("error getting the files in the folder");
 
-  currentList.concat(containedInFolder);
+  currentList = currentList.concat(containedInFolder);
   for (let i = 0; i < containedInFolder.length; i++) {
     if (containedInFolder[i]?.type === "FOLDER") {
       if (!containedInFolder[i] || !containedInFolder) throw new Error("no id");
@@ -72,6 +72,7 @@ export const addSharedFileCtrl = [
         if (error) throw new Error("Error getting nested files in folders");
         filesInFolder = result;
       }
+      //need to create the big folder // allegedly
       logger.test("filesInFolder: ", filesInFolder);
 
       for (let i = 0; i < filesInFolder.length; i++) {
@@ -89,6 +90,8 @@ export const addSharedFileCtrl = [
                 destinationUser: req.user.id,
                 sessionId: shareSession?.id,
                 parentFolder: filesInFolder[i]?.parentFolderId || "Home",
+                
+
               },
             }),
           );

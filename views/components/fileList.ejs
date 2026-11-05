@@ -10,7 +10,7 @@
     const endOfOwnedFiles = locals.ownedFiles.length - 1
     for(let i = 0; i < files.length; i++){
       const file = files[i]
-      let finalFileType = file.type;
+      let finalFileType = file.fileType;
       let finalName=file.fileName; 
       const ownerOfThisFile = i > endOfOwnedFiles ? false : true;
       const travelUser = ownerOfThisFile ? "0" : "1";

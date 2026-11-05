@@ -72,9 +72,9 @@ async function fileUploaderFunction(req: Request, res: Response) {
         data: {
           ownerId: userId,
           fileName: newName,
-          type: fileType,
+          fileType: fileType,
           size: size,
-          parentFolder: originalFolderId,
+          parentFolderId: originalFolderId,
         },
       }),
     );

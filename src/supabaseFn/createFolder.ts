@@ -45,10 +45,10 @@ export async function createFolder(
       prisma.items.create({
         data: {
           ownerId: user,
-          parentFolder: currentFolderId,
+          parentFolderId: currentFolderId,
           fileName: newFolderName,
           type: "FOLDER",
-          filetype: "folder",
+          fileType: "folder",
           size: "-",
         },
       }),

@@ -23,24 +23,28 @@ model Users {
   id                 String         @id @default(uuid())
   username           String         @unique
   password           String
-  fileList           Items[]
   avatarVersion      Int            @default(0)
   sharedFiles        ShareSession[]
   receivedFiles      SharedFiles[]
+  fileList           Items[]
 }
 
 model Items {
   id                        String         @id @default(uuid())
   ownerId                   String
-  parentFolderId            String   
+  referenceOwnerId          Users          @relation(fields: [ownerId], references: [id])
+  parentFolderId            String?
   fileName                  String
   type                      Type           @default(FILE)
   fileType                  String
   size                      String         @default("-")
   updated_at                DateTime       @default(now())
   created_at                DateTime       @default(now())
-  referenceOwnerId          Users          @relation(fields: [ownerId], references: [id])
   sessionId                 ShareSession[]
+  sharedFiles               SharedFiles[]
+  upperFolderId             String?
+  insideFolder              Items? @relation("FolderHierarchy", fields: [upperFolderId], references: [id])
+  subFolders                Items[] @relation("FolderHierarchy")
 }
 
 model ShareSession {
@@ -61,6 +65,8 @@ model SharedFiles {
   sessionId       String
   session         ShareSession @relation(fields: [sessionId], references: [id])
   parentFolder    String
+  originalFile    String
+  ogFileRelation  Items @relation(fields: [originalFile], references: [id])
 }
 
 

@@ -5,7 +5,7 @@ import { getInsideSharedFolder } from "./getInsideSharedFolder";
 import logger from "../../config/logger";
 import customErrorContainer from "@/customErrors/customErrorContainer";
 import type { Request, Response } from "express";
-import type { Files } from "../../generated/prisma/client";
+import type { Items } from "../../generated/prisma/client";
 import { getUserAndOriginalFolderId } from "./getUserAndOriginalFolderId";
 
 export async function getAllFiles(req: Request, res: Response) {
@@ -68,9 +68,12 @@ export async function getAllFiles(req: Request, res: Response) {
     throw new Error("sharedFileError: ", sharedFilesError);
   }
 
-  let finalSharedFiles: Files[] = [];
+  logger.test("sharedFilea; ", sharedFiles);
+  let finalSharedFiles: Items[] = [];
   for (let i = 0; i < sharedFiles.length; i++) {
-    if (sharedFiles[i] != undefined) {
+    if (sharedFiles == undefined || sharedFiles[i] == undefined)
+      throw new Error("err");
+    if (sharedFiles[i] != undefined || sharedFiles != undefined) {
       finalSharedFiles.push(sharedFiles[i]);
     }
   }

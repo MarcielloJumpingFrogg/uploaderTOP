@@ -30,7 +30,7 @@ export const shareCreatorController = [
           where: {
             ownerId: req.user.id,
             id: req.body._fileId,
-            parentFolder: req.body._parentFolder,
+            parentFolderId: req.body._parentFolder,
           },
         }),
       );

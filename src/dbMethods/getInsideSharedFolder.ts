@@ -33,7 +33,6 @@ export async function getInsideSharedFolder(
 
   for (let i = 0; i < ogFiles.length; i++) {
     const file = ogFiles[i];
-    let reservedId = file;
     if (file) {
       fileList.push(file);
     }

@@ -14,15 +14,20 @@ async function getSubFiles(folder: string | undefined, currentList: Items[]) {
   if (errorGettingFilesInFolder)
     throw new Error("error getting the files in the folder");
 
-  currentList = currentList.concat(containedInFolder);
   for (let i = 0; i < containedInFolder.length; i++) {
     if (containedInFolder[i]?.type === "FOLDER") {
+      logger.test("we should see this 2", containedInFolder[i]);
       if (!containedInFolder[i] || !containedInFolder) throw new Error("no id");
       if (containedInFolder[i]?.id != undefined) {
-        getSubFiles(containedInFolder[i]?.id, currentList);
+        const { data: recursionResult, error: errorRecursion } = await tryCatch(
+          getSubFiles(containedInFolder[i]?.id, currentList),
+        );
+        currentList = currentList.concat(recursionResult);
+        if (errorRecursion) throw new Error("error in recursion");
       }
     }
   }
+  currentList = currentList.concat(containedInFolder);
 
   return currentList;
 }
@@ -70,16 +75,18 @@ export const addSharedFileCtrl = [
           getSubFiles(originalFile.id, filesInFolder),
         );
         if (error) throw new Error("Error getting nested files in folders");
-        filesInFolder = result;
+        filesInFolder = filesInFolder.concat(result);
       }
+      logger.test("the one that got to the end: ", filesInFolder);
+      filesInFolder.push(originalFile);
       //need to create the big folder // allegedly
-      logger.test("filesInFolder: ", filesInFolder);
 
       for (let i = 0; i < filesInFolder.length; i++) {
         if (
           filesInFolder == undefined ||
           filesInFolder[i] == undefined ||
-          filesInFolder[i]?.parentFolderId == undefined
+          filesInFolder[i]?.parentFolderId == undefined ||
+          filesInFolder[i]?.id == undefined
         )
           throw new Error("no files in folder");
 
@@ -90,8 +97,7 @@ export const addSharedFileCtrl = [
                 destinationUser: req.user.id,
                 sessionId: shareSession?.id,
                 parentFolder: filesInFolder[i]?.parentFolderId || "Home",
-                
-
+                originalFile: filesInFolder[i]?.id || "",
               },
             }),
           );
@@ -101,6 +107,7 @@ export const addSharedFileCtrl = [
           customErrorContainer.genericError();
           return;
         }
+        logger.test("result when creating the db entry: ", createdShareFile);
       }
     } catch (e) {
       logger.error(`Unhandled error caught: `, e);

@@ -9,3 +9,4 @@
 - [ ] make the ui less ugly
 - [ ] finish the project
 - [ ] redirect on all POST Methods
+- [ ] Make the share be visible for un-authenticated users, but they cannot do anything

@@ -6,7 +6,7 @@ export async function getFromCurrentFolderId(
   currentFolderId: string | undefined,
   userIsOwner: boolean,
   userId: string,
-): Promise<Files | null> {
+): Promise<Items | null> {
   try {
     if (
       currentFolderId === "Home" ||
@@ -15,7 +15,7 @@ export async function getFromCurrentFolderId(
       userIsOwner === true
     ) {
       logger.error(`Home: ${currentFolderId}`);
-      logger.test(`userIsOwner: ${userIsOwner}`);
+      // logger.test(`userIsOwner: ${userIsOwner}`);
       return null;
     }
 
@@ -23,7 +23,7 @@ export async function getFromCurrentFolderId(
       where: { id: currentFolderId, destinationUser: userId },
     });
 
-    logger.test("sharedFile: ", sharedFile);
+    // logger.test("sharedFile: ", sharedFile);
     if (!sharedFile) {
       logger.error("!sharedFile");
       return null;
@@ -32,11 +32,11 @@ export async function getFromCurrentFolderId(
     const session = await prisma.shareSession.findUniqueOrThrow({
       where: { id: sharedFile?.sessionId },
     });
-    logger.test("session: ", session);
+    // logger.test("session: ", session);
     const originalFolder: Items = await prisma.items.findUniqueOrThrow({
       where: { id: session?.originalFile },
     });
-    logger.test("originalFolder: ", originalFolder);
+    // logger.test("originalFolder: ", originalFolder);
 
     if (!originalFolder) {
       logger.error("original folder");

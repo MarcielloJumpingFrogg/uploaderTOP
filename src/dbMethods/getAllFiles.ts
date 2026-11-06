@@ -37,17 +37,21 @@ export async function getAllFiles(req: Request, res: Response) {
     );
   }
 
-  const { data: sharedInsideFolder, error: errorSharedInsideFolder } =
-    await tryCatch(
-      getInsideSharedFolder(originalFolderId, userIsOwner, userId),
-    );
+  // const { data: sharedInsideFolder, error: errorSharedInsideFolder } =
+  //   await tryCatch(
+  //     getInsideSharedFolder(originalFolderId, userIsOwner, userId),
+  //   );
+  // logger.test("sharedInsideFoldera; ", sharedInsideFolder);
+  // logger.toImplement(
+  //   "NEED TO REMOVE THIS (the getInsideSharedFolder, since everything is shared now)",
+  // );
 
-  if (errorSharedInsideFolder) {
-    throw new Error(
-      "Could not get the files inside the shared folder: ",
-      errorSharedInsideFolder,
-    );
-  }
+  // if (errorSharedInsideFolder) {
+  //   throw new Error(
+  //     "Could not get the files inside the shared folder: ",
+  //     errorSharedInsideFolder,
+  //   );
+  // }
 
   //ownedFiles:
   const { data: ownedFiles, error: ownedFilesError } = await tryCatch(
@@ -68,7 +72,7 @@ export async function getAllFiles(req: Request, res: Response) {
     throw new Error("sharedFileError: ", sharedFilesError);
   }
 
-  logger.test("sharedFilea; ", sharedFiles);
+  // logger.test("sharedFilea; ", sharedFiles);
   let finalSharedFiles: Items[] = [];
   for (let i = 0; i < sharedFiles.length; i++) {
     if (sharedFiles == undefined || sharedFiles[i] == undefined)
@@ -77,11 +81,11 @@ export async function getAllFiles(req: Request, res: Response) {
       finalSharedFiles.push(sharedFiles[i]);
     }
   }
-  for (let i = 0; i < sharedInsideFolder.length; i++) {
-    if (sharedInsideFolder[i] != undefined) {
-      finalSharedFiles.push(sharedInsideFolder[i]);
-    }
-  }
+  // for (let i = 0; i < sharedInsideFolder.length; i++) {
+  //   if (sharedInsideFolder[i] != undefined) {
+  //     finalSharedFiles.push(sharedInsideFolder[i]);
+  //   }
+  // }
 
   return { ownedFiles, finalSharedFiles };
 }

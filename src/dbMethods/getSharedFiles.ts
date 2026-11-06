@@ -19,10 +19,11 @@ export async function getSharedFiles(
 
   const foundFiles: Items[] = [];
 
-  logger.test("originalFile: ", sharedFiles);
+  // logger.test("originalFile: ", sharedFiles);
   for (let i = 0; i < sharedFiles.length; i++) {
     const file = sharedFiles[i];
     if (!file) {
+      // logger.test("No file");
       return [];
     }
 

@@ -44,7 +44,8 @@ const newFolderController = [
         newFolderName,
         "Files",
       );
-      res.redirect("/account");
+      const ownerRedirect = owner ? "0" : "1";
+      res.redirect(`/account/${ownerRedirect}/${currentFolder}`);
     } catch (e) {
       logger.error("e", e);
     }

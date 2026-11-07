@@ -7,16 +7,14 @@ export async function getSharedFiles(
   userId: string,
   currentFolder: string,
 ): Promise<Items[]> {
+  logger.test("currentFolderId: ", currentFolder);
   let parentFolder: string | null = currentFolder;
   if (parentFolder == "Home") parentFolder = null;
-  logger.test(`parentFOlder: ${parentFolder}`);
-  logger.test(`userId: ${userId}`);
   const { data: sharedFiles, error: fileError } = await tryCatch(
     prisma.sharedFiles.findMany({
-      where: { destinationUser: userId, parentFolder: currentFolder },
+      where: { destinationUser: userId, parentFolder: parentFolder },
     }),
   );
-  logger.test("sharedFiles: ", sharedFiles);
   if (fileError) {
     logger.error("fileError", fileError);
     throw new Error("Error during sharedFile.find : ", fileError);

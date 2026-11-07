@@ -6,7 +6,7 @@ import {
   shareFile,
 } from "./functions";
 import { /*beforeEach,*/ expect, it, describe } from "vitest";
-import { app } from "../app";
+import { app } from "@/app";
 import request from "supertest";
 import { prisma } from "../lib/prisma";
 import { getFiles } from "../src/dbMethods/getFiles";

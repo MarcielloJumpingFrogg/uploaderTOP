@@ -1,12 +1,12 @@
 import express from "express";
 import "dotenv/config";
-import { passport } from "./config/passport";
-import { routes } from "./src/startup/routes";
+import { passport } from "../config/passport";
+import { routes } from "@/startup/routes";
 import type { Express } from "express";
 import expressSession from "express-session";
-import { prisma } from "./lib/prisma";
-import { handleMulterError } from "./src/multer/multer";
-import logger from "./config/logger";
+import { prisma } from "@prisma";
+import { handleMulterError } from "@/multer/multer";
+import logger from "../config/logger";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 
 const app: Express = express();

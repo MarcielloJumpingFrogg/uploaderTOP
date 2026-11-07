@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
-import { app } from "../app";
+import { app } from "@/app";
 
 import { resetBuckets, resetDb } from "./functions";
 

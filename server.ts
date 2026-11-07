@@ -1,7 +1,7 @@
 import logger from "./config/logger";
-import { app } from "./app";
+import { app } from "@/app";
 import "dotenv/config";
-const PORT = Number(process.env.PORT) || 8080;
+const PORT = Number(process.env[`PORT`]) || 8080;
 
 const server = app.listen(PORT, "0.0.0.0", () => {
   console.log("Listenting on:", PORT);

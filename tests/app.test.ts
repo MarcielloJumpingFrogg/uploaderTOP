@@ -1,4 +1,4 @@
-import { app } from "../app";
+import { app } from "@/app";
 import { expect, test, beforeEach } from "vitest";
 import request from "supertest";
 

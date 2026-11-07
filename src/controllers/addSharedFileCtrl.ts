@@ -85,7 +85,6 @@ export const addSharedFileCtrl = [
         if (
           filesInFolder == undefined ||
           filesInFolder[i] == undefined ||
-          filesInFolder[i]?.parentFolderId == undefined ||
           filesInFolder[i]?.id == undefined
         )
           throw new Error("no files in folder");
@@ -96,7 +95,7 @@ export const addSharedFileCtrl = [
               data: {
                 destinationUser: req.user.id,
                 sessionId: shareSession?.id,
-                parentFolder: filesInFolder[i]?.parentFolderId || "Home",
+                parentFolder: filesInFolder[i]?.parentFolderId || null,
                 originalFile: filesInFolder[i]?.id || "",
               },
             }),

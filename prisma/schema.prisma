@@ -32,8 +32,8 @@ model Users {
 model Items {
   id                        String         @id @default(uuid())
   ownerId                   String
-  referenceOwnerId          Users          @relation(fields: [ownerId], references: [id])
-  parentFolderId            String?
+  referenceOwnerId          Users          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  parentFolderId            String?        
   fileName                  String
   type                      Type           @default(FILE)
   fileType                  String
@@ -42,8 +42,8 @@ model Items {
   created_at                DateTime       @default(now())
   sessionId                 ShareSession[]
   sharedFiles               SharedFiles[]
-  upperFolderId             String?
-  insideFolder              Items? @relation("FolderHierarchy", fields: [upperFolderId], references: [id])
+  // upperFolderId             String?
+  insideFolder              Items? @relation("FolderHierarchy", fields: [parentFolderId], references: [id], onDelete: Cascade)
   subFolders                Items[] @relation("FolderHierarchy")
 }
 
@@ -54,19 +54,19 @@ model ShareSession {
   expiration              DateTime @default(now())
   edit                    Boolean
   sharedFiles             SharedFiles[]
-  originalFileRelation    Items @relation(fields: [originalFile], references: [id])
-  originalUserRelation    Users @relation(fields: [originalUser], references: [id])
+  originalFileRelation    Items @relation(fields: [originalFile], references: [id], onDelete: Cascade)
+  originalUserRelation    Users @relation(fields: [originalUser], references: [id], onDelete: Cascade)
 }
 
 model SharedFiles {
   id            String @id @default(uuid())
   destinationUser String
-  userSharedWith  Users @relation(fields: [destinationUser], references: [id])
+  userSharedWith  Users @relation(fields: [destinationUser], references: [id], onDelete: Cascade)
   sessionId       String
-  session         ShareSession @relation(fields: [sessionId], references: [id])
-  parentFolder    String
+  session         ShareSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  parentFolder    String?
   originalFile    String
-  ogFileRelation  Items @relation(fields: [originalFile], references: [id])
+  ogFileRelation  Items @relation(fields: [originalFile], references: [id], onDelete: Cascade)
 }
 
 

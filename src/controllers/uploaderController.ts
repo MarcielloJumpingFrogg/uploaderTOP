@@ -67,6 +67,12 @@ async function fileUploaderFunction(req: Request, res: Response) {
     const ownerRedirect = userIsOwner ? "0" : "1";
 
     //Creating for prisma the file and handling error{{{
+    let parentFolder: string | null = "";
+    if (currentFolderId == "Home") {
+      parentFolder = null;
+    } else {
+      parentFolder = currentFolderId;
+    }
     const { data: prismaFileList, error: errorPrismaFileList } = await tryCatch(
       prisma.items.create({
         data: {
@@ -74,7 +80,7 @@ async function fileUploaderFunction(req: Request, res: Response) {
           fileName: newName,
           fileType: fileType,
           size: size,
-          parentFolderId: originalFolderId,
+          parentFolderId: parentFolder,
         },
       }),
     );

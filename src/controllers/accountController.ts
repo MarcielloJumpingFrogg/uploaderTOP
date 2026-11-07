@@ -29,6 +29,7 @@ async function renderAccount(req: Request, res: Response) {
     }
     //}}}
     const { userId, userIsOwner, originalFolderId } = objectData;
+    logger.test("currentFolderId: ", req.currentFolderId);
 
     //refresh cookies {{{
     try {

@@ -8,10 +8,12 @@ export async function getOwnedFiles(
   currentFolderId: string,
   userIsOwner: boolean,
 ): Promise<Items[] | [] | null> {
+  let parentFolder: string | null = currentFolderId;
+  if (currentFolderId == "Home") parentFolder = null;
   if (userIsOwner) {
     const { data: result, error: err } = await tryCatch(
       prisma.items.findMany({
-        where: { ownerId: userId, parentFolderId: currentFolderId },
+        where: { ownerId: userId, parentFolderId: parentFolder },
       }),
     );
     if (err) {

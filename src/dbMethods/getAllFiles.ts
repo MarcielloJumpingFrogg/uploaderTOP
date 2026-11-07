@@ -28,7 +28,7 @@ export async function getAllFiles(req: Request, res: Response) {
     res.redirect("/");
     return;
   }
-  const { userId, userIsOwner, originalFolderId } = objectData;
+  const { userId: originalUserId, userIsOwner, originalFolderId } = objectData;
 
   //approximate the currentFolder's id
   if (!currentFolderId) {
@@ -55,17 +55,20 @@ export async function getAllFiles(req: Request, res: Response) {
 
   //ownedFiles:
   const { data: ownedFiles, error: ownedFilesError } = await tryCatch(
-    getOwnedFiles(userId, originalFolderId, userIsOwner),
+    getOwnedFiles(originalUserId, originalFolderId, userIsOwner),
   );
   if (ownedFilesError || ownedFiles === null || ownedFiles === undefined)
     throw new Error(
       `Error getting the files owned by the user: ${ownedFilesError || "Owned Files results null or undefined"}`,
     );
   //
+  if (!req.user) {
+    throw new Error("No user");
+  }
 
   //sharedFiles:
   const { data: sharedFiles, error: sharedFilesError } = await tryCatch(
-    getSharedFiles(userId, currentFolderId),
+    getSharedFiles(req.user.id, originalFolderId),
   );
   if (sharedFilesError || sharedFiles === null) {
     logger.error(sharedFilesError);

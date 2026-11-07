@@ -25,12 +25,14 @@ export const shareCreatorController = [
 
       const canBeEdited = req.body.canEdit === "on" ? true : false;
 
+      let parentFolder: string | null = req.body._parentFolder;
+      if (req.body._parentFolder == "Home") parentFolder = null;
       const { data: dbOriginalFile, error: dbError } = await tryCatch(
         prisma.items.findUnique({
           where: {
             ownerId: req.user.id,
             id: req.body._fileId,
-            parentFolderId: req.body._parentFolder,
+            parentFolderId: parentFolder,
           },
         }),
       );

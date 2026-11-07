@@ -41,11 +41,17 @@ export async function createFolder(
     //}}}
 
     //creating folder {{{
+    let folderParent: string | null = "";
+    if (currentFolderId == "Home") {
+      folderParent = null;
+    } else {
+      folderParent = currentFolderId;
+    }
     const { data: folderCreation, error: folderCreationError } = await tryCatch(
       prisma.items.create({
         data: {
           ownerId: user,
-          parentFolderId: currentFolderId,
+          parentFolderId: folderParent,
           fileName: newFolderName,
           type: "FOLDER",
           fileType: "folder",

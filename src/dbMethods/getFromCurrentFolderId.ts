@@ -1,6 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import type { Items } from "../../generated/prisma/client";
 import logger from "../../config/logger";
+import { tryCatch } from "@/customErrors/tryCatch";
 
 export async function getFromCurrentFolderId(
   currentFolderId: string | undefined,
@@ -19,9 +20,15 @@ export async function getFromCurrentFolderId(
       return null;
     }
 
-    const sharedFile = await prisma.sharedFiles.findUnique({
-      where: { id: currentFolderId, destinationUser: userId },
-    });
+    const { data: sharedFile, error: sharedFileError } = await tryCatch(
+      prisma.sharedFiles.findUnique({
+        where: { id: currentFolderId, destinationUser: userId },
+      }),
+    );
+
+    if (sharedFileError) {
+      throw new Error("shared file error");
+    }
 
     // logger.test("sharedFile: ", sharedFile);
     if (!sharedFile) {
@@ -29,13 +36,27 @@ export async function getFromCurrentFolderId(
       return null;
     }
 
-    const session = await prisma.shareSession.findUniqueOrThrow({
-      where: { id: sharedFile?.sessionId },
-    });
+    const { data: session, error: sessionError } = await tryCatch(
+      prisma.shareSession.findUniqueOrThrow({
+        where: { id: sharedFile?.sessionId },
+      }),
+    );
+
+    logger.test("session: ", session);
+
+    if (sessionError || !session) {
+      throw new Error("session error");
+    }
     // logger.test("session: ", session);
-    const originalFolder: Items = await prisma.items.findUniqueOrThrow({
-      where: { id: session?.originalFile },
-    });
+    const { data: originalFolder, error: originalFolderError } = await tryCatch(
+      prisma.items.findUniqueOrThrow({
+        where: { id: sharedFile?.originalFile },
+      }),
+    );
+
+    if (originalFolderError) {
+      throw new Error("original folder error");
+    }
     // logger.test("originalFolder: ", originalFolder);
 
     if (!originalFolder) {

@@ -7,7 +7,6 @@ export async function getSharedFiles(
   userId: string,
   currentFolder: string,
 ): Promise<Items[]> {
-  logger.test("currentFolderId: ", currentFolder);
   let parentFolder: string | null = currentFolder;
   if (parentFolder == "Home") parentFolder = null;
   const { data: sharedFiles, error: fileError } = await tryCatch(
@@ -51,8 +50,6 @@ export async function getSharedFiles(
         },
       }),
     );
-
-    logger.test("originalFile: ", originalFile);
 
     if (fileError || !originalFile) {
       logger.error("fileError: ", fileError);

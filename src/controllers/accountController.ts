@@ -29,7 +29,6 @@ async function renderAccount(req: Request, res: Response) {
     }
     //}}}
     const { userId, userIsOwner, originalFolderId } = objectData;
-    logger.test("currentFolderId: ", req.currentFolderId);
 
     //refresh cookies {{{
     try {
@@ -76,7 +75,8 @@ async function renderAccount(req: Request, res: Response) {
       res.redirect("/");
       return;
     }
-    parentFolderId = orginalFolder?.parentFolder || "Home";
+    parentFolderId = orginalFolder?.parentFolderId || "Home";
+    logger.test("pushing to fileList.ejs: ", parentFolderId);
     //}}}
 
     let popUp = req.popUp || {};

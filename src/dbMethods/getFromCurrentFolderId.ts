@@ -42,8 +42,6 @@ export async function getFromCurrentFolderId(
       }),
     );
 
-    logger.test("session: ", session);
-
     if (sessionError || !session) {
       throw new Error("session error");
     }

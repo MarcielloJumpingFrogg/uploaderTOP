@@ -4,8 +4,8 @@
   <form action="/account/delete" method="POST">
     <input type="hidden" name="_method" value="DELETE" />
     <input type="hidden" name="_fileId" value="<%=file.id%>" />
-    <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>"
-    <input type="hidden" name="_parentFolder" value="<%=parentFolderId%>" />
+    <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
+    <input type="hidden" name="_parentFolder" value="<%= parentFolderId %>" />
     <button type="submit" value="Delete">Delete</button>
   </form>
   <form action="/account/rename" method="POST">

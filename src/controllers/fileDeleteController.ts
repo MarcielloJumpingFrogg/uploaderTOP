@@ -80,6 +80,9 @@ export const fileDeleteController = [
 
     let file: Items | null;
     let error: Error | null = null;
+    logger.toImplement(
+      "need to find out if the whole folder is the file we are trying to delete or just the shared file , it's a mess",
+    );
     if (isOwner == true) {
       const { data: ownedResult, error: ownedError } = await tryCatch(
         getFile(req.user.id, bodyParentFolder, fileId),
@@ -87,12 +90,21 @@ export const fileDeleteController = [
       error = ownedError;
       file = ownedResult;
     } else {
+      const { data: parent, error: errorParent } = await tryCatch(
+        prisma.sharedFiles.findUnique({
+          where: {
+            destinationUser: req.user.id,
+            id: req.body.bodyParentFolder,
+          },
+        }),
+      );
+
       const { data: ogFile, error: ogFileError } = await tryCatch(
         prisma.sharedFiles.findUnique({
           where: {
             destinationUser: req.user.id,
             id: fileId,
-            parentFolder: getParentFolder(bodyParentFolder),
+            parentFolder: parent?.originalFile,
           },
         }),
       );

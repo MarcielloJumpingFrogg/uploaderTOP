@@ -12,9 +12,38 @@ import type {
   ShareSession,
 } from "../../generated/prisma/client";
 
-async function deleteFromDb(userId: string, folderId: string) {
+async function getRecursivePath(folderId: string, currentList: Items[]) {
+  const { data: allSubFilesData, error: allSubFilesError } = await tryCatch(
+    prisma.items.findMany({
+      where: {
+        parentFolderId: folderId,
+      },
+    }),
+  );
+
+  logger.test("result: ", allSubFilesData);
+  if (allSubFilesError) throw new Error("Sub Files Error: ", allSubFilesError);
+
+  for (let i = 0; i < allSubFilesData?.length; i++) {
+    const file = allSubFilesData[i];
+    if (file?.type == "FOLDER") {
+      const { data: recursiveResult, error: recursiveError } = await tryCatch(
+        getRecursivePath(file.id, currentList),
+      );
+      if (recursiveError) throw new Error("recursiveError: ", recursiveError);
+      currentList = currentList.concat(recursiveResult);
+    }
+  }
+
+  currentList = currentList.concat(allSubFilesData);
+
+  return currentList;
+}
+
+async function deleteFromDb(userId: string, folder: Items) {
+  if (!folder || !folder.id) return;
   const { data, error } = await tryCatch(
-    prisma.items.delete({ where: { id: folderId, ownerId: userId } }),
+    prisma.items.delete({ where: { id: folder.id, ownerId: userId } }),
   );
 
   if (error) {
@@ -56,8 +85,6 @@ function getParentFolder(bodyParentFolder: string | null | undefined) {
 }
 
 async function getSharedFile(fileId: string, userId: string) {
-  logger.test("fileId: ", fileId);
-  logger.test("userId: ", userId);
   const { data: sharedFile, error: sharedError } = await tryCatch(
     prisma.sharedFiles.findUnique({
       where: {
@@ -135,8 +162,10 @@ export const fileDeleteController = [
         return;
       }
 
-      let file: Items | null;
+      let originalFile: Items | null = null;
       let error: Error | null = null;
+      let sharedFile: SharedFiles | null = null;
+      let shareSession: ShareSession | null = null;
       let deleteMode:
         "Owner" | "GuestWithPermission" | "Guest" | "DeletingSession" | null =
         null;
@@ -148,13 +177,13 @@ export const fileDeleteController = [
         );
 
         error = ownedError;
-        file = ownedResult;
+        originalFile = ownedResult;
         deleteMode = "Owner";
         canEdit = true;
       } else {
         if (!fileId) throw new Error("No file Id");
 
-        const { data: sharedFile, error: errorFile } = await tryCatch(
+        const { data: sharedFileResult, error: errorFile } = await tryCatch(
           getSharedFile(fileId, req.user.id),
         );
 
@@ -162,20 +191,21 @@ export const fileDeleteController = [
           logger.error("Error getting the sharedFile: ", errorFile);
           throw new Error("Error getting the sharedFile: ", errorFile);
         }
+        sharedFile = sharedFileResult;
 
         //get info if it is the main file shared  by the original user or just a subfile of a bigger folder {{{
         let isMainFile: boolean = false;
 
-        const { data: shareSession, error: errorShareSession } = await tryCatch(
-          getShareSession(sharedFile),
-        );
+        const { data: shareSessionResult, error: errorShareSession } =
+          await tryCatch(getShareSession(sharedFile));
 
         if (errorShareSession) {
           throw new Error("Error getting shareSession: ", errorShareSession);
         }
-        if (!shareSession) {
+        if (!shareSessionResult) {
           throw new Error("could not get sharesession");
         }
+        shareSession = shareSessionResult;
 
         const { data: isShareSessionTarget, error: errorSessionTarget } =
           await tryCatch(shareSessionTarget(shareSession, sharedFile));
@@ -208,12 +238,49 @@ export const fileDeleteController = [
         return;
       }
 
+      if (deleteMode == "GuestWithPermission") {
+        const { data: ogFile, error: ogError } = await tryCatch(
+          prisma.items.findUnique({
+            where: {
+              id: sharedFile?.originalFile,
+              ownerId: shareSession?.originalUser,
+            },
+          }),
+        );
+        if (ogError || !ogFile)
+          throw new Error(`in delete mode: ogError: ${ogError || "No ogFile"}`);
+        originalFile = ogFile;
+        logger.test("og filea; ", ogFile);
+      }
       switch (deleteMode) {
-        case "Owner":
         case "GuestWithPermission":
-          deleteFromDb(req.user.id, fileId);
-          logger.toImplement("deleting db file");
-          logger.toImplement("deleting supabase file");
+        case "Owner":
+          if (!originalFile) throw new Error("No original file");
+          const { data: recursivePath, error: recursivePathError } =
+            await tryCatch(getRecursivePath(originalFile.id, []));
+          if (recursivePathError)
+            throw new Error("recursivePath Error: ", recursivePathError);
+          if (!originalFile) throw new Error("No file");
+
+          recursivePath.push(originalFile);
+          for (let i = 0; i < recursivePath.length; i++) {
+            const path = recursivePath[i];
+            if (!path) throw new Error("path is undefined");
+            const recursiveDeleteResult = await tryCatch(
+              recursiveDelete(
+                `${originalFile.ownerId}/Storage/${path.id}`,
+                "Files",
+              ),
+            );
+            if (recursiveDeleteResult.error) {
+              logger.error(
+                "recursiveDeleteResult Error: ",
+                recursiveDeleteResult.error,
+              );
+              throw new Error("recursiveDeleteResult Error: ");
+            }
+          }
+          deleteFromDb(originalFile.ownerId, originalFile);
           break;
         case "DeletingSession":
           logger.toImplement("deteling session");

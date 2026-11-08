@@ -76,7 +76,6 @@ async function renderAccount(req: Request, res: Response) {
       return;
     }
     parentFolderId = orginalFolder?.parentFolderId || "Home";
-    logger.test("pushing to fileList.ejs: ", parentFolderId);
     //}}}
 
     let popUp = req.popUp || {};

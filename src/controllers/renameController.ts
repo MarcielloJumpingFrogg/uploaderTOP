@@ -1,166 +1,175 @@
 import type { Request, Response } from "express";
-import { moveFile } from "../supabaseFn/moveFile";
-import { getAllFilesSubfolders } from "../supabaseFn/getAllFilesSubfolders";
 import logger from "../../config/logger";
-import { prisma } from "../../lib/prisma";
-import { admin_supabase } from "../../config/supabase";
-import customErrorContainer from "../customErrors/customErrorContainer";
+import { moveFile } from "../supabaseFn/moveFile";
+import { ProjectError } from "@/customErrors/ErrorBase";
+import { getEditMode } from "@/dbMethods/getEditMode";
+import { findOwnedFile } from "@/dbMethods/findOwnedFile";
+import type {
+  Items,
+  SharedFiles,
+  ShareSession,
+} from "../../generated/prisma/client";
+import { getOriginalFileFromSharedData } from "@/dbMethods/getOriginalFileFromSharedData";
+import { findCurrentSharedFiles } from "@/dbMethods/findCurrentSharedFiles";
+import { getShareSessionFromSharedFile } from "@/dbMethods/getShareSessionFromSharedFile";
+import { tryCatch } from "@/customErrors/tryCatch";
+import { prisma } from "@prisma";
+import customErrorContainer from "@/customErrors/customErrorContainer";
 
-async function updateDb(oldPath: string, newNamePath: string, newName: string) {
-  const fulldb = await prisma.shareSession.findMany({});
-  const allValidSessions = await prisma.shareSession.findMany({
-    where: { filePath: { startsWith: oldPath } },
-  });
+async function rename(mainFile: Items, newName: string) {
+  const { data, error } = await tryCatch(
+    prisma.items.update({
+      where: {
+        id: mainFile.id,
+      },
+      data: {
+        fileName: newName,
+      },
+    }),
+  );
 
-  allValidSessions.forEach(async (session) => {
-    await prisma.sharedFiles.updateMany({
-      where: { sessionId: session.id },
-      data: { fileName: newName },
+  if (error) {
+    throw new ProjectError({
+      name: "SERVER_ERROR",
+      message: "Error while renaming file",
+      cause: error,
     });
-    await prisma.shareSession.updateMany({
-      where: { id: session.id },
-      data: { filePath: newNamePath, fileName: newName },
-    });
-  });
-}
-
-async function fileUpdateDb(id: string, newName: string) {
-  if (id == undefined || id == "0") {
-    return 0;
   }
-  const result = await prisma.shareSession.update({
-    where: { id: id },
-    data: { fileName: newName },
-  });
-
-  const shareFileResult = await prisma.sharedFiles.updateMany({
-    where: { sessionId: id },
-    data: { fileName: newName },
-  });
-  return result;
+  if (!data) {
+    throw new ProjectError({
+      name: "VARIABLE_IS_EMPTY",
+      message: "No file was changed during rename",
+    });
+  }
 }
 
-function isShared(req: any) {
-  const fileSessionId = req.body._sessionId;
-  const folderSessionId = req.body._folderSession;
-  if (fileSessionId !== "0" && fileSessionId !== undefined) {
-    //this means the fileSessionId is the main provider
-    return fileSessionId;
-  } else if (
-    folderSessionId !== "0" &&
-    folderSessionId !== undefined &&
-    (fileSessionId === "0" || fileSessionId === undefined)
-  ) {
-    //this means the folderSession is the main provider
-    return folderSessionId;
+function checkAll(
+  fileId: string,
+  isOwner: string,
+  parentFolder: string,
+  newName: string,
+) {
+  if (!fileId) {
+    throw new ProjectError({
+      name: "VARIABLE_IS_EMPTY",
+      message: "File id is empty",
+    });
+  }
+  if (!isOwner) {
+    throw new ProjectError({
+      name: "VARIABLE_IS_EMPTY",
+      message: "isOwner is empty",
+    });
+  }
+  if (!parentFolder) {
+    throw new ProjectError({
+      name: "VARIABLE_IS_EMPTY",
+      message: "parentFolder is empty",
+    });
+  }
+  if (!newName) {
+    throw new ProjectError({
+      name: "VARIABLE_IS_EMPTY",
+      message: "newName is empty",
+    });
+  }
+}
+
+async function renameFunction(req: Request) {
+  const body = req.body;
+  const fileId: string = body._fileId;
+  const isOwner: "true" | "false" = body._isOwner;
+  const parentFolder: string = body._parentFolder;
+  const newName: string = body.newName;
+
+  checkAll(fileId, isOwner, parentFolder, newName);
+
+  let mainFile: Items | null = null;
+
+  if (!req.user)
+    throw new ProjectError({
+      name: "MISSING_USER",
+      message: "Missing user in renameFunction",
+    });
+
+  const editMode: "Owner" | "GuestWithPermission" | "Guest" | "session" =
+    await getEditMode(isOwner, req.user.id, fileId);
+
+  let sharedFile: SharedFiles | null = null;
+  let shareSession: ShareSession | null = null;
+  if (editMode == "Owner") {
+    mainFile = await findOwnedFile(req.user.id, parentFolder, fileId);
   } else {
-    return false;
+    sharedFile = await findCurrentSharedFiles(fileId, req.user.id);
+    shareSession = await getShareSessionFromSharedFile(sharedFile);
   }
-}
 
-async function getIds(req: any) {
-  let session;
-  let owner;
-  let foundSession;
-  // const fileSessionId = req.body._sessionId;
-  // const folderSessionId = req.body._folderSession;
+  if (editMode == "GuestWithPermission") {
+    if (!sharedFile || !shareSession) {
+      throw new ProjectError({
+        name: "VARIABLE_IS_EMPTY",
+        message: "SharedFile or ShareSession are empty inside renameController",
+      });
+    }
+    mainFile = await getOriginalFileFromSharedData(sharedFile, shareSession);
+  }
 
-  const isFileShared = isShared(req);
-  if (isFileShared) {
-    session = isFileShared;
-  } else {
-    owner = req.user.id;
-    session = "0";
+  switch (editMode) {
+    case "GuestWithPermission":
+    case "Owner":
+      if (!mainFile) {
+        throw new ProjectError({
+          name: "VARIABLE_IS_EMPTY",
+          message: "MainFile is missing during owner/guestWithPermission visit",
+        });
+      }
+      await rename(mainFile, newName);
+      break;
+    case "Guest":
+    case "session":
+      customErrorContainer.inputError(
+        "You cannot modify this file, permission insufficient",
+      );
+      break;
+    default:
+      const _unhandledCase: never = editMode;
+      _unhandledCase; //for some reason lsp is not ignoring it even tho i used the undescorre, this is good enough
+      customErrorContainer.inputError("Catch Case, something went wrong");
+      throw new ProjectError({
+        name: "VARIABLE_IS_EMPTY",
+        message: "NOT ALL CASES FOR EDITMODE HAVE BEEN HANDLED",
+      });
   }
-  if (session !== "0") {
-    foundSession = await prisma.shareSession.findUnique({
-      where: { id: session },
-    });
-    owner = foundSession?.originalUser;
-  }
-  return { session, owner, foundSession };
 }
 
 const renameController = [
-  async (req: any, res: Response) => {
+  async (req: Request, res: Response) => {
     try {
-      const locationPath = req.body._location.replaceAll(",", "/");
-
-      const { owner, foundSession } = await getIds(req);
-
-      if (owner !== req.user.id && foundSession?.edit === false) {
-        customErrorContainer.renameError("Not allowed to edit", 401);
-        res.redirect("/account");
-        return;
-      }
-
-      const partialPath = owner + "/" + locationPath + "/";
-      let oldPath;
-      let newPath;
-      // logger.test("foundSession.fileapath: ", foundSession);
-      logger.toImplement("Big issue here");
-      if (
-        foundSession !== undefined &&
-        foundSession?.filePath !== undefined &&
-        foundSession.fileName !== undefined
-      ) {
-        if (foundSession.type === "folder") {
-          oldPath =
-            foundSession.filePath +
-            foundSession.fileName +
-            "/" +
-            req.body._name;
-          newPath =
-            foundSession.filePath +
-            foundSession.fileName +
-            "/" +
-            req.body.newName;
-        } else {
-          oldPath = foundSession.filePath + foundSession.fileName;
-          newPath = foundSession.filePath + req.body.newName;
+      await renameFunction(req);
+    } catch (error: unknown) {
+      if (error instanceof ProjectError) {
+        if (error.name == "MISSING_USER") {
+          customErrorContainer.userError(res);
+          return;
         }
-      } else {
-        oldPath = partialPath + req.body._name;
-        newPath = partialPath + req.body.newName;
-      }
-      if (req.body._type !== "folder") {
-        // logger.test("oldPath: ", oldPath);
-        // logger.test("newPath: ", newPath);
-        await moveFile(oldPath, newPath, "Files");
-        await fileUpdateDb(req.body._sessionId, req.body.newName);
-      } else {
-        logger.toImplement(
-          "NEED TO FIX THIS BECAUSE IT'S NOT WORKING AT THE MOMENT I THINK PROBABLY",
-        );
-        const folderToChange = req.body._name;
-        const result = await getAllFilesSubfolders(
-          partialPath + folderToChange,
-          "Files",
-          [],
-        );
-        const splitResults = [];
-        for (let i = 0; i < result.length; i++) {
-          const splitName = result[i].split(partialPath + folderToChange + "/");
-          splitResults.push(splitName[1]);
-          const oldName = result[i];
-          const newName =
-            partialPath + req.body.newName + "/" + splitResults[i];
-          const partialName = partialPath;
-          await moveFile(oldName, newName, "Files");
-          await updateDb(partialName, newName, req.body.newName);
+        if (error.name == "VARIABLE_IS_EMPTY") {
+          logger.error("VARIABLE_IS_EMPTY", error);
+          customErrorContainer.genericError();
+          res.redirect("/");
+          return;
         }
+        if (error.name == "SERVER_ERROR") {
+          logger.error("SERVER_ERROR COULD NOT COMPLETE: ", error);
+          customErrorContainer.genericError();
+          res.redirect("/");
+          return;
+        }
+        const _unHandledCases: never = error.name;
+        _unHandledCases; //for some reason lsp is not ignoring it even tho i used the undescorre, this is good enough
       }
-
-      const fullPath =
-        "/" +
-        (req.body._folderSession || "0") +
-        "/" +
-        req.body._location.replaceAll("/", "@");
-
-      res.redirect("/account" + fullPath);
-    } catch (e) {
-      logger.error("Error: ", e);
+      logger.error("UNEXPECTED ERROR: ", error);
     }
+    res.redirect("/");
   },
 ];
 

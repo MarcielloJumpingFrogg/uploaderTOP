@@ -10,6 +10,9 @@
   </form>
   <form action="/account/rename" method="POST">
     <input type="hidden" name="_method" value="RENAME" />
+    <input type="hidden" name="_fileId" value="<%=file.id%>" />
+    <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
+    <input type="hidden" name="_parentFolder" value="<%= currentFolderId %>" />
     <label for="newName">New Name:</label>
     <input type="text" name="newName" />
     <button type="submit" value="Rename">Rename</button>

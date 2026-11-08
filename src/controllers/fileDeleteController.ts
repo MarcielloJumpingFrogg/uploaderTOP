@@ -13,9 +13,10 @@ import type {
 import { ProjectError } from "@/customErrors/ErrorBase";
 import { getRecursivePath } from "@/dbMethods/getRecursivePath";
 import { findOwnedFile } from "@/dbMethods/findOwnedFile";
+import { getOriginalFileFromSharedData } from "@/dbMethods/getOriginalFileFromSharedData";
+import { getEditMode } from "@/dbMethods/getEditMode";
 import { findCurrentSharedFiles } from "@/dbMethods/findCurrentSharedFiles";
 import { getShareSessionFromSharedFile } from "@/dbMethods/getShareSessionFromSharedFile";
-import { getOriginalFileFromSharedData } from "@/dbMethods/getOriginalFileFromSharedData";
 
 async function deleteFromDb(userId: string, folder: Items) {
   //{{{
@@ -33,36 +34,6 @@ async function deleteFromDb(userId: string, folder: Items) {
   }
 
   logger.test("data: ", data);
-  //}}}
-}
-
-function sharedUserPermission(sharedSession: ShareSession) {
-  //{{{
-  let canEdit: boolean = false;
-
-  if (sharedSession.edit == true) {
-    canEdit = true;
-  } else {
-    canEdit = false;
-  }
-
-  return canEdit;
-  //}}}
-}
-
-function shareSessionTarget(
-  //{{{
-  shareSession: ShareSession,
-  sharedFile: SharedFiles,
-) {
-  let isMainFile: boolean = false;
-  if (shareSession.originalFile == sharedFile.originalFile) {
-    isMainFile = true;
-  } else {
-    isMainFile = false;
-  }
-
-  return isMainFile;
   //}}}
 }
 
@@ -113,36 +84,14 @@ async function fileDelete(req: Request, res: Response) {
   let originalFile: Items | null = null;
   let sharedFile: SharedFiles | null = null;
   let shareSession: ShareSession | null = null;
-  let deleteMode:
-    "Owner" | "GuestWithPermission" | "Guest" | "DeletingSession" | null = null;
-  let canEdit: boolean = false;
+  const deleteMode: "Owner" | "GuestWithPermission" | "Guest" | "session" =
+    await getEditMode(isOwner, req.user.id, fileId);
 
-  if (isOwner == "true") {
-    const ownedResult = await findOwnedFile(
-      req.user.id,
-      bodyParentFolder,
-      fileId,
-    );
-    originalFile = ownedResult;
-    deleteMode = "Owner";
-    canEdit = true;
+  if (deleteMode == "Owner") {
+    originalFile = await findOwnedFile(req.user.id, bodyParentFolder, fileId);
   } else {
     sharedFile = await findCurrentSharedFiles(fileId, req.user.id);
-    let isMainFile: boolean = false;
     shareSession = await getShareSessionFromSharedFile(sharedFile);
-    isMainFile = shareSessionTarget(shareSession, sharedFile);
-
-    if (isMainFile == false) {
-      canEdit = sharedUserPermission(shareSession);
-      if (canEdit) {
-        deleteMode = "GuestWithPermission";
-      } else {
-        deleteMode = "Guest";
-      }
-    } else {
-      canEdit = false;
-      deleteMode = "DeletingSession";
-    }
   }
 
   if (deleteMode === "GuestWithPermission") {
@@ -152,13 +101,12 @@ async function fileDelete(req: Request, res: Response) {
         message:
           "sharedFile is empty before calling to get original file, this is never supposed to happen but typescript doesn't know",
       });
-    const ogFile = await getOriginalFileFromSharedData(
+    originalFile = await getOriginalFileFromSharedData(
       sharedFile,
       shareSession,
     );
-    originalFile = ogFile;
-    logger.test("og filea; ", ogFile);
   }
+
   switch (deleteMode) {
     case "GuestWithPermission":
     case "Owner":
@@ -185,7 +133,7 @@ async function fileDelete(req: Request, res: Response) {
       }
       await deleteFromDb(originalFile.ownerId, originalFile);
       break;
-    case "DeletingSession":
+    case "session":
       if (!shareSession)
         throw new ProjectError({
           name: "VARIABLE_IS_EMPTY",

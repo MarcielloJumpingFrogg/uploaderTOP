@@ -1,12 +1,12 @@
 import { tryCatch } from "@/customErrors/tryCatch";
 import { getOwnedFiles } from "./getOwnedFiles";
 import { getSharedFiles } from "./getSharedFiles";
-import { getInsideSharedFolder } from "./getInsideSharedFolder";
 import logger from "../../config/logger";
 import customErrorContainer from "@/customErrors/customErrorContainer";
 import type { Request, Response } from "express";
 import type { Items } from "../../generated/prisma/client";
 import { getUserAndOriginalFolderId } from "./getUserAndOriginalFolderId";
+import { ProjectError } from "@/customErrors/ErrorBase";
 
 export async function getAllFiles(req: Request, res: Response) {
   let currentFolderId: string | undefined = req.currentFolderId || "Home";
@@ -37,22 +37,6 @@ export async function getAllFiles(req: Request, res: Response) {
     );
   }
 
-  // const { data: sharedInsideFolder, error: errorSharedInsideFolder } =
-  //   await tryCatch(
-  //     getInsideSharedFolder(originalFolderId, userIsOwner, userId),
-  //   );
-  // logger.test("sharedInsideFoldera; ", sharedInsideFolder);
-  // logger.toImplement(
-  //   "NEED TO REMOVE THIS (the getInsideSharedFolder, since everything is shared now)",
-  // );
-
-  // if (errorSharedInsideFolder) {
-  //   throw new Error(
-  //     "Could not get the files inside the shared folder: ",
-  //     errorSharedInsideFolder,
-  //   );
-  // }
-
   //ownedFiles:
   const { data: ownedFiles, error: ownedFilesError } = await tryCatch(
     getOwnedFiles(originalUserId, originalFolderId, userIsOwner),
@@ -70,25 +54,29 @@ export async function getAllFiles(req: Request, res: Response) {
   const { data: sharedFiles, error: sharedFilesError } = await tryCatch(
     getSharedFiles(req.user.id, originalFolderId),
   );
-  if (sharedFilesError || sharedFiles === null) {
-    logger.error(sharedFilesError);
-    throw new Error("sharedFileError: ", sharedFilesError);
+  if (sharedFilesError) {
+    throw new ProjectError({
+      name: "SERVER_ERROR",
+      message: "Error while using getSharedFiles inside getAllFiles",
+      cause: sharedFilesError,
+    });
+  }
+
+  if (sharedFiles == null) {
+    throw new ProjectError({
+      name: "VARIABLE_IS_EMPTY",
+      message:
+        "sharedFiles is null while using getSharedFiles inside getAllFiles",
+    });
   }
 
   // logger.test("sharedFilea; ", sharedFiles);
   let finalSharedFiles: Items[] = [];
   for (let i = 0; i < sharedFiles.length; i++) {
-    if (sharedFiles == undefined || sharedFiles[i] == undefined)
-      throw new Error("err");
-    if (sharedFiles[i] != undefined || sharedFiles != undefined) {
+    if (sharedFiles[i] !== undefined) {
       finalSharedFiles.push(sharedFiles[i]);
     }
   }
-  // for (let i = 0; i < sharedInsideFolder.length; i++) {
-  //   if (sharedInsideFolder[i] != undefined) {
-  //     finalSharedFiles.push(sharedInsideFolder[i]);
-  //   }
-  // }
 
   return { ownedFiles, finalSharedFiles };
 }

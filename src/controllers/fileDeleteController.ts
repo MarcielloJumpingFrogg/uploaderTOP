@@ -33,7 +33,6 @@ async function deleteFromDb(userId: string, folder: Items) {
     });
   }
 
-  logger.test('data: ', data);
   //}}}
 }
 

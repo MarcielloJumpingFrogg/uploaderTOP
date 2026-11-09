@@ -4,6 +4,8 @@ import logger from '../config/logger';
 import type request from 'supertest';
 import { tryCatch } from '@/customErrors/tryCatch';
 import { ProjectError } from '@/customErrors/ErrorBase';
+import { createShareSession } from '@/dbMethods/createShareSession';
+import bcrypt from 'bcryptjs';
 
 async function resetDb() {
   await prisma.$transaction([
@@ -35,6 +37,25 @@ const generalPassword = 'Password1234!';
 //   const user = await agent.get('/api/user');
 //   return user;
 // }
+
+const hashedPassword = await bcrypt.hash(generalPassword, 10);
+
+async function createEntry(credentials: {
+  id: string;
+  username: string;
+  avatarVersion?: number;
+}) {
+  await tryCatch(
+    prisma.users.create({
+      data: {
+        id: credentials.id,
+        username: credentials.username,
+        password: hashedPassword,
+        avatarVersion: credentials.avatarVersion || 0,
+      },
+    }),
+  );
+}
 
 async function logIn(agent: request.Agent, username: string) {
   const { data, error } = await tryCatch(
@@ -86,19 +107,16 @@ async function shareFile(
   params: {
     parentFolder: string;
     _fileId: string;
-    canEdit?: string;
-    daysExpiration?: number;
+    canEdit: boolean;
+    daysExpiration: number;
   },
 ) {
-  const shareSession = await prisma.shareSession.findMany({
-    where: {
-      filePath: filePath,
-      originalUser: userId,
-      fileName: params._name,
-    },
-  });
-
-  return { shareCreateResult, shareSession };
+  return await createShareSession(
+    userId,
+    params._fileId,
+    params.daysExpiration,
+    params.canEdit,
+  );
 }
 
 async function softReset() {
@@ -111,6 +129,7 @@ async function softReset() {
 export {
   resetDb,
   resetBuckets,
+  createEntry,
   logIn,
   uploadFile,
   shareFile,

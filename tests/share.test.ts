@@ -12,8 +12,6 @@ import { prisma } from '../lib/prisma';
 import type { Response } from 'express';
 import logger from '../config/logger';
 import { ProjectError } from '@/customErrors/ErrorBase';
-import bcrypt from 'bcryptjs';
-import type { Users } from '../generated/prisma/browser';
 
 await resetDb();
 await resetBuckets();
@@ -22,17 +20,14 @@ describe('Implementing the functionality of share', async () => {
   try {
     const firstAgent = request.agent(app);
     const secondAgent = request.agent(app);
-    const hashedPassword = await bcrypt.hash('Password1234!', 10);
-    const firstUserCredentials: Users = {
+    const firstUserCredentials = {
       id: 'shareFileUser1',
       username: 'shareFileUser1',
-      password: hashedPassword,
       avatarVersion: 0,
     };
     const secondUserCredentials = {
       id: 'shareFileUser2',
       username: 'shareFileUser2',
-      password: hashedPassword,
       avatarVersion: 0,
     };
 

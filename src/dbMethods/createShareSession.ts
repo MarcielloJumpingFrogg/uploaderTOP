@@ -5,9 +5,13 @@ import { prisma } from '@prisma';
 export async function createShareSession(
   userId: string,
   fileId: string,
-  expirationDay: number,
+  expiration: number,
   canBeEdited: boolean,
 ) {
+  const dayInMs = 24 * 60 * 60 * 1000;
+  expiration = expiration * dayInMs;
+  const expirationDay = Date.now() + expiration;
+
   const { data: shareSessionResult, error: shareSessionError } = await tryCatch(
     prisma.shareSession.create({
       data: {

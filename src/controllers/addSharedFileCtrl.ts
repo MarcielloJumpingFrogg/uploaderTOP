@@ -38,10 +38,10 @@ export const addSharedFileCtrl = [
     try {
       const shareId = req.params[`shareId`];
       if (!shareId || Array.isArray(shareId)) {
-        logger.error(`No share id`);
-        customErrorContainer.genericError();
-        res.redirect(`/`);
-        return;
+        throw new ProjectError({
+          name: 'VARIABLE_IS_EMPTY',
+          message: 'No shareId in addSharedFileCtrl',
+        });
       }
 
       const shareSession = await prisma.shareSession.findUnique({
@@ -51,23 +51,34 @@ export const addSharedFileCtrl = [
       });
 
       if (!shareSession) {
-        logger.error('No share Session');
-        customErrorContainer.databaseError(res);
-        return;
+        throw new ProjectError({
+          name: 'VARIABLE_IS_EMPTY',
+          message: 'No ShareSession inside addSharedFileCtrl',
+        });
       }
 
       if (!req.user) {
-        customErrorContainer.userError(res);
-        return;
+        throw new ProjectError({
+          name: 'MISSING_USER',
+          message: 'missing user inside addSharedFileCtrl',
+        });
       }
 
       const { data: originalFile, error: err } = await tryCatch(
         prisma.items.findFirst({ where: { id: shareSession.originalFile } }),
       );
-      if (err || !originalFile) {
-        throw new Error(
-          'Could not get the original file from the current session',
-        );
+      if (err) {
+        throw new ProjectError({
+          name: 'SERVER_ERROR',
+          message: 'Error getting the originalFile',
+          cause: err,
+        });
+      }
+      if (!originalFile) {
+        throw new ProjectError({
+          name: 'VARIABLE_IS_EMPTY',
+          message: 'No original file from frindOriginalFile',
+        });
       }
 
       let filesInFolder: Items[] = [];

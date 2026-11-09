@@ -1,31 +1,34 @@
-import logger from "../../config/logger";
-import type { Items } from "../../generated/prisma/client";
-import { prisma } from "@prisma";
-import { tryCatch } from "../customErrors/tryCatch";
+import type { Items } from '../../generated/prisma/client';
+import { prisma } from '@prisma';
+import { tryCatch } from '../customErrors/tryCatch';
+import { ProjectError } from '@/customErrors/ErrorBase';
 
 export async function getSharedFiles(
   userId: string,
-  currentFolder: string,
+  originalFolderId: string | null,
 ): Promise<Items[]> {
-  let parentFolder: string | null = currentFolder;
-  if (parentFolder == "Home") parentFolder = null;
+  let parentFolder: string | null =
+    originalFolderId == 'Home' ? null : originalFolderId;
+
   const { data: sharedFiles, error: fileError } = await tryCatch(
     prisma.sharedFiles.findMany({
       where: { destinationUser: userId, parentFolder: parentFolder },
     }),
   );
+
   if (fileError) {
-    logger.error("fileError", fileError);
-    throw new Error("Error during sharedFile.find : ", fileError);
+    throw new ProjectError({
+      name: 'SERVER_ERROR',
+      message: 'Error while getting the file shared with the user',
+      cause: fileError,
+    });
   }
 
   const foundFiles: Items[] = [];
 
-  // logger.test("originalFile: ", sharedFiles);
   for (let i = 0; i < sharedFiles.length; i++) {
     const file = sharedFiles[i];
     if (!file) {
-      // logger.test("No file");
       return [];
     }
 
@@ -35,11 +38,19 @@ export async function getSharedFiles(
       }),
     );
 
-    if (shareSessionError || !shareSession) {
-      logger.error("ShareSessionError: ", shareSessionError);
-      throw new Error(
-        `ShareSessionError: ${shareSessionError || "No shareSession"}`,
-      );
+    if (shareSessionError) {
+      throw new ProjectError({
+        name: 'SERVER_ERROR',
+        message: 'Error getting shareSession in getSharedFiles',
+        cause: shareSessionError,
+      });
+    }
+
+    if (!shareSession) {
+      throw new ProjectError({
+        name: 'VARIABLE_IS_EMPTY',
+        message: 'ShareSession is Empty in getSharedFiles',
+      });
     }
 
     const { data: originalFile, error: fileError } = await tryCatch(
@@ -51,11 +62,19 @@ export async function getSharedFiles(
       }),
     );
 
-    if (fileError || !originalFile) {
-      logger.error("fileError: ", fileError);
-      throw new Error(
-        `Error from prisma.items of shareSession.originalFile: ${fileError || "No originalFile"} `,
-      );
+    if (fileError) {
+      throw new ProjectError({
+        name: 'SERVER_ERROR',
+        message: 'Error getting File in getSharedFiles',
+        cause: shareSessionError,
+      });
+    }
+
+    if (!originalFile) {
+      throw new ProjectError({
+        name: 'VARIABLE_IS_EMPTY',
+        message: 'OriginalFile is Empty in getSharedFiles',
+      });
     }
 
     let safeGuardedId = originalFile;

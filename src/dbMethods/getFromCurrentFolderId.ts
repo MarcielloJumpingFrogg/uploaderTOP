@@ -1,69 +1,86 @@
-import { prisma } from "../../lib/prisma";
-import type { Items } from "../../generated/prisma/client";
-import logger from "../../config/logger";
-import { tryCatch } from "@/customErrors/tryCatch";
+import { prisma } from '../../lib/prisma';
+import type { Items } from '../../generated/prisma/client';
+import { tryCatch } from '@/customErrors/tryCatch';
+import { ProjectError } from '@/customErrors/ErrorBase';
 
 export async function getFromCurrentFolderId(
   currentFolderId: string | undefined,
   userIsOwner: boolean,
   userId: string,
-): Promise<Items | null> {
-  try {
-    if (
-      currentFolderId === "Home" ||
-      currentFolderId === undefined ||
-      userIsOwner === undefined ||
-      userIsOwner === true
-    ) {
-      logger.error(`Home: ${currentFolderId}`);
-      // logger.test(`userIsOwner: ${userIsOwner}`);
-      return null;
-    }
-
-    const { data: sharedFile, error: sharedFileError } = await tryCatch(
-      prisma.sharedFiles.findUnique({
-        where: { id: currentFolderId, destinationUser: userId },
-      }),
-    );
-
-    if (sharedFileError) {
-      throw new Error("shared file error");
-    }
-
-    // logger.test("sharedFile: ", sharedFile);
-    if (!sharedFile) {
-      logger.error("!sharedFile");
-      return null;
-    }
-
-    const { data: session, error: sessionError } = await tryCatch(
-      prisma.shareSession.findUniqueOrThrow({
-        where: { id: sharedFile?.sessionId },
-      }),
-    );
-
-    if (sessionError || !session) {
-      throw new Error("session error");
-    }
-    // logger.test("session: ", session);
-    const { data: originalFolder, error: originalFolderError } = await tryCatch(
-      prisma.items.findUniqueOrThrow({
-        where: { id: sharedFile?.originalFile },
-      }),
-    );
-
-    if (originalFolderError) {
-      throw new Error("original folder error");
-    }
-    // logger.test("originalFolder: ", originalFolder);
-
-    if (!originalFolder) {
-      logger.error("original folder");
-      return null;
-    }
-
-    return originalFolder;
-  } catch (e: any) {
-    throw new Error("Error during 'getFromSharedFile': ", e);
+): Promise<Items> {
+  if (currentFolderId === 'Home' || currentFolderId === undefined) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'CurrentFolder id is Home or undefined',
+    });
   }
+  if (userIsOwner === undefined || userIsOwner === true) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'UserIs the owner, so no Id can be found',
+    });
+  }
+
+  const { data: sharedFile, error: sharedFileError } = await tryCatch(
+    prisma.sharedFiles.findUnique({
+      where: { id: currentFolderId, destinationUser: userId },
+    }),
+  );
+
+  if (sharedFileError) {
+    throw new ProjectError({
+      name: 'SERVER_ERROR',
+      message: 'Error while getting sharedFile',
+      cause: sharedFileError,
+    });
+  }
+
+  if (!sharedFile) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'Shared File is Empty',
+    });
+  }
+
+  const { data: session, error: sessionError } = await tryCatch(
+    prisma.shareSession.findUniqueOrThrow({
+      where: { id: sharedFile?.sessionId },
+    }),
+  );
+
+  if (sessionError) {
+    throw new ProjectError({
+      name: 'SERVER_ERROR',
+      message: 'Error getting the session',
+      cause: sessionError,
+    });
+  }
+  if (!session) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'Session is Empty',
+    });
+  }
+  const { data: originalFolder, error: originalFolderError } = await tryCatch(
+    prisma.items.findUniqueOrThrow({
+      where: { id: sharedFile?.originalFile },
+    }),
+  );
+
+  if (originalFolderError) {
+    throw new ProjectError({
+      name: 'SERVER_ERROR',
+      message: 'Error getting the originalFolder',
+      cause: originalFolderError,
+    });
+  }
+
+  if (!originalFolder) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'No original folder found',
+    });
+  }
+
+  return originalFolder;
 }

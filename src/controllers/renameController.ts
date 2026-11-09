@@ -14,6 +14,7 @@ import { getShareSessionFromSharedFile } from '@/dbMethods/getShareSessionFromSh
 import { tryCatch } from '@/customErrors/tryCatch';
 import { prisma } from '@prisma';
 import customErrorContainer from '@/customErrors/customErrorContainer';
+import { errorBehaviour } from '@/customErrors/errorBehaviour';
 
 async function rename(mainFile: Items, newName: string) {
   const { data, error } = await tryCatch(
@@ -146,30 +147,10 @@ const renameController = [
     try {
       await renameFunction(req);
     } catch (error: unknown) {
-      if (error instanceof ProjectError) {
-        if (error.name == 'MISSING_USER') {
-          customErrorContainer.userError(res);
-          return;
-        }
-        if (error.name == 'VARIABLE_IS_EMPTY') {
-          logger.error('VARIABLE_IS_EMPTY', error);
-          customErrorContainer.genericError();
-          res.redirect('/');
-          return;
-        }
-        if (error.name == 'SERVER_ERROR') {
-          logger.error('SERVER_ERROR COULD NOT COMPLETE: ', error);
-          customErrorContainer.genericError();
-          res.redirect('/');
-          return;
-        }
-        const _unHandledCases: never = error.name;
-        return _unHandledCases;
-      }
-      logger.error('UNEXPECTED ERROR: ', error);
-      logger.test('hi');
+      errorBehaviour(error, res);
+      res.redirect('/');
+      return;
     }
-    res.redirect('/');
   },
 ];
 

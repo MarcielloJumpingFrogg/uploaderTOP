@@ -1,18 +1,19 @@
-import type { Request, Response } from "express";
-import { prisma } from "../../lib/prisma";
-import logger from "../../config/logger";
-import { renderAccount } from "./accountController";
-import customErrorContainer from "@/customErrors/customErrorContainer";
-import { tryCatch } from "@/customErrors/tryCatch";
+import type { Request, Response } from 'express';
+import logger from '../../config/logger';
+import { renderAccount } from './accountController';
+import customErrorContainer from '@/customErrors/customErrorContainer';
+import { createShareSession } from '@/dbMethods/createShareSession';
+import { ProjectError } from '@/customErrors/ErrorBase';
+import { findOwnedFile } from '@/dbMethods/findOwnedFile';
 
 export const shareCreatorController = [
   async (req: Request, res: Response) => {
     try {
       if (!req.user) {
-        logger.error("No user");
-        customErrorContainer.passportError("No user", 400);
-        res.redirect("/account");
-        return;
+        throw new ProjectError({
+          name: 'MISSING_USER',
+          message: 'No user found',
+        });
       }
 
       const dayInMs = 24 * 60 * 60 * 1000;
@@ -23,57 +24,58 @@ export const shareCreatorController = [
       expiration = expiration * dayInMs;
       const expirationDay = Date.now() + expiration;
 
-      const canBeEdited = req.body.canEdit === "on" ? true : false;
+      const canBeEdited = req.body.canEdit === 'on' ? true : false;
 
       let parentFolder: string | null = req.body._parentFolder;
-      if (req.body._parentFolder == "Home") parentFolder = null;
-      const { data: dbOriginalFile, error: dbError } = await tryCatch(
-        prisma.items.findUnique({
-          where: {
-            ownerId: req.user.id,
-            id: req.body._fileId,
-            parentFolderId: parentFolder,
-          },
-        }),
+      const fileId: string = req.body._fileId;
+
+      if (!fileId) {
+        throw new ProjectError({
+          name: 'VARIABLE_IS_EMPTY',
+          message: 'File id is empty in createShareController',
+        });
+      }
+
+      const originalFile = await findOwnedFile(
+        req.user.id,
+        parentFolder,
+        fileId,
       );
 
-      if (dbError || !dbOriginalFile) {
-        logger.error("Error while getting the db's original file: ", dbError);
-        customErrorContainer.genericError();
-        res.redirect("/account");
-        return;
-      }
-
-      const { data: shareSessionResult, error: shareSessionError } =
-        await tryCatch(
-          prisma.shareSession.create({
-            data: {
-              originalUser: req.user.id,
-              originalFile: dbOriginalFile.id,
-              expiration: new Date(expirationDay),
-              edit: canBeEdited,
-            },
-          }),
-        );
-
-      if (shareSessionError || !shareSessionResult) {
-        logger.error(
-          "Error while creating a shareSession: ",
-          shareSessionError || null,
-        );
-        customErrorContainer.genericError();
-        res.redirect("/");
-        return;
-      }
+      const shareSessionResult = await createShareSession(
+        req.user.id,
+        originalFile.id,
+        expirationDay,
+        canBeEdited,
+      );
 
       req.popUp = {
-        title: "Url: ",
-        text: "http://localhost:8080/share/add/" + shareSessionResult.id,
+        title: 'Url: ',
+        text: 'http://localhost:8080/share/add/' + shareSessionResult.id,
       };
-    } catch (e) {
-      logger.error("Error: ", e);
+    } catch (error: unknown) {
+      if (error instanceof ProjectError) {
+        if (error.name == 'MISSING_USER') {
+          customErrorContainer.userError(res);
+          return;
+        }
+        if (error.name == 'VARIABLE_IS_EMPTY') {
+          logger.error('VARIABLE_IS_EMPTY', error);
+          customErrorContainer.genericError();
+          res.redirect('/');
+          return;
+        }
+        if (error.name == 'SERVER_ERROR') {
+          logger.error('SERVER_ERROR COULD NOT COMPLETE: ', error);
+          customErrorContainer.genericError();
+          res.redirect('/');
+          return;
+        }
+        const _unHandledCases: never = error.name;
+        return _unHandledCases;
+      }
+      logger.error('UNEXPECTED ERROR: ', error);
     }
-    res.location("/account/0/Home");
     renderAccount(req, res);
   },
 ];

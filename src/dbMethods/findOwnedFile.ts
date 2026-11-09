@@ -1,19 +1,20 @@
-import { ProjectError } from "@/customErrors/ErrorBase";
-import logger from "../../config/logger";
-import { prisma } from "@prisma";
-import { tryCatch } from "@/customErrors/tryCatch";
+import { ProjectError } from '@/customErrors/ErrorBase';
+import logger from '../../config/logger';
+import { prisma } from '@prisma';
+import { tryCatch } from '@/customErrors/tryCatch';
 
 function getParentFolder(bodyParentFolder: string | null | undefined) {
   //{{{
-  if (bodyParentFolder == "Home" || bodyParentFolder == undefined) {
-    logger.test("current parent folder: null");
+  if (bodyParentFolder == 'Home' || bodyParentFolder == undefined) {
+    logger.test('current parent folder: null');
     return null;
   } else {
-    logger.test("current parent folder: ", bodyParentFolder);
+    logger.test('current parent folder: ', bodyParentFolder);
     return bodyParentFolder;
   }
   //}}}
 }
+
 export async function findOwnedFile(
   userId: string,
   bodyParentFolder: string | null | undefined,
@@ -32,10 +33,17 @@ export async function findOwnedFile(
 
   if (ownedError)
     throw new ProjectError({
-      name: "SERVER_ERROR",
-      message: "Error during findOwnedFile",
+      name: 'SERVER_ERROR',
+      message: 'Error during findOwnedFile',
       cause: ownedError,
     });
+
+  if (!ownedFile) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'No ownedFile found with given id',
+    });
+  }
 
   return ownedFile;
   //}}}

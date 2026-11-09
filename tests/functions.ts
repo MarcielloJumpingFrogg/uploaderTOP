@@ -1,7 +1,9 @@
-import { prisma } from "../lib/prisma";
-import { emptyBucket } from "../src/supabaseFn/emptyBucket";
-import logger from "../config/logger";
-import type request from "supertest";
+import { prisma } from '../lib/prisma';
+import { emptyBucket } from '../src/supabaseFn/emptyBucket';
+import logger from '../config/logger';
+import type request from 'supertest';
+import { tryCatch } from '@/customErrors/tryCatch';
+import { ProjectError } from '@/customErrors/ErrorBase';
 
 async function resetDb() {
   await prisma.$transaction([
@@ -14,22 +16,43 @@ async function resetDb() {
 }
 
 async function resetBuckets() {
-  const _resultAvatar = await emptyBucket("avatar");
-  const _resultFiles = await emptyBucket("Files");
+  const _resultAvatar = await emptyBucket('avatar');
+  const _resultFiles = await emptyBucket('Files');
+  return { _resultAvatar, _resultFiles };
 }
 
-const generalPassword = "Password1234!";
+const generalPassword = 'Password1234!';
 
-async function signUp(
-  agent: request.Agent,
-  creadentials: { username: string; password?: string },
-) {
-  const something = await agent
-    .post("/signUp")
-    .type("form")
-    .send({ username: creadentials.username, password: generalPassword });
+// async function signUp(
+//   agent: request.Agent,
+//   creadentials: { username: string; password?: string },
+// ) {
+//   await agent
+//     .post('/signUp')
+//     .type('form')
+//     .send({ username: creadentials.username, password: generalPassword });
+//
+//   const user = await agent.get('/api/user');
+//   return user;
+// }
 
-  const user = await agent.get("/api/user");
+async function logIn(agent: request.Agent, username: string) {
+  const { data, error } = await tryCatch(
+    agent
+      .post('/login')
+      .type('form')
+      .send({ username: username, password: generalPassword }),
+  );
+
+  if (error) {
+    throw new ProjectError({
+      name: 'SERVER_ERROR',
+      message: `Error while logging in with user ${username}`,
+      cause: error,
+    });
+  }
+
+  return data;
 }
 
 async function uploadFile(
@@ -39,11 +62,11 @@ async function uploadFile(
   fileToUpload: string,
 ) {
   return await agent
-    .post("/account/file")
-    .type("form")
-    .field("newName", uploadName)
-    .field("_location", parentFolder)
-    .attach("usrFile", __dirname + "/testFiles/" + fileToUpload)
+    .post('/account/file')
+    .type('form')
+    .field('newName', uploadName)
+    .field('_location', parentFolder)
+    .attach('usrFile', __dirname + '/testFiles/' + fileToUpload)
     .expect(302);
 }
 
@@ -53,46 +76,29 @@ async function createFolder(
   parentFolder: string,
 ) {
   agent
-    .post("/account/newFolder")
-    .type("form")
-    .send({ _parentFolder: "Home", newFolderName: name, _owner: "0" });
+    .post('/account/newFolder')
+    .type('form')
+    .send({ _parentFolder: parentFolder, newFolderName: name, _owner: '0' });
 }
 
 async function shareFile(
-  agent: request.Agent,
+  userId: string,
   params: {
-    _location: string;
-    _fileType: string;
-    _name: string;
+    parentFolder: string;
+    _fileId: string;
     canEdit?: string;
     daysExpiration?: number;
   },
 ) {
-  try {
-    const shareCreateResult = await agent
-      .post("/share/create")
-      .send(params)
-      .expect(200);
+  const shareSession = await prisma.shareSession.findMany({
+    where: {
+      filePath: filePath,
+      originalUser: userId,
+      fileName: params._name,
+    },
+  });
 
-    const user: any = await agent.get("/api/user");
-    const userId = user._body.user.id;
-    const filePath = userId + "/" + params._location + "/";
-
-    const shareSession = await prisma.shareSession.findMany({
-      where: {
-        filePath: filePath,
-        originalUser: userId,
-        fileName: params._name,
-      },
-    });
-    if (!shareSession) {
-      throw new Error("No share session");
-    }
-
-    return { shareCreateResult, shareSession };
-  } catch (e) {
-    logger.error("Error in shareFile: ", e);
-  }
+  return { shareCreateResult, shareSession };
 }
 
 async function softReset() {
@@ -105,7 +111,7 @@ async function softReset() {
 export {
   resetDb,
   resetBuckets,
-  signUp,
+  logIn,
   uploadFile,
   shareFile,
   softReset,

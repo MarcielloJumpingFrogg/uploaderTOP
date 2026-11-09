@@ -6,6 +6,12 @@
   "semi": true,
   "trailingComma": "all",
   "tabWidth": 2,
+  "options": {
+    "typeAware": true,
+    "typeCheck": true,
+    "maxWarnings": 10
+  },
+  "singleQuote": true,
 
   "associations": [
     {

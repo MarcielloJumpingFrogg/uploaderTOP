@@ -8,9 +8,9 @@ import {
   logIn,
   uploadFile,
   shareFile,
-  createEntry,
 } from './functions';
 import { prisma } from '../lib/prisma';
+import { createPseudoUser } from './createPseudoUser';
 
 await resetDb();
 await resetBuckets();
@@ -21,8 +21,8 @@ describe('create the users and test delete file operations: ', async () => {
   const sharedParams = { id: 'sharedDelete', username: 'sharedDelete' };
   const sharedAgent = request.agent(app);
 
-  await createEntry(ownerParams);
-  await createEntry(sharedParams);
+  await createPseudoUser(ownerParams);
+  await createPseudoUser(sharedParams);
 
   const ownerId = ownerParams.id;
 

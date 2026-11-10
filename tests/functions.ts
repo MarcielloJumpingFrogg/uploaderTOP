@@ -23,7 +23,7 @@ async function resetBuckets() {
   return { _resultAvatar, _resultFiles };
 }
 
-const generalPassword = 'Password1234!';
+export const generalPassword = 'Password1234!';
 
 // async function signUp(
 //   agent: request.Agent,
@@ -37,25 +37,6 @@ const generalPassword = 'Password1234!';
 //   const user = await agent.get('/api/user');
 //   return user;
 // }
-
-const hashedPassword = await bcrypt.hash(generalPassword, 10);
-
-async function createEntry(credentials: {
-  id: string;
-  username: string;
-  avatarVersion?: number;
-}) {
-  await tryCatch(
-    prisma.users.create({
-      data: {
-        id: credentials.id,
-        username: credentials.username,
-        password: hashedPassword,
-        avatarVersion: credentials.avatarVersion || 0,
-      },
-    }),
-  );
-}
 
 async function logIn(agent: request.Agent, username: string) {
   const { data, error } = await tryCatch(
@@ -129,7 +110,6 @@ async function softReset() {
 export {
   resetDb,
   resetBuckets,
-  createEntry,
   logIn,
   uploadFile,
   shareFile,

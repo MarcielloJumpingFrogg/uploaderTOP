@@ -3,14 +3,12 @@ import { uploadFiles } from '../multer/multer';
 import type { Response, Request } from 'express';
 import customErrorContainer from '../customErrors/customErrorContainer';
 import { uploadFile } from '../supabaseFn/uploadFile';
-import { prisma } from '../../lib/prisma';
 import logger from '../../config/logger';
 import { getSize } from '../fileMethods/getSize';
 import { getFileType } from '../fileMethods/getFileType';
 import { tryCatch } from '../customErrors/tryCatch';
 import { getUserAndOriginalFolderId } from '@/dbMethods/getUserAndOriginalFolderId';
 import { ProjectError } from '@/customErrors/ErrorBase';
-import type { Items } from '../../generated/prisma/browser';
 import { createDbEntry } from '@/dbMethods/createDbEntry';
 import { errorBehaviour } from '@/customErrors/errorBehaviour';
 
@@ -39,7 +37,6 @@ async function fileUploaderFunction(req: Request, res: Response) {
     const size = getSize(file.size);
 
     const newName = setNewName(req, file);
-    logger.toImplement('need to add validator to the name of the new file');
     const currentFolderId = req.body._currentFolderId || 'Home';
 
     //Get file type {{{
@@ -92,9 +89,6 @@ async function fileUploaderFunction(req: Request, res: Response) {
 
     //Creating the file for supabaes and handling the error {{{
     const name = `${userId}/Storage/${originalFolderId}/${dbEntryResult.id}`;
-    logger.toImplement(
-      'NEED TO MAKE SURE THE UPLOAD IS DELETED FROM THE SERVER IF THE SUPABASE UPLOAD FAILS',
-    );
     const { data: _uploadResult, error: uploadError } = await tryCatch(
       uploadFile(file, 'Files', name),
     );

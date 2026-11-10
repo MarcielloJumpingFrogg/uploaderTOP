@@ -1,9 +1,9 @@
-import bcrypt from "bcryptjs";
-import { prisma } from "../../lib/prisma";
-import { validationResult } from "express-validator";
-import { validateUser } from "./validateUser";
-import customErrorContainer from "../customErrors/customErrorContainer";
-import logger from "../../config/logger";
+import bcrypt from 'bcryptjs';
+import { prisma } from '../../lib/prisma';
+import { validationResult } from 'express-validator';
+import { validateUser } from '../validate/validateUser';
+import customErrorContainer from '../customErrors/customErrorContainer';
+import logger from '../../config/logger';
 
 const signUpController: any = [
   validateUser,
@@ -13,7 +13,7 @@ const signUpController: any = [
       customErrorContainer.validatorError(errors.errors);
       return res
         .status(customErrorContainer.getErrorCode())
-        .render("signUp", { errors: customErrorContainer.getErrorList() });
+        .render('signUp', { errors: customErrorContainer.getErrorList() });
     }
     try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -26,23 +26,23 @@ const signUpController: any = [
       req.login(newUser, (err: any) => {
         if (err) throw err;
         req.user = newUser;
-        res.redirect("/account");
+        res.redirect('/account');
       });
     } catch (e: any) {
-      if (e.code === "P2002") {
-        const error = "Username Already Take";
+      if (e.code === 'P2002') {
+        const error = 'Username Already Take';
         customErrorContainer.signUpError(error, 409);
         return res
           .status(customErrorContainer.getErrorCode())
-          .render("signUp", { errors: customErrorContainer.getErrorList() });
+          .render('signUp', { errors: customErrorContainer.getErrorList() });
       } else {
         const genericError =
-          "There has been an unexpected error, please try again later";
+          'There has been an unexpected error, please try again later';
         customErrorContainer.signUpError(genericError, 400);
         logger.error(e);
         return res
           .status(customErrorContainer.getErrorCode())
-          .render("signUp", { errors: customErrorContainer.getErrorList() });
+          .render('signUp', { errors: customErrorContainer.getErrorList() });
       }
     }
   },

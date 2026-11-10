@@ -1,16 +1,16 @@
-import { body } from "express-validator";
+import { body } from 'express-validator';
 
-const userNameLenghtErr = "Username Must be between 3 and 15 characters";
-const passwordLenghtErr = "Password Must be between 8 and 16 characters";
+const userNameLenghtErr = 'Username Must be between 3 and 15 characters';
+const passwordLenghtErr = 'Password Must be between 8 and 16 characters';
 const passwordStrenght =
-  "Password Must have at least one lowerCase, one upperCase, one number and one symbol";
+  'Password Must have at least one lowerCase, one upperCase, one number and one symbol';
 
 const validateUser = [
-  body("username")
+  body('username')
     .trim()
     .isLength({ min: 3, max: 15 })
     .withMessage(userNameLenghtErr),
-  body("password")
+  body('password')
     .trim()
     .isLength({ min: 8, max: 16 })
     .withMessage(passwordLenghtErr)

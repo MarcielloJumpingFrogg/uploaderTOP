@@ -5,7 +5,6 @@ import type request from 'supertest';
 import { tryCatch } from '@/customErrors/tryCatch';
 import { ProjectError } from '@/customErrors/ErrorBase';
 import { createShareSession } from '@/dbMethods/createShareSession';
-import bcrypt from 'bcryptjs';
 
 async function resetDb() {
   await prisma.$transaction([

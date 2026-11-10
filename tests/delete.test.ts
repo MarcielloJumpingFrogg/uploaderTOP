@@ -1,7 +1,6 @@
 import request from 'supertest';
 import { describe, it, expect } from 'vitest';
 import { app } from '@/app';
-import logger from '../config/logger';
 import {
   resetBuckets,
   resetDb,

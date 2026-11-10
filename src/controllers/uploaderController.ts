@@ -2,17 +2,16 @@ import { body } from 'express-validator';
 import { uploadFiles } from '../multer/multer';
 import type { Response, Request } from 'express';
 import customErrorContainer from '../customErrors/customErrorContainer';
-import { uploadFile } from '../supabaseFn/uploadFile';
 import logger from '../../config/logger';
 import { getSize } from '../fileMethods/getSize';
 import { getFileType } from '../fileMethods/getFileType';
 import { tryCatch } from '../customErrors/tryCatch';
 import { getUserAndOriginalFolderId } from '@/dbMethods/getUserAndOriginalFolderId';
 import { ProjectError } from '@/customErrors/ErrorBase';
-import { createDbEntry } from '@/dbMethods/createDbEntry';
 import { errorBehaviour } from '@/customErrors/errorBehaviour';
+import { uploadFileInBoth } from '@/fileMethods/uploadFileInBoth';
 
-function setNewName(req: Request, file: any) {
+function setNewName(req: Request, file: any): string {
   if (req.body.newName) {
     return req.body.newName;
   } else {
@@ -70,7 +69,7 @@ async function fileUploaderFunction(req: Request, res: Response) {
 
     const ownerRedirect = userIsOwner ? '0' : '1';
 
-    //Creating for prisma the file and handling error{{{
+    //Creating for prisma the file and handling error
     let parentFolder: string | null = '';
     if (currentFolderId == 'Home') {
       parentFolder = null;
@@ -84,20 +83,7 @@ async function fileUploaderFunction(req: Request, res: Response) {
       size: size,
       parentFolderId: parentFolder,
     };
-    const dbEntryResult = await createDbEntry(itemsParams);
-    //}}}
-
-    //Creating the file for supabaes and handling the error {{{
-    const name = `${userId}/Storage/${originalFolderId}/${dbEntryResult.id}`;
-    const { data: _uploadResult, error: uploadError } = await tryCatch(
-      uploadFile(file, 'Files', name),
-    );
-    if (uploadError) {
-      logger.error('uploadError: ', uploadError);
-      customErrorContainer.genericError();
-      return uploadError;
-    }
-    //}}}
+    await uploadFileInBoth(itemsParams, file);
 
     res.redirect(`/account/${ownerRedirect}/${originalFolderId}`);
   } catch (error: unknown) {

@@ -6,7 +6,6 @@ import type { pseudoUser } from './testTypes';
 import { createPseudoUser } from './createPseudoUser';
 import { prisma } from '@prisma';
 import 'dotenv/config';
-import logger from '../config/logger';
 
 beforeEach(async () => {
   await resetDb();

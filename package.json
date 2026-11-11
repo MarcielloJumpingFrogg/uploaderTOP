@@ -8,7 +8,7 @@
   "type": "module",
   "main": "server.ts",
   "scripts": {
-    "test": "NODE_ENV=test prisma migrate reset --force && NODE_ENV=test prisma generate && NODE_ENV=test vitest",
+    "test": "NODE_ENV=test prisma migrate reset --force && NODE_ENV=test prisma migrate dev -n test && NODE_ENV=test prisma generate && NODE_ENV=test vitest",
     "dev": "NODE_ENV=docker tsx server.ts",
     "local": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=local tsx server.ts'",
     "localTest": "nodemon --watch './' --ext 'ts, json, ejs' --exec 'NODE_ENV=test tsx --watch server.ts'",

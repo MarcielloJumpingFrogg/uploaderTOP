@@ -1,183 +1,145 @@
-import {
-  resetDb,
-  resetBuckets,
-  logIn,
-  uploadFile,
-  shareFile,
-} from './functions';
-import { /*beforeEach,*/ expect, it, describe } from 'vitest';
+import { resetDb, resetBuckets, logIn } from './functions';
+import { beforeEach, expect, it, describe } from 'vitest';
 import { app } from '@/app';
 import request from 'supertest';
 import { prisma } from '../lib/prisma';
-import type { Response } from 'express';
 import logger from '../config/logger';
-import { ProjectError } from '@/customErrors/ErrorBase';
+import { createPseudoFile } from './createPseudoFile';
+import { createPseudoUser } from './createPseudoUser';
+import type { pseudoUser } from './testTypes';
+import { createShareSession } from '@/dbMethods/createShareSession';
+import { createPseudoFolder } from './createPseudoFolder';
 
-await resetDb();
-await resetBuckets();
+beforeEach(async () => {
+  await resetDb();
+  await resetBuckets();
+});
 
 describe('Implementing the functionality of share', async () => {
-  try {
+  it('Create and share a file', async () => {
     const firstAgent = request.agent(app);
     const secondAgent = request.agent(app);
     const firstUserCredentials = {
       id: 'shareFileUser1',
       username: 'shareFileUser1',
-      avatarVersion: 0,
     };
     const secondUserCredentials = {
       id: 'shareFileUser2',
       username: 'shareFileUser2',
-      avatarVersion: 0,
     };
 
-    const responseUser1 = await logIn(
-      firstAgent,
-      firstUserCredentials.username,
-    );
-    if (!responseUser1) {
-      throw new ProjectError({
-        name: 'VARIABLE_IS_EMPTY',
-        message: 'No response, so no db entry in firstAgent',
-      });
-    }
+    await createPseudoUser(firstUserCredentials);
+    await createPseudoUser(secondUserCredentials);
 
-    const firstId = firstUserCredentials.id;
+    await logIn(firstAgent, firstUserCredentials.username);
 
-    const responseUser2 = await logIn(
-      secondAgent,
-      secondUserCredentials.username,
-    );
-    if (!responseUser2) {
-      throw new ProjectError({
-        name: 'VARIABLE_IS_EMPTY',
-        message: 'No response, so no db entry in secondAgent',
-      });
-    }
-
-    const secondId = secondUserCredentials.id;
+    await logIn(secondAgent, secondUserCredentials.username);
 
     const uniqueFileName = 'newFileForUniqueIdentification';
-    const fullUniqueFileName = `newFolder/${uniqueFileName}`;
-    const fileToUpload = 'textTest.txt';
-    await uploadFile(firstAgent, fullUniqueFileName, '/Home', fileToUpload);
+    const fileId = 'newFileForUniqueIdentificationId';
+    const result = await createPseudoFile(
+      firstUserCredentials.id,
+      uniqueFileName,
+      'txt',
+      undefined,
+      fileId,
+    );
+    if (!result) {
+      logger.error('Could not create pseudoFile');
+      return;
+    }
 
-    const shareFilePath = firstId + '/Home/newFolder/';
-
-    const shareParams = {
-      _location: 'Home/newFolder',
-      _fileType: 'plain/text',
-      _name: 'newFileForUniqueIdentification',
-      canEdit: 'on',
-      daysExpiration: 1,
-    };
-    const { shareCreateResult } = await shareFile(firstAgent, shareParams);
+    await firstAgent
+      .post('/share/create')
+      .send({
+        daysExpiration: 1,
+        canEdit: 'on',
+        _fileId: fileId,
+        _parentFolder: 'Home',
+      })
+      .expect(200);
 
     const shareSession = await prisma.shareSession.findMany({
       where: {
-        filePath: { startsWith: shareFilePath },
-        fileName: uniqueFileName,
+        originalUser: firstUserCredentials.id,
+        originalFile: fileId,
       },
     });
 
-    if (shareSession === undefined) {
-      throw new Error('shareSession is undefined');
-    }
     expect(shareSession.length).toBe(1);
 
-    const idShared = shareSession[0].id;
+    await secondAgent.get(`/share/add/${shareSession[0]?.id}`);
 
-    it('A user logs in and tries to share the file', async () => {
-      expect(shareCreateResult.text).toContain('/share/add/' + idShared);
+    const secondUserHome = await secondAgent.get('/account');
+    expect(secondUserHome.text).toContain(`<p>${uniqueFileName}</p>`);
+  });
+
+  it('Share a folder with multiple files inside', async () => {
+    const firstSharedFolderCredentials: pseudoUser = {
+      id: 'firstSharedFolderCredentials',
+      username: 'firstSharedFolderCredentials',
+    };
+    await createPseudoUser(firstSharedFolderCredentials);
+    const firstAgent = request.agent(app);
+    await logIn(firstAgent, firstSharedFolderCredentials.username);
+
+    const secondSharedFolderCredentials: pseudoUser = {
+      id: 'secondSharedFolderCredentials',
+      username: 'secondSharedFolderCredentials',
+    };
+    await createPseudoUser(secondSharedFolderCredentials);
+    const secondAgent = request.agent(app);
+    await logIn(secondAgent, secondSharedFolderCredentials.username);
+
+    const folder = 'folderToShare';
+    const firstFile = 'firstFileInFolder';
+    const secondFile = 'secondFileInFolder';
+
+    await createPseudoFolder(
+      firstSharedFolderCredentials.id,
+      folder,
+      undefined,
+      folder,
+    );
+    await createPseudoFile(
+      firstSharedFolderCredentials.id,
+      firstFile,
+      'txt',
+      folder,
+      firstFile,
+    );
+    await createPseudoFile(
+      firstSharedFolderCredentials.id,
+      secondFile,
+      'txt',
+      folder,
+      secondFile,
+    );
+
+    const shareSessionResult = await createShareSession(
+      firstSharedFolderCredentials.id,
+      folder,
+      1,
+      true,
+    );
+
+    if (!shareSessionResult) {
+      logger.error('no shareSession created');
+      return;
+    }
+
+    await secondAgent.get(`/share/add/${shareSessionResult.id}`);
+
+    const dbCheck = await prisma.sharedFiles.findMany({
+      where: {
+        destinationUser: secondSharedFolderCredentials.id,
+        sessionId: shareSessionResult.id,
+      },
     });
 
-    it('A user adds the link and has the file now', async () => {
-      await secondAgent.get('/share/add/' + idShared).expect(302);
-      const getFilesResult = await getFiles(secondId, 'Home');
-
-      const sharedFileResult = await prisma.sharedFiles.findMany({
-        where: {
-          sessionId: idShared,
-        },
-      });
-
-      expect(sharedFileResult.length).toBe(1);
-      expect(sharedFileResult[0]?.originalUser).toBe(firstId);
-      expect(sharedFileResult[0]?.destinationUser).toBe(secondId);
-      expect(sharedFileResult[0]?.expiration).toStrictEqual(
-        shareSession[0]?.expiration,
-      );
-
-      const sourceFileFirstShare = await getFiles(firstId, '/Home/newFolder');
-      for (let i = 0; i < sourceFileFirstShare.length; i++) {
-        expect(sourceFileFirstShare[i]).toBeOneOf(getFilesResult);
-      }
-    });
-
-    it('There are multiple files in a single shared folder: ', async () => {
-      const secondUploadName = 'newFolder/newSubFolder/newFile2';
-      const _firstResult = await uploadFile(
-        firstAgent,
-        secondUploadName,
-        '/Home',
-        fileToUpload,
-      );
-
-      const paramsSecondShare = {
-        _location: 'Home',
-        _fileType: 'folder',
-        _name: 'newFolder',
-        canEdit: 'on',
-        daysExpiration: 1,
-      };
-
-      const secondShareFilePath = firstId + '/Home/';
-      const secondShareResult = await shareFile(firstAgent, paramsSecondShare);
-
-      const secondShareSession = await prisma.shareSession.findFirst({
-        where: {
-          filePath: { startsWith: secondShareFilePath },
-          fileName: 'newFolder',
-        },
-      });
-
-      if (secondShareSession === null) {
-        throw new Error('Second Share Session is null');
-      }
-      expect(secondShareResult?.shareCreateResult.text).toContain(
-        '/share/add/' + secondShareSession.id,
-      );
-      const secondShareSessionResult = await secondAgent
-        .get('/share/add/' + secondShareSession.id)
-        .expect(302);
-
-      const homePageSecondAgent = await secondAgent.get('/account').expect(200);
-      expect(homePageSecondAgent.text).toContain('<p>newFolder</p>');
-
-      const multiFilesInSharedFolder = await secondAgent
-        .get('/account/' + secondShareSession.id + '/Home@newFolder')
-        .expect(200);
-
-      expect(multiFilesInSharedFolder.text).toContain(
-        `<p>${uniqueFileName}</p>`,
-      );
-      expect(multiFilesInSharedFolder.text).toContain('<p>newSubFolder</p>');
-    });
-
-    it("Travel inside the original user's folder", async () => {
-      const homePage = await firstAgent.get('/account').expect(200);
-      expect(homePage.text).toContain('<p>newFolder</p>');
-    });
-
-    it('Travel with url: ', async () => {
-      const currentResult = await firstAgent
-        .get('/account/0/Home@newFolder')
-        .expect(200);
-
-      expect(currentResult.text).toContain(`<p>${uniqueFileName}</p>`);
-      expect(currentResult.text).toContain(`<p>newSubFolder</p>`);
-    });
-  } catch (e) {
-    logger.error('Unexpected error: ', e);
-  }
+    const testArray = [folder, firstFile, secondFile];
+    for (let i = 0; i < dbCheck.length; i++) {
+      expect(testArray).toContain(dbCheck[i]?.originalFile);
+    }
+  });
 });

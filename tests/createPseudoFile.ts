@@ -23,7 +23,7 @@ export async function createPseudoFile(
     }),
   );
   if (error) {
-    logger.error('Error creating the pseudoFile:');
+    logger.error('Error creating the pseudoFile:', error);
     return;
   }
   return data;

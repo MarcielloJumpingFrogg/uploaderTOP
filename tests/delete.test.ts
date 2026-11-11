@@ -28,19 +28,21 @@ describe('create the users and test delete file operations: ', async () => {
   await logIn(ownerAgent, ownerParams.username);
   await logIn(sharedAgent, sharedParams.username);
 
+  const folder = 'newFolder1';
   const uniqueName = 'uniqueFileNameToBeDeleted.txt';
   const fileToUpload = 'textTest.txt';
 
   it("The owner of the file can delete it's own file", async () => {
     const uploadResult = await uploadFile(
       ownerAgent,
-      fileUploadName,
+      uniqueName,
       'Home',
+      'true',
       fileToUpload,
     );
     expect(uploadResult.statusCode).toBe(302);
 
-    const preDeleteFolder = await ownerAgent.get('/account/0/Home@newFolder');
+    const preDeleteFolder = await ownerAgent.get('/account/0/');
     expect(preDeleteFolder.text).toContain(`<p>${uniqueName}</p>`);
 
     await deleteFile(ownerAgent, {

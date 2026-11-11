@@ -60,13 +60,15 @@ async function uploadFile(
   agent: request.Agent,
   uploadName: string,
   parentFolder: string,
+  isOwner: 'true' | 'false',
   fileToUpload: string,
 ) {
   return await agent
     .post('/account/file')
     .type('form')
     .field('newName', uploadName)
-    .field('_location', parentFolder)
+    .field('_isOwner', isOwner)
+    .field('_currentFolderId', parentFolder)
     .attach('usrFile', __dirname + '/testFiles/' + fileToUpload)
     .expect(302);
 }

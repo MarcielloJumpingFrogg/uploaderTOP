@@ -1,10 +1,10 @@
-import { admin_supabase } from "../../config/supabase";
-import logger from "../../config/logger";
-import { prisma } from "../../lib/prisma";
-import { getFromCurrentFolderId } from "../dbMethods/getFromCurrentFolderId";
-import { tryCatch } from "../customErrors/tryCatch";
-import type { Request, Response } from "express";
-import customErrorContainer from "@/customErrors/customErrorContainer";
+import { admin_supabase } from '../../config/supabase';
+import logger from '../../config/logger';
+import { prisma } from '../../lib/prisma';
+import { getFromCurrentFolderId } from '../dbMethods/getFromCurrentFolderId';
+import { tryCatch } from '../customErrors/tryCatch';
+import type { Request, Response } from 'express';
+import customErrorContainer from '@/customErrors/customErrorContainer';
 
 export async function createFolder(
   owner: boolean,
@@ -15,8 +15,7 @@ export async function createFolder(
   bucket: string,
 ) {
   try {
-    let currentFolderId: string = "";
-    logger.toImplement("Need to refactor");
+    let currentFolderId: string = '';
     if (!req.user) {
       customErrorContainer.userError(res);
       return;
@@ -29,9 +28,9 @@ export async function createFolder(
         getFromCurrentFolderId(bodyFolderId, !owner, user),
       );
       if (errorCurrentFolder || !currentFolder) {
-        logger.error("Error: no currentFolder in createFolder function");
+        logger.error('Error: no currentFolder in createFolder function');
         customErrorContainer.genericError();
-        res.redirect("/");
+        res.redirect('/');
         return;
       }
       currentFolderId = currentFolder.id;
@@ -41,8 +40,8 @@ export async function createFolder(
     //}}}
 
     //creating folder {{{
-    let folderParent: string | null = "";
-    if (currentFolderId == "Home") {
+    let folderParent: string | null = '';
+    if (currentFolderId == 'Home') {
       folderParent = null;
     } else {
       folderParent = currentFolderId;
@@ -53,16 +52,16 @@ export async function createFolder(
           ownerId: user,
           parentFolderId: folderParent,
           fileName: newFolderName,
-          type: "FOLDER",
-          fileType: "folder",
-          size: "-",
+          type: 'FOLDER',
+          fileType: 'folder',
+          size: '-',
         },
       }),
     );
     if (folderCreationError) {
-      logger.error("error creating the folder");
+      logger.error('error creating the folder');
       customErrorContainer.genericError();
-      res.redirect("/");
+      res.redirect('/');
       return;
     }
     //}}}
@@ -71,18 +70,18 @@ export async function createFolder(
     const { data: creationResult, error: errorCreatingFolder } = await tryCatch(
       admin_supabase.storage
         .from(bucket)
-        .upload(name + "/.emptyFolderPlaceholder", ""),
+        .upload(name + '/.emptyFolderPlaceholder', ''),
     ); //last argument empty because the file is empty, just a placeHolder for the folder
     if (errorCreatingFolder) {
-      logger.error("could not create the folder");
+      logger.error('could not create the folder');
       logger.toImplement(
-        "need to delete the folder from the database as well, to make sure they are in sync",
+        'need to delete the folder from the database as well, to make sure they are in sync',
       );
       customErrorContainer.genericError();
-      res.redirect("/");
+      res.redirect('/');
       return;
     }
   } catch (e: any) {
-    logger.error("Error in createFolder: ", e);
+    logger.error('Error in createFolder: ', e);
   }
 }

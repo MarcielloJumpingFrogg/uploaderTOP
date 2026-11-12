@@ -9,7 +9,9 @@ await resetDb();
 await resetBuckets();
 
 describe("The shared user can upload files to the owner's folder ", async () => {
-  expect(1).toBe(1);
+  it('somehting', () => {
+    expect(1).toBe(1);
+  });
   logger.toImplement('Missing test');
   // const ownerPar = { username: "ownShareUpload" };
   // const sharedPar = { username: "shrdShreUpld" };

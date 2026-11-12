@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express';
-import logger from '../../config/logger';
 import { ProjectError } from '@/customErrors/ErrorBase';
 import { getEditMode } from '@/dbMethods/getEditMode';
 import { findOwnedFile } from '@/dbMethods/findOwnedFile';
@@ -151,6 +150,7 @@ const renameController = [
       res.redirect('/');
       return;
     }
+    res.redirect(`/account`);
   },
 ];
 

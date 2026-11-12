@@ -2,6 +2,7 @@ import type { Items } from '../../generated/prisma/client';
 import { prisma } from '@prisma';
 import { tryCatch } from '../customErrors/tryCatch';
 import { ProjectError } from '@/customErrors/ErrorBase';
+import logger from '../../config/logger';
 
 export async function getSharedFiles(
   userId: string,
@@ -26,8 +27,7 @@ export async function getSharedFiles(
 
   const foundFiles: Items[] = [];
 
-  for (let i = 0; i < sharedFiles.length; i++) {
-    const file = sharedFiles[i];
+  for (const file of sharedFiles) {
     if (!file) {
       return [];
     }
@@ -38,6 +38,35 @@ export async function getSharedFiles(
       }),
     );
 
+    if (
+      shareSession &&
+      Number(shareSession?.expiration) <= Number(Date.now())
+    ) {
+      const { data: deleteResult, error: deleteError } = await tryCatch(
+        prisma.shareSession.delete({
+          where: {
+            id: shareSession.id,
+          },
+        }),
+      );
+
+      if (deleteError) {
+        throw new ProjectError({
+          name: 'SERVER_ERROR',
+          message: 'Error while deleting the expired session',
+          cause: deleteError,
+        });
+      }
+
+      if (!deleteResult) {
+        throw new ProjectError({
+          name: 'VARIABLE_IS_EMPTY',
+          message: 'Empty deleteResult, no file was deleted',
+        });
+      }
+
+      continue;
+    }
     if (shareSessionError) {
       throw new ProjectError({
         name: 'SERVER_ERROR',

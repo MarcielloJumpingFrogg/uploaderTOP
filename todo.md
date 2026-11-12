@@ -1,10 +1,10 @@
-- [ ] need to add the option to upload files to a shared folder
+- [x] need to add the option to upload files to a shared folder
 - [ ] expiration date on both the session and the file
 - [ ] make the ui less ugly
 - [ ] finish the project
 - [ ] redirect on all POST Methods
 - [ ] Make the share be visible for un-authenticated users, but they cannot do anything
-- [ ] Refactor rename and delete controller for DRY
+- [x] Refactor rename and delete controller for DRY
 - [ ] Do something about the double folder when sharing
 - [ ] Missing: move file
-- [ ] Missing: The test files
+- [x] Missing: The test files

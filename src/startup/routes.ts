@@ -93,6 +93,25 @@ async function routes(app: Express) {
   app.get('/share/add/:shareId', addSharedFileCtrl);
 
   app.post('/share/create', shareCreatorController);
+  app.get('/share/create', async (req, res) => {
+    res.redirect('/');
+  });
+
+  app.use((req, res, next) => {
+    res.status(404);
+
+    if (req.accepts('html')) {
+      res.render('404', { url: req.url });
+      return;
+    }
+
+    if (req.accepts('json')) {
+      res.json({ error: 'Not found' });
+      return;
+    }
+
+    res.type('txt').send('Not found');
+  });
 }
 
 export { routes };

@@ -1,4 +1,8 @@
-type ErrorName = "VARIABLE_IS_EMPTY" | "MISSING_USER" | "SERVER_ERROR";
+type ErrorName =
+  | 'VARIABLE_IS_EMPTY'
+  | 'MISSING_USER'
+  | 'SERVER_ERROR'
+  | 'VARIABLE_IS_NOT_VALID_TYPE';
 
 export class ErrorBase<T extends string> extends Error {
   override name: T;

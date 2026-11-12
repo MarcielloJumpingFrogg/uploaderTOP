@@ -17,6 +17,7 @@ import { getOriginalFileFromSharedData } from '@/dbMethods/getOriginalFileFromSh
 import { getEditMode } from '@/dbMethods/getEditMode';
 import { findCurrentSharedFiles } from '@/dbMethods/findCurrentSharedFiles';
 import { getShareSessionFromSharedFile } from '@/dbMethods/getShareSessionFromSharedFile';
+import { errorBehaviour } from '@/customErrors/errorBehaviour';
 
 async function deleteFromDb(userId: string, folder: Items) {
   if (!folder || !folder.id) {
@@ -174,27 +175,9 @@ export const fileDeleteController = [
     try {
       await fileDelete(req, res);
     } catch (error: unknown) {
-      if (error instanceof ProjectError) {
-        if (error.name == 'MISSING_USER') {
-          customErrorContainer.userError(res);
-          return;
-        }
-        if (error.name == 'VARIABLE_IS_EMPTY') {
-          logger.error('VARIABLE_IS_EMPTY', error);
-          customErrorContainer.genericError();
-          res.redirect('/');
-          return;
-        }
-        if (error.name == 'SERVER_ERROR') {
-          logger.error('SERVER_ERROR COULD NOT COMPLETE: ', error);
-          customErrorContainer.genericError();
-          res.redirect('/');
-          return;
-        }
-        const _unHandledCases: never = error.name;
-        return _unHandledCases;
-      }
-      logger.error('UNEXPECTED ERROR: ', error);
+      errorBehaviour(error, res);
+      res.redirect('/');
+      return;
     }
     res.redirect('/');
   },

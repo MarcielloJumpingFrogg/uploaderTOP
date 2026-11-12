@@ -45,6 +45,7 @@ model Items {
   // upperFolderId             String?
   insideFolder              Items? @relation("FolderHierarchy", fields: [parentFolderId], references: [id], onDelete: Cascade)
   subFolders                Items[] @relation("FolderHierarchy")
+  mimetype                  String?
 }
 
 model ShareSession {

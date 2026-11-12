@@ -9,6 +9,7 @@ export async function uploadFileInBoth(
     ownerId: string;
     fileName: string;
     fileType: string;
+    mimetype: string;
     size: string;
     parentFolderId: string | null;
   },

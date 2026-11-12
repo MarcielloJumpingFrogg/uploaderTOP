@@ -14,7 +14,7 @@ import { tryCatch } from '@/customErrors/tryCatch';
 import { prisma } from '@prisma';
 import customErrorContainer from '@/customErrors/customErrorContainer';
 import { errorBehaviour } from '@/customErrors/errorBehaviour';
-import logger from '../../config/logger';
+import { checkAll } from '@/functions/checkAll';
 
 async function rename(mainFile: Items, newName: string) {
   const { data, error } = await tryCatch(
@@ -43,38 +43,6 @@ async function rename(mainFile: Items, newName: string) {
   }
 }
 
-function checkAll(
-  fileId: string,
-  isOwner: string,
-  parentFolder: string,
-  newName: string,
-) {
-  if (!fileId) {
-    throw new ProjectError({
-      name: 'VARIABLE_IS_EMPTY',
-      message: 'File id is empty',
-    });
-  }
-  if (!isOwner) {
-    throw new ProjectError({
-      name: 'VARIABLE_IS_EMPTY',
-      message: 'isOwner is empty',
-    });
-  }
-  if (!parentFolder) {
-    throw new ProjectError({
-      name: 'VARIABLE_IS_EMPTY',
-      message: 'parentFolder is empty',
-    });
-  }
-  if (!newName) {
-    throw new ProjectError({
-      name: 'VARIABLE_IS_EMPTY',
-      message: 'newName is empty',
-    });
-  }
-}
-
 async function renameFunction(req: Request) {
   const body = req.body;
   const fileId: string = body._fileId;
@@ -82,7 +50,14 @@ async function renameFunction(req: Request) {
   const parentFolder: string = body._parentFolder;
   const newName: string = body.newName;
 
-  checkAll(fileId, isOwner, parentFolder, newName);
+  if (!newName) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'newName is empty',
+    });
+  }
+
+  checkAll(fileId, isOwner, parentFolder);
 
   let mainFile: Items | null = null;
 

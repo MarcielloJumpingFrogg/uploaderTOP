@@ -6,6 +6,7 @@ export async function createDbEntry(itemParams: {
   ownerId: string;
   fileName: string;
   fileType: string;
+  mimetype: string;
   size: string;
   parentFolderId: string | null;
 }) {
@@ -17,6 +18,7 @@ export async function createDbEntry(itemParams: {
         fileType: itemParams.fileType,
         size: itemParams.size,
         parentFolderId: itemParams.parentFolderId,
+        mimetype: itemParams.mimetype,
       },
     }),
   );

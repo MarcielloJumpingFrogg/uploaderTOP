@@ -21,6 +21,12 @@ export function errorBehaviour(error: unknown, res: Response) {
       res.redirect('/');
       return;
     }
+    if (error.name == 'VARIABLE_IS_NOT_VALID_TYPE') {
+      logger.error('VARIABLE IS OF UNEXPECTED TYPE: ', error);
+      customErrorContainer.genericError();
+      res.redirect('/');
+      return;
+    }
     const _unHandledCases: never = error.name;
     return _unHandledCases;
   }

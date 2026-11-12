@@ -28,6 +28,9 @@
 
   <form action="/account/download" method="POST">
     <input type="hidden" name="_method" value="DOWNLOAD" />
+    <input type="hidden" name="_fileId" value="<%=file.id%>" />
+    <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
+    <input type="hidden" name="_parentFolder" value="<%= currentFolderId %>" />
     <button type="submit">Download</button>
   </form>
   <% } %>

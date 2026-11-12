@@ -81,6 +81,7 @@ async function fileUploaderFunction(req: Request, res: Response) {
       ownerId: userId,
       fileName: newName,
       fileType: fileType,
+      mimetype: file.mimetype,
       size: size,
       parentFolderId: parentFolder,
     };

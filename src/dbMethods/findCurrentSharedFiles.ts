@@ -1,6 +1,6 @@
-import { prisma } from "@prisma";
-import { ProjectError } from "@/customErrors/ErrorBase";
-import { tryCatch } from "@/customErrors/tryCatch";
+import { prisma } from '@prisma';
+import { ProjectError } from '@/customErrors/ErrorBase';
+import { tryCatch } from '@/customErrors/tryCatch';
 
 export async function findCurrentSharedFiles(fileId: string, userId: string) {
   //{{{
@@ -12,17 +12,18 @@ export async function findCurrentSharedFiles(fileId: string, userId: string) {
       },
     }),
   );
+
   if (sharedError)
     throw new ProjectError({
-      name: "SERVER_ERROR",
-      message: "Error during findCurrentSharedFiles",
+      name: 'SERVER_ERROR',
+      message: 'Error during findCurrentSharedFiles',
       cause: sharedError,
     });
 
   if (!sharedFile) {
     throw new ProjectError({
-      name: "VARIABLE_IS_EMPTY",
-      message: "Empty_variable during findCurrentSharedFiles",
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'Empty_variable during findCurrentSharedFiles',
     });
   }
 

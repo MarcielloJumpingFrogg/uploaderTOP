@@ -19,8 +19,13 @@ import { findCurrentSharedFiles } from '@/dbMethods/findCurrentSharedFiles';
 import { getShareSessionFromSharedFile } from '@/dbMethods/getShareSessionFromSharedFile';
 
 async function deleteFromDb(userId: string, folder: Items) {
+  if (!folder || !folder.id) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'folder id is empty when deleting',
+    });
+  }
   //{{{
-  if (!folder || !folder.id) return;
   const { data, error } = await tryCatch(
     prisma.items.delete({ where: { id: folder.id, ownerId: userId } }),
   );
@@ -33,6 +38,7 @@ async function deleteFromDb(userId: string, folder: Items) {
     });
   }
 
+  logger.test('data: ', data);
   //}}}
 }
 

@@ -224,20 +224,34 @@ describe('Deleting shared stuff', async () => {
 
     await destinationAgent.get(`/share/add/${shareSession.id}`);
 
-    const dbPull = await prisma.sharedFiles.findMany({
+    const sharedFiles = await prisma.sharedFiles.findMany({
       where: { destinationUser: destinationParams.id },
     });
 
-    logger.test('db:', dbPull);
+    expect(sharedFiles.length).toBe(1);
 
     const destinationPreDelete = await destinationAgent.get('/account');
     expect(destinationPreDelete.text).toContain(`<p>${file}</p>`);
 
-    destinationAgent.post('/account/delete').send({
-      _isOwner: false,
-      _fileId: shareSession.id,
-      _parentFolder: 'Home',
+    if (!sharedFiles[0]) {
+      logger.error('No sharedFiles');
+      return;
+    }
+
+    await destinationAgent
+      .post('/account/delete')
+      .send({
+        _isOwner: 'false',
+        _fileId: sharedFiles[0].id,
+        _parentFolder: 'Home',
+      })
+      .expect(302);
+
+    const postDeleteDb = await prisma.sharedFiles.findMany({
+      where: { destinationUser: destinationParams.id },
     });
+
+    expect(postDeleteDb.length).toBe(0);
 
     const ownerPage = await ownerAgent.get('/account');
     expect(ownerPage.text).toContain(`<p>${file}</p>`);

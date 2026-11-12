@@ -1,6 +1,6 @@
-import { findCurrentSharedFiles } from "./findCurrentSharedFiles";
-import { getShareSessionFromSharedFile } from "./getShareSessionFromSharedFile";
-import type { SharedFiles, ShareSession } from "../../generated/prisma/client";
+import { findCurrentSharedFiles } from './findCurrentSharedFiles';
+import { getShareSessionFromSharedFile } from './getShareSessionFromSharedFile';
+import type { SharedFiles, ShareSession } from '../../generated/prisma/client';
 
 function shareSessionTarget(
   //{{{
@@ -32,14 +32,14 @@ function sharedUserPermission(sharedSession: ShareSession) {
 }
 
 export async function getEditMode(
-  isOwner: "true" | "false",
+  isOwner: 'true' | 'false',
   userId: string,
   fileId: string,
 ) {
-  let editMode: "Owner" | "GuestWithPermission" | "Guest" | "session" | null =
+  let editMode: 'Owner' | 'GuestWithPermission' | 'Guest' | 'session' | null =
     null;
 
-  if (isOwner == "true") return "Owner";
+  if (isOwner == 'true') return 'Owner';
   const sharedFile = await findCurrentSharedFiles(fileId, userId);
   const shareSession = await getShareSessionFromSharedFile(sharedFile);
 
@@ -47,12 +47,12 @@ export async function getEditMode(
   const canEdit = sharedUserPermission(shareSession);
   if (isMainFile == false) {
     if (canEdit) {
-      editMode = "GuestWithPermission";
+      editMode = 'GuestWithPermission';
     } else {
-      editMode = "Guest";
+      editMode = 'Guest';
     }
   } else {
-    editMode = "session";
+    editMode = 'session';
   }
 
   return editMode;

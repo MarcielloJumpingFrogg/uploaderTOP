@@ -3,6 +3,7 @@ import { emptyBucket } from '../src/supabaseFn/emptyBucket';
 import type request from 'supertest';
 import { tryCatch } from '@/customErrors/tryCatch';
 import { ProjectError } from '@/customErrors/ErrorBase';
+import type { SharedFiles } from '../generated/prisma/client';
 
 async function resetDb() {
   await prisma.$transaction([
@@ -47,4 +48,12 @@ async function softReset() {
   await resetBuckets();
 }
 
-export { resetDb, resetBuckets, logIn, softReset };
+function getFileInFolder(sharedFiles: SharedFiles[], fileId: string) {
+  for (let i = 0; i < sharedFiles.length; i++) {
+    if (!sharedFiles[i]) return;
+    const checkFile = sharedFiles[i];
+    if (checkFile!.originalFile == fileId) return sharedFiles[i];
+  }
+}
+
+export { getFileInFolder, resetDb, resetBuckets, logIn, softReset };

@@ -1,9 +1,8 @@
 import { app } from '@/app';
 import request from 'supertest';
 import { it, describe, expect, beforeEach } from 'vitest';
-import { resetDb, resetBuckets, logIn } from './functions';
+import { resetDb, resetBuckets, logIn, getFileInFolder } from './functions';
 import { prisma } from '../lib/prisma';
-import logger from '../config/logger';
 import type { pseudoUser } from './testTypes';
 import { createPseudoUser } from './createPseudoUser';
 import { createPseudoFile } from './createPseudoFile';
@@ -111,100 +110,6 @@ describe('Owner renaming file', async () => {
       (await prisma.items.findUnique({ where: { id: folder } }))?.fileName,
     ).toBe(newName);
   });
-
-  //   it('user that has the file shared with will rename something inside the folder', async () => {
-  //     await upload(oldFileUploadName);
-  //     const { shareSession } = await shareFile(ownerAgent, {
-  //       _location: `Home/${oldFolderName}`,
-  //       _fileType: 'file',
-  //       _name: oldUniqueName,
-  //       canEdit: 'on',
-  //       daysExpiration: 1,
-  //     });
-  //
-  //     await sharedAgent.get('/share/add/' + shareSession[0].id);
-  //     const sharedHomeBefore = await sharedAgent.get('/account');
-  //     expect(sharedHomeBefore.text).toContain(`<p>${oldUniqueName}</p>`);
-  //
-  //     await fileRename(
-  //       sharedAgent,
-  //       oldUniqueName,
-  //       secondName,
-  //       'Home',
-  //       shareSession[0].id,
-  //       '0',
-  //     );
-  //     const sharedHome = await sharedAgent.get('/account');
-  //     expect(sharedHome.text).toContain(`<p>${secondName}</p>`);
-  //
-  //     expect(
-  //       (await ownerAgent.get(`/account/0/Home@${oldFolderName}`)).text,
-  //     ).toContain(`<p>${secondName}</p>`);
-  //   });
-  //
-  //   it('Shared file cannot be edited', async () => {
-  //     await upload(oldFileUploadName);
-  //     const { shareSession } = await shareFile(ownerAgent, {
-  //       _location: `Home/${oldFolderName}`,
-  //       _fileType: 'file',
-  //       _name: oldUniqueName,
-  //       canEdit: 'off',
-  //       daysExpiration: 1,
-  //     });
-  //
-  //     await sharedAgent.get('/share/add/' + shareSession[0].id);
-  //     const sharedHome = await sharedAgent.get('/account');
-  //     expect(sharedHome.text).toContain(`<p>${oldUniqueName}</p>`);
-  //
-  //     const result = await fileRename(
-  //       sharedAgent,
-  //       oldUniqueName,
-  //       secondName,
-  //       'Home',
-  //       shareSession[0].id,
-  //     );
-  //
-  //     expect(result.status).toBe(302);
-  //     const postTry = await sharedAgent.get('/account');
-  //     expect(postTry.text).toContain(`<p>${oldUniqueName}</p>`);
-  //   });
-  //
-  //   it('a folder is shared and rename inside it ', async () => {
-  //     await upload(oldFileUploadName);
-  //     const { shareSession } = await shareFile(ownerAgent, {
-  //       _location: `Home`,
-  //       _fileType: 'folder',
-  //       _name: oldFolderName,
-  //       canEdit: 'on',
-  //       daysExpiration: 1,
-  //     });
-  //
-  //     await sharedAgent.get('/share/add/' + shareSession[0].id);
-  //     expect((await sharedAgent.get('/account')).text).toContain(
-  //       `<p>${oldFolderName}</p>`,
-  //     );
-  //
-  //     await fileRename(
-  //       sharedAgent,
-  //       oldUniqueName,
-  //       secondName,
-  //       `Home/${oldFolderName}`,
-  //       '0',
-  //       shareSession[0].id,
-  //     );
-  //
-  //     expect(
-  //       (
-  //         await sharedAgent.get(
-  //           `/account/${shareSession[0].id}/Home@${oldFolderName}`,
-  //         )
-  //       ).text,
-  //     ).toContain(`<p>${secondName}</p>`);
-  //   });
-  //
-  //   it('shared user cannot rename homeFolder', async () => {});
-  //
-  //   it('owner changes name and sharedUser can see the new name', async () => {});
 });
 
 describe('Renaming and shared compatibility', async () => {
@@ -258,5 +163,128 @@ describe('Renaming and shared compatibility', async () => {
 
     expect(fileNameAfterChange?.fileName).not.toBe(newName);
     expect(fileNameAfterChange?.fileName).toBe(file);
+
+    const homePageAfter = await destinationAgent.get('/account');
+    expect(homePageAfter.text).toContain(
+      'You cannot modify this file, permission insufficient',
+    );
+  });
+
+  it('Renaming a file in a folder with permission', async () => {
+    const ownerParams: pseudoUser = {
+      id: 'Owner of sharedFolder for rename',
+      username: 'Owner of sharedFolder for rename',
+    };
+    await createPseudoUser(ownerParams);
+    const ownerAgent = request.agent(app);
+    await logIn(ownerAgent, ownerParams.id);
+
+    const destinationParams: pseudoUser = {
+      id: 'Destination of sharedFolder for rename',
+      username: 'Destination of sharedFolder for rename',
+    };
+    await createPseudoUser(destinationParams);
+    const destinationAgent = request.agent(app);
+    await logIn(destinationAgent, destinationParams.id);
+
+    const folder = 'Shared folder for rename';
+    await createPseudoFolder(ownerParams.id, folder, undefined, folder);
+
+    const file = 'File in folder, to be renamed';
+    await createPseudoFile(ownerParams.id, file, 'txt', folder, file);
+    const shareSession = await createShareSession(
+      ownerParams.id,
+      folder,
+      1,
+      true,
+    );
+
+    await destinationAgent.get(`/share/add/${shareSession.id}`);
+
+    const dbResult = await prisma.sharedFiles.findMany({
+      where: {
+        destinationUser: destinationParams.id,
+      },
+    });
+
+    expect(dbResult.length).toBe(2);
+
+    const fileInFolder = getFileInFolder(dbResult, file);
+
+    const newName = 'New name for file';
+    await destinationAgent.post('/account/rename').type('form').send({
+      _isOwner: 'false',
+      _fileId: fileInFolder?.id,
+      _parentFolder: folder,
+      newName: newName,
+    });
+
+    const fileNameAfterChange = await prisma.items.findUnique({
+      where: { id: file },
+    });
+
+    expect(fileNameAfterChange?.fileName).toBe(newName);
+  });
+
+  it('Cannot rename a file without permission', async () => {
+    const ownerParams: pseudoUser = {
+      id: 'Owner of shareFolder without permission',
+      username: 'Owner of shareFolder without permission',
+    };
+    await createPseudoUser(ownerParams);
+    const ownerAgent = request.agent(app);
+    await logIn(ownerAgent, ownerParams.id);
+
+    const destinationParams: pseudoUser = {
+      id: 'Destination of shareFolder without permission',
+      username: 'Destination of shareFolder without permission',
+    };
+    await createPseudoUser(destinationParams);
+    const destinationAgent = request.agent(app);
+    await logIn(destinationAgent, destinationParams.id);
+
+    const folder = 'Shared folder without permission';
+    await createPseudoFolder(ownerParams.id, folder, undefined, folder);
+
+    const file = 'File in folder, cannot be renamed';
+    await createPseudoFile(ownerParams.id, file, 'txt', folder, file);
+    const shareSession = await createShareSession(
+      ownerParams.id,
+      folder,
+      1,
+      false,
+    );
+
+    await destinationAgent.get(`/share/add/${shareSession.id}`);
+
+    const dbResult = await prisma.sharedFiles.findMany({
+      where: {
+        destinationUser: destinationParams.id,
+      },
+    });
+
+    expect(dbResult.length).toBe(2);
+
+    const fileInFolder = getFileInFolder(dbResult, file);
+
+    const newName = 'Will not change';
+    await destinationAgent.post('/account/rename').type('form').send({
+      _isOwner: 'false',
+      _fileId: fileInFolder?.id,
+      _parentFolder: folder,
+      newName: newName,
+    });
+
+    const fileNameAfterChange = await prisma.items.findUnique({
+      where: { id: file },
+    });
+
+    expect(fileNameAfterChange?.fileName).not.toBe(newName);
+    expect(fileNameAfterChange?.fileName).toBe(file);
+
+    const homeAfterRename = await destinationAgent.get(`/account`);
+    expect(homeAfterRename.text).toContain(
+      'You cannot modify this file, permission insufficient',
+    );
   });
 });

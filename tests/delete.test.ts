@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { app } from '@/app';
-import { resetBuckets, resetDb, logIn } from './functions';
+import { resetBuckets, resetDb, logIn, getFileInFolder } from './functions';
 import { prisma } from '../lib/prisma';
 import { createPseudoUser } from './createPseudoUser';
 import type { pseudoUser } from './testTypes';
@@ -9,20 +9,11 @@ import { createPseudoFile } from './createPseudoFile';
 import { createPseudoFolder } from './createPseudoFolder';
 import { createShareSession } from '@/dbMethods/createShareSession';
 import logger from '../config/logger';
-import type { SharedFiles } from '../generated/prisma/client';
 
 beforeEach(async () => {
   await resetDb();
   await resetBuckets();
 });
-
-function getFileInFolder(sharedFiles: SharedFiles[], fileId: string) {
-  for (let i = 0; i < sharedFiles.length; i++) {
-    if (!sharedFiles[i]) return;
-    const checkFile = sharedFiles[i];
-    if (checkFile!.originalFile == fileId) return sharedFiles[i];
-  }
-}
 
 describe('Test Delete of files and folder of the owner', async () => {
   it('Create a file and then delete it: ', async () => {

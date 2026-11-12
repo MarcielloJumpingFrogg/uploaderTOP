@@ -14,6 +14,7 @@ import { tryCatch } from '@/customErrors/tryCatch';
 import { prisma } from '@prisma';
 import customErrorContainer from '@/customErrors/customErrorContainer';
 import { errorBehaviour } from '@/customErrors/errorBehaviour';
+import logger from '../../config/logger';
 
 async function rename(mainFile: Items, newName: string) {
   const { data, error } = await tryCatch(

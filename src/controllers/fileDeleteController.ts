@@ -26,7 +26,7 @@ async function deleteFromDb(userId: string, folder: Items) {
     });
   }
   //{{{
-  const { data, error } = await tryCatch(
+  const { data: _z, error } = await tryCatch(
     prisma.items.delete({ where: { id: folder.id, ownerId: userId } }),
   );
 
@@ -38,7 +38,6 @@ async function deleteFromDb(userId: string, folder: Items) {
     });
   }
 
-  logger.test('data: ', data);
   //}}}
 }
 

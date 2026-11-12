@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { app } from '@/app';
-import { resetBuckets, resetDb, logIn, shareFile } from './functions';
+import { resetBuckets, resetDb, logIn } from './functions';
 import { prisma } from '../lib/prisma';
 import { createPseudoUser } from './createPseudoUser';
 import type { pseudoUser } from './testTypes';
@@ -9,11 +9,20 @@ import { createPseudoFile } from './createPseudoFile';
 import { createPseudoFolder } from './createPseudoFolder';
 import { createShareSession } from '@/dbMethods/createShareSession';
 import logger from '../config/logger';
+import type { SharedFiles } from '../generated/prisma/client';
 
 beforeEach(async () => {
   await resetDb();
   await resetBuckets();
 });
+
+function getFileInFolder(sharedFiles: SharedFiles[], fileId: string) {
+  for (let i = 0; i < sharedFiles.length; i++) {
+    if (!sharedFiles[i]) return;
+    const checkFile = sharedFiles[i];
+    if (checkFile!.originalFile == fileId) return sharedFiles[i];
+  }
+}
 
 describe('Test Delete of files and folder of the owner', async () => {
   it('Create a file and then delete it: ', async () => {
@@ -140,55 +149,6 @@ describe('Test Delete of files and folder of the owner', async () => {
     });
     expect(postDelete.length).toBe(1);
   });
-
-  // it("Shared file get's removed upon deletion, but the sharer maintains it", async () => {
-  //   const uploadResult = await uploadFile(
-  //     ownerAgent,
-  //     fileUploadName,
-  //     'Home',
-  //     fileToUpload,
-  //   );
-  //   expect(uploadResult.statusCode).toBe(302);
-  //
-  //   await shareFile(ownerAgent, {
-  //     _location: 'Home',
-  //     _fileType: 'txt',
-  //     _name: uniqueName,
-  //     canEdit: 'on',
-  //     daysExpiration: 1,
-  //   });
-  //
-  //   const shareSession = await prisma.shareSession.findFirst({
-  //     where: { originalUser: ownerId, fileName: uniqueName },
-  //   });
-  //   if (!shareSession) {
-  //     throw new Error('No Share Session');
-  //   }
-  //
-  //   const preShareSharedHome = await sharedAgent.get('/account');
-  //   expect(preShareSharedHome.text).toContain('<p>No files</p>');
-  //
-  //   await sharedAgent.get('/share/add/' + shareSession.id);
-  //
-  //   const postShareSharedHome = await sharedAgent.get('/account');
-  //   expect(postShareSharedHome.text).toContain(`<p>${uniqueName}</p>`);
-  //
-  //   await deleteFile(sharedAgent, {
-  //     _location: 'Home',
-  //     _name: uniqueName,
-  //     _type: 'txt',
-  //     _sessionId: shareSession.id,
-  //   });
-  //   const postDeleteSharedHome = await sharedAgent.get('/account');
-  //   expect(postDeleteSharedHome.text).toContain(`<p>No files</p>`);
-  //
-  //   const postDeleteOwner = await ownerAgent.get('/account');
-  //   expect(postDeleteOwner.text).toContain('<p>newFolder</p>');
-  //   const postDeleteOwnerFolder = await ownerAgent.get(
-  //     '/account/0/Home@newFolder',
-  //   );
-  //   expect(postDeleteOwnerFolder.text).toContain(`<p>${uniqueName}</p>`);
-  // });
 });
 
 describe('Deleting shared stuff', async () => {
@@ -202,8 +162,8 @@ describe('Deleting shared stuff', async () => {
     await logIn(ownerAgent, ownerParams.username);
 
     const destinationParams: pseudoUser = {
-      id: 'DestinationOfDeleteSesion',
-      username: 'DestinationOfDeleteSesion',
+      id: 'DestinationOfDeleteSession',
+      username: 'DestinationOfDeleteSession',
     };
     await createPseudoUser(destinationParams);
     const destinationAgent = request.agent(app);
@@ -258,5 +218,148 @@ describe('Deleting shared stuff', async () => {
 
     const sharedPage = await destinationAgent.get('/account');
     expect(sharedPage.text).not.toContain(`<p>${file}</p>`);
+  });
+
+  it('Delete a file in a shared Folder', async () => {
+    const ownerParams: pseudoUser = {
+      id: 'OwnerOfDeleteInSharedFolder',
+      username: 'OwnerOfDeleteInSharedFolder',
+    };
+    await createPseudoUser(ownerParams);
+    const ownerAgent = request.agent(app);
+    await logIn(ownerAgent, ownerParams.username);
+
+    const destinationParams: pseudoUser = {
+      id: 'DestinationOfDeleteInSharedFolder',
+      username: 'DestinationOfDeleteInSharedFolder',
+    };
+    await createPseudoUser(destinationParams);
+    const destinationAgent = request.agent(app);
+    await logIn(destinationAgent, destinationParams.username);
+
+    const folder = 'FolderWithSharedFiles';
+    await createPseudoFolder(ownerParams.id, folder, undefined, folder);
+
+    const file = 'fileInSharedFolder';
+    await createPseudoFile(ownerParams.id, file, 'txt', folder, file);
+    const shareSession = await createShareSession(
+      ownerParams.id,
+      folder,
+      1,
+      true,
+    );
+
+    if (!shareSession) {
+      logger.error('No shareSession');
+    }
+
+    await destinationAgent.get(`/share/add/${shareSession.id}`);
+
+    const sharedFiles = await prisma.sharedFiles.findMany({
+      where: {
+        destinationUser: destinationParams.id,
+      },
+    });
+
+    expect(sharedFiles.length).toBe(2);
+
+    const fileInFolder = getFileInFolder(sharedFiles, file);
+    if (!fileInFolder) {
+      logger.error('No file in folder');
+      return;
+    }
+    await destinationAgent.post('/account/delete').type('form').send({
+      _isOwner: 'false',
+      _fileId: fileInFolder.id,
+      _parentFolder: folder,
+    });
+
+    const postDeleteDb = await prisma.sharedFiles.findMany({
+      where: {
+        destinationUser: destinationParams.id,
+      },
+    });
+
+    expect(postDeleteDb.length).toBe(1);
+
+    const ownerDeleteDb = await prisma.items.findMany({
+      where: {
+        ownerId: ownerParams.id,
+      },
+    });
+
+    expect(ownerDeleteDb.length).toBe(1);
+  });
+
+  it('Fail to delete file in a sharedFolder without permission', async () => {
+    const ownerParams: pseudoUser = {
+      id: 'OwnerOfDeleteWithoutPermission',
+      username: 'OwnerOfDeleteWithoutPermission',
+    };
+    await createPseudoUser(ownerParams);
+    const ownerAgent = request.agent(app);
+    await logIn(ownerAgent, ownerParams.username);
+
+    const destinationParams: pseudoUser = {
+      id: 'DestinationOfDeleteWithoutPermission',
+      username: 'DestinationOfDeleteWithoutPermission',
+    };
+    await createPseudoUser(destinationParams);
+    const destinationAgent = request.agent(app);
+    await logIn(destinationAgent, destinationParams.username);
+
+    const folder = 'FolderWihtoutPermission';
+    await createPseudoFolder(ownerParams.id, folder, undefined, folder);
+
+    const file = 'FileCannotBeDeleted';
+    await createPseudoFile(ownerParams.id, file, 'txt', folder, file);
+    const shareSession = await createShareSession(
+      ownerParams.id,
+      folder,
+      1,
+      false,
+    );
+
+    if (!shareSession) {
+      logger.error('No shareSession');
+    }
+
+    await destinationAgent.get(`/share/add/${shareSession.id}`);
+
+    const sharedFiles = await prisma.sharedFiles.findMany({
+      where: {
+        destinationUser: destinationParams.id,
+      },
+    });
+
+    expect(sharedFiles.length).toBe(2);
+
+    const fileInFolder = getFileInFolder(sharedFiles, file);
+    if (!fileInFolder) {
+      logger.error('No file in folder');
+      return;
+    }
+    await destinationAgent
+      .post('/account/delete')
+      .type('form')
+      .send({
+        _isOwner: 'false',
+        _fileId: fileInFolder.id,
+        _parentFolder: folder,
+      })
+      .expect(302);
+
+    const homePage = await destinationAgent.get('/account');
+    expect(homePage.text).toContain(
+      'You cannot delete a file that is not yours',
+    );
+
+    const postDeleteDb = await prisma.sharedFiles.findMany({
+      where: {
+        destinationUser: destinationParams.id,
+      },
+    });
+
+    expect(postDeleteDb.length).toBe(2);
   });
 });

@@ -1,35 +1,77 @@
-import request, { agent } from 'supertest';
-import { describe, it, expect } from 'vitest';
+import request from 'supertest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { app } from '@/app';
 import logger from '../config/logger';
-import { resetBuckets, resetDb, uploadFile, shareFile } from './functions';
+import { resetBuckets, resetDb, logIn } from './functions';
 import { prisma } from '../lib/prisma';
+import type { pseudoUser } from './testTypes';
+import { createPseudoUser } from './createPseudoUser';
+import { createPseudoFolder } from './createPseudoFolder';
+import { createShareSession } from '@/dbMethods/createShareSession';
+import { createPseudoFile } from './createPseudoFile';
 
-await resetDb();
-await resetBuckets();
+beforeEach(async () => {
+  await resetDb();
+  await resetBuckets();
+});
 
-describe("The shared user can upload files to the owner's folder ", async () => {
-  it('somehting', () => {
-    expect(1).toBe(1);
+describe('uploading to a sharedFolder', async () => {
+  it('The owner uploads something and the sharedUser sees it', async () => {
+    const ownerParams: pseudoUser = {
+      id: 'Owner Uploads to shared folder',
+      username: 'Owner Uploads to shared folder',
+    };
+    await createPseudoUser(ownerParams);
+    const ownerAgent = request.agent(app);
+    await logIn(ownerAgent, ownerParams.username);
+
+    const destinationParams: pseudoUser = {
+      id: 'Destination for upload to sharedFolder',
+      username: 'Destination for upload to sharedFolder',
+    };
+    await createPseudoUser(destinationParams);
+    const destinationAgent = request.agent(app);
+    await logIn(destinationAgent, destinationParams.username);
+
+    const folder = 'FolderToBeShared';
+    await createPseudoFolder(ownerParams.id, folder, undefined, folder);
+    const firstFile = 'FirstFileSharedInSession';
+    await createPseudoFile(ownerParams.id, firstFile, 'txt', folder, firstFile);
+
+    const shareSession = await createShareSession(
+      ownerParams.id,
+      folder,
+      1,
+      true,
+    );
+
+    if (!shareSession) {
+      logger.error('No shareSession');
+      return;
+    }
+
+    await destinationAgent.get(`/share/add/${shareSession.id}`);
+
+    const preUploadDb = await prisma.sharedFiles.findMany({
+      where: {
+        destinationUser: destinationParams.id,
+      },
+    });
+
+    expect(preUploadDb.length).toBe(2);
+
+    const secondFile = 'SecondFileAfterShare';
+    await createPseudoFile(
+      ownerParams.id,
+      secondFile,
+      'txt',
+      folder,
+      secondFile,
+    );
+
+    const postUpload = await prisma.sharedFiles.findMany({
+      where: { destinationUser: destinationParams.id },
+    });
+    expect(postUpload.length).toBe(3);
   });
-  logger.toImplement('Missing test');
-  // const ownerPar = { username: "ownShareUpload" };
-  // const sharedPar = { username: "shrdShreUpld" };
-  // const ownerAgent = request.agent(app);
-  // const sharedAgent = request.agent(app);
-  //
-  //
-  // await uploadFile(ownerAgent, "newFolder/ownerFile", "Home", "textTest.txt");
-  // const { shareSession } = await shareFile(ownerAgent, {
-  //   _location: "Home",
-  //   _fileType: "folder",
-  //   _name: "newFolder",
-  //   canEdit: "on",
-  //   daysExpiration: 1,
-  // });
-  //
-  // it("just to shut it up ", () => {
-  //   logger.toImplement("missing test");
-  //   expect(1).toBe(1);
-  // });
 });

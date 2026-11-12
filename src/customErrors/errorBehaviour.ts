@@ -23,7 +23,9 @@ export function errorBehaviour(error: unknown, res: Response) {
     }
     if (error.name == 'VARIABLE_IS_NOT_VALID_TYPE') {
       logger.error('VARIABLE IS OF UNEXPECTED TYPE: ', error);
-      customErrorContainer.genericError();
+      customErrorContainer.inputError(
+        'There was an unexpected error, You cannot download a folder',
+      );
       res.redirect('/');
       return;
     }

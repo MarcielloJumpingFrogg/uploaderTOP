@@ -26,12 +26,18 @@ export const downloadController = [
       let originalFile: Items | undefined = undefined;
       let ogFileId: string = '';
       if (isOwner != 'true') {
-        ogFileId = (await findCurrentSharedFiles(fileId, userId)).id;
+        ogFileId = (await findCurrentSharedFiles(fileId, userId)).originalFile;
       } else {
         ogFileId = fileId;
       }
 
       originalFile = await getFileFromId(ogFileId);
+      if (isOwner == 'true' && originalFile.ownerId !== req.user.id) {
+        throw new ProjectError({
+          name: 'SERVER_ERROR',
+          message: 'Cannot download the file of another user',
+        });
+      }
 
       if (originalFile.type == 'FOLDER') {
         throw new ProjectError({

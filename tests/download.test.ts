@@ -154,8 +154,6 @@ describe('Downloading files', async () => {
     );
     await destinationAgent.get(`/share/add/${shareSession.id}`);
 
-    logger.test('shareSessiona; ', shareSession);
-
     const sharedFile = await prisma.sharedFiles.findMany({
       where: {
         destinationUser: destinationUser.id,
@@ -163,7 +161,6 @@ describe('Downloading files', async () => {
       },
     });
 
-    logger.test('sharedFile:', sharedFile);
     expect(sharedFile.length).toBe(1);
 
     const response = await destinationAgent.post('/account/download').send({
@@ -172,7 +169,6 @@ describe('Downloading files', async () => {
       _fileId: sharedFile[0]!.id,
     });
 
-    // logger.test('what: ', response);
     expect(response.header['content-type']).toBe(`${fileItem[0]?.mimetype}`);
 
     expect(response.header['content-disposition']).toContain(`${file}`);

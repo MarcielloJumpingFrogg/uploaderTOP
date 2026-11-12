@@ -81,6 +81,8 @@ export async function createFolder(
       res.redirect('/');
       return;
     }
+
+    return folderCreation;
   } catch (e: any) {
     logger.error('Error in createFolder: ', e);
   }

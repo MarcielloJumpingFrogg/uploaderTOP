@@ -10,6 +10,7 @@ import { getUserAndOriginalFolderId } from '@/dbMethods/getUserAndOriginalFolder
 import { ProjectError } from '@/customErrors/ErrorBase';
 import { errorBehaviour } from '@/customErrors/errorBehaviour';
 import { uploadFileInBoth } from '@/fileMethods/uploadFileInBoth';
+import { updateInSharedFolders } from '@/dbMethods/updateInSharedFolders';
 
 function setNewName(req: Request, file: any): string {
   if (req.body.newName) {
@@ -83,10 +84,12 @@ async function fileUploaderFunction(req: Request, res: Response) {
       size: size,
       parentFolderId: parentFolder,
     };
-    await uploadFileInBoth(itemsParams, file);
+    const dbEntryResult = await uploadFileInBoth(itemsParams, file);
+    await updateInSharedFolders(dbEntryResult);
 
     res.redirect(`/account/${ownerRedirect}/${originalFolderId}`);
   } catch (error: unknown) {
+    logger.error(error);
     errorBehaviour(error, res);
     res.redirect('/');
     return;

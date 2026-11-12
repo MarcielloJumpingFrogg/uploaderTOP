@@ -51,5 +51,6 @@ export async function uploadFileInBoth(
       cause: uploadError,
     });
   }
+  return dbEntryResult;
   //}}}
 }

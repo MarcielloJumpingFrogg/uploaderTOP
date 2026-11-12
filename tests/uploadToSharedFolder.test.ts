@@ -2,7 +2,7 @@ import request from 'supertest';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { app } from '@/app';
 import logger from '../config/logger';
-import { resetBuckets, resetDb, logIn } from './functions';
+import { resetBuckets, resetDb, logIn, getFileInFolder } from './functions';
 import { prisma } from '../lib/prisma';
 import type { pseudoUser } from './testTypes';
 import { createPseudoUser } from './createPseudoUser';
@@ -61,17 +61,41 @@ describe('uploading to a sharedFolder', async () => {
     expect(preUploadDb.length).toBe(2);
 
     const secondFile = 'SecondFileAfterShare';
-    await createPseudoFile(
-      ownerParams.id,
-      secondFile,
-      'txt',
-      folder,
-      secondFile,
-    );
+    await ownerAgent
+      .post('/account/file')
+      .field('newName', secondFile)
+      .field('_isOwner', 'true')
+      .field('_currentFolderId', folder)
+      .attach('usrFile', __dirname + '/testFiles/textTest.txt')
+      .expect(302);
 
     const postUpload = await prisma.sharedFiles.findMany({
       where: { destinationUser: destinationParams.id },
     });
     expect(postUpload.length).toBe(3);
+    const folderSharedFile = getFileInFolder(postUpload, folder);
+    const inFolder = await destinationAgent.get(
+      `/account/1/${folderSharedFile?.id}`,
+    );
+    expect(inFolder.text).toContain(`<p>${secondFile}</p>`);
+
+    const secondFolder = 'SecondFolder in shareSession';
+    await ownerAgent
+      .post('/account/newFolder')
+      .send({
+        folderName: secondFolder,
+        _isOwner: 'true',
+        _currentFolderId: folder,
+      })
+      .expect(302);
+
+    const postSecondUpload = await prisma.sharedFiles.findMany({
+      where: { destinationUser: destinationParams.id },
+    });
+    expect(postSecondUpload.length).toBe(4);
+    const afterSecondUpload = await destinationAgent.get(
+      `/account/1/${folderSharedFile?.id}`,
+    );
+    expect(afterSecondUpload.text).toContain(`<p>${secondFolder}</p>`);
   });
 });

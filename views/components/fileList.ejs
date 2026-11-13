@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <div class="bottomContainer flex flex-col bg-gray-100 min-h-full m-3 p-2 rounded-2xl">
 
-  <div class="listContainer flex flex-wrap justify-center min-h-full">
+  <div class="listContainer flex flex-wrap justify-center min-h-full ">
     <%
     const files = (locals.ownedFiles).concat(sharedFiles)
     if(!files) { %>
@@ -17,7 +17,7 @@
       if(shareSessionTemp != undefined){
         travelUser = shareSessionTemp
       } else {
-        travelUser = ownerOfThisFile ? "0" : "1";
+      ownerOfThisFile ? "0" : "1";
       }
 
       %>

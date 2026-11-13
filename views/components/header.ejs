@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 
-<header>
-  <a class="text-3xl" href="/account"
-    >Welcome Back <span class="underline italic"><%= user.username %></span></a
+<header class="bg-royalBlue text-white flex h-30 justify-between align-middle p-5 rounded-b-2xl mb-5 "> 
+  <a class="text-3xl self-center " href="/account" >Welcome Back <span class="underline italic "><%= user.username %></span></a
   >
   <div class="imageContainer">
     <img
       src="<%= avatar %>"
-      class="avatar header-avatar"
+      class="size-20 rounded-full border-4 border-white"
       onclick="toggleVisibility()"
     />
     <div id="user_modal" class="hidden user_modal">
-      <div class="user_modal_header flex">
+      <div class="user_modal_header flex w-11 rounded-b-full">
         <img
           src="<%= avatar %>"
-          class="avatar menu-avatar"
+          class="size-20"
           onclick="toggleVisibility()"
         />
         <span class="username"><%= user.username %></span>

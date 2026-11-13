@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<div class="flex flex-row justify-between bg-white ">
-<div class="w-1/7 min-w-20">
+<div class="flex flex-row justify-between bg-white align-bottom">
+<div class="w-1/7 min-w-20 self-center ">
   <%
   let buttonClass = "disabledBackButton"
-  let text = " <= Back"
+let text = "  Back"
   let ownerRedirect = locals.isOwner ? "0" : "1";
   let folderRedirect = locals.parentFolderId || "Home"
   let backPath = `/account/${ownerRedirect}/${folderRedirect}`
@@ -13,8 +13,9 @@
     buttonClass = "disabledBackButton"
   }
   if(buttonClass == "inFolder") { %>
-  <button class="backButton <%=buttonClass%>" onClick="location.href = '<%=backPath%>'">
-    <%= text %>
+  <button class="backButton flex bg-royalGold  text-black py-5 px-10 mx-5 rounded-2xl border-2 border-black <%=buttonClass%>" onClick="location.href = '<%=backPath%>'">
+<img src="/static/back-arrow.svg"> <%= text %>
+
   </button>
   <% } else { %>
   <button class="backButton <%=buttonClass%>" >
@@ -23,8 +24,8 @@
   <% } %>
 </div>
 
-<div class="w-1/9 min-w-50 flex flex-row justify-center px-5 py-2 border mx-4 rounded-2xl bgAmber" >
-  <button class="bg-white rounded-lg px-2 py-1 m-2 border " onclick="toggleOptions(this, '.submitNewFile')"><img class="size-10" src="/static/add-file.svg" alt="add-new-file"></button>
+<div class="w-1/9 min-w-50 flex flex-row justify-center px-5 py-2 border-2 mx-4 rounded-2xl bg-royalGold" >
+  <button class="bg-white rounded-lg px-2 py-1 m-2 border-2 " onclick="toggleOptions(this, '.submitNewFile')"><img class="size-10" src="/static/add-file.svg" alt="add-new-file"></button>
   <div class="submitNewFile hidden">
   <form action="/account/file" method="post" enctype="multipart/form-data">
     <label for="file">New File: </label>
@@ -38,7 +39,7 @@
   </form>
   </div>
 
-  <button class="bg-white rounded-lg px-2 py-1 m-2 border" onclick="toggleOptions(this, '.submitNewFolder')"><img class="size-10" src="/static/add-folder.svg" alt="add-new-file"></button>
+  <button class="bg-white rounded-lg px-2 py-1 m-2 border-2" onclick="toggleOptions(this, '.submitNewFolder')"><img class="size-10" src="/static/add-folder.svg" alt="add-new-file"></button>
   <div id="folderForm" class="submitNewFolder hidden">
     <form action="/account/newFolder" method="POST">
       <label for="folderName">Folder Name: </label>

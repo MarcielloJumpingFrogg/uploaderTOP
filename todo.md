@@ -5,7 +5,7 @@
 - [x] redirect on all POST Methods
 - [ ] Make the share be visible for un-authenticated users, but they cannot do anything
 - [x] Refactor rename and delete controller for DRY
-- [ ] Downloads
+- [x] Downloads
 - [ ] Do something about the double folder when sharing
 - [ ] Missing: move file
 - [x] Missing: The test files

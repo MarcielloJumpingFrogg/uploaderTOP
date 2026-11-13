@@ -7,9 +7,7 @@ import type { pseudoUser } from './testTypes';
 import { createPseudoUser } from './createPseudoUser';
 import { createPseudoFolder } from './createPseudoFolder';
 import logger from '../config/logger';
-import { log } from 'console';
 import { createShareSession } from '@/dbMethods/createShareSession';
-import { promisify } from 'util';
 
 beforeEach(async () => {
   await resetBuckets();

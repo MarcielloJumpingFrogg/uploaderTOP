@@ -8,28 +8,81 @@ import { getUserAndOriginalFolderId } from '@/dbMethods/getUserAndOriginalFolder
 import { prisma } from '@prisma';
 import { ProjectError } from '@/customErrors/ErrorBase';
 import { errorBehaviour } from '@/customErrors/errorBehaviour';
+import { downloadFile } from '@/supabaseFn/downloadFile';
+
+async function guestsDownload(req: Request, res: Response) {
+  const { data: shareSession, error: shareSessionError } = await tryCatch(
+    prisma.shareSession.findUnique({ where: { id: req.shareSessionTemp } }),
+  );
+  if (shareSessionError) {
+    throw new ProjectError({
+      name: 'SERVER_ERROR',
+      message: 'Error while getting the files in the shareSessionTemp',
+      cause: shareSessionError,
+    });
+  }
+
+  const { data: item, error: itemError } = await tryCatch(
+    prisma.items.findUnique({
+      where: { id: shareSession?.originalFile },
+    }),
+  );
+  if (itemError) {
+    throw new ProjectError({
+      name: 'SERVER_ERROR',
+      message: 'Error while getting the files in the shareSessionTemp',
+      cause: itemError,
+    });
+  }
+
+  if (!item) {
+    throw new ProjectError({
+      name: 'VARIABLE_IS_EMPTY',
+      message: 'Empty item from shareSession id of un-authenticated user',
+    });
+  }
+
+  if (item.type == 'FOLDER') {
+    customErrorContainer.inputError('Cannot download a folder');
+    res.redirect('/');
+    return;
+  }
+
+  await downloadFile(item, res);
+}
 
 async function renderAccount(req: Request, res: Response) {
   try {
-    //getting informations about the userId, the original folder id and if the user is also the owner: {{{
+    let requestUser;
+    let userId: string = '';
     if (!req.user) {
-      throw new ProjectError({
-        name: 'MISSING_USER',
-        message: 'User Missing in renderAccount',
-      });
+      userId = '0';
+    } else {
+      userId = req.user.id;
     }
 
-    const userId = req.user.id;
+    requestUser = { id: userId, username: req.user?.username || 'Guest' };
+    logger.test('requestUser: ', requestUser);
     const requestUserIsOwner = req.userIsOwner;
     const requestCurrentFolder = req.currentFolderId;
-    const objectData = await getUserAndOriginalFolderId(
-      userId,
-      requestUserIsOwner,
-      requestCurrentFolder,
-    );
 
-    //}}}
-    const { userId: folderOwner, userIsOwner, originalFolderId } = objectData;
+    let folderOwner: string = '';
+    let userIsOwner: boolean = false;
+    let originalFolderId: string = '';
+
+    if (req.user) {
+      const objectData = await getUserAndOriginalFolderId(
+        userId,
+        requestUserIsOwner,
+        requestCurrentFolder,
+      );
+
+      folderOwner = objectData.userId;
+      userIsOwner = objectData.userIsOwner;
+      originalFolderId = objectData.originalFolderId;
+    } else {
+      await guestsDownload(req, res);
+    }
 
     //refresh cookies {{{
     try {
@@ -46,7 +99,7 @@ async function renderAccount(req: Request, res: Response) {
 
     //avatar {{{
     const { data: avatar, error: avatarError } = await tryCatch(
-      getAvatar(req.user.id),
+      getAvatar(requestUser.id),
     );
     if (avatarError) throw new Error('error getting avatar: ', avatarError);
     //}}}
@@ -56,7 +109,8 @@ async function renderAccount(req: Request, res: Response) {
       folderOwner,
       originalFolderId,
       userIsOwner,
-      req.user.id,
+      requestUser.id,
+      req.shareSessionTemp,
     );
     // }}}
 
@@ -78,10 +132,11 @@ async function renderAccount(req: Request, res: Response) {
 
     res.status(customErrorContainer.getErrorCode()).render('account', {
       //user and file data {{{
-      user: req.user,
+      user: requestUser,
       isOwner: userIsOwner,
       ownedFiles: ownedFiles,
       sharedFiles: finalSharedFiles,
+      shareSessionTemp: req.shareSessionTemp,
       parentFolderId: parentFolderId,
       currentFolderId: req.currentFolderId || 'Home',
       avatar: avatar,

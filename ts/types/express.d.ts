@@ -13,6 +13,7 @@ declare global {
       };
       user?: {
         id: string;
+        username: string;
       };
       logout?: class;
       popUp?: {
@@ -21,6 +22,12 @@ declare global {
       };
       currentFolderId?: string;
       userIsOwner?: boolean;
+      shareSessionTemp?: string;
+
+      login(
+        user: { username: string; password: string; id?: string },
+        error: unknown,
+      ): void;
     }
 
     interface Response {

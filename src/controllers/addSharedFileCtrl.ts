@@ -6,6 +6,7 @@ import { tryCatch } from '@/customErrors/tryCatch';
 import type { Items } from '../../generated/prisma/client';
 import { createSharedFile } from '@/dbMethods/createSharedFile';
 import { ProjectError } from '@/customErrors/ErrorBase';
+import { renderSharedFiles } from './renderShardFile';
 
 async function getSubFiles(folder: string | undefined, currentList: Items[]) {
   if (folder == undefined) throw new Error('Folder is undefined');
@@ -58,10 +59,7 @@ export const addSharedFileCtrl = [
       }
 
       if (!req.user) {
-        throw new ProjectError({
-          name: 'MISSING_USER',
-          message: 'missing user inside addSharedFileCtrl',
-        });
+        await renderSharedFiles(shareSession, req, res);
       }
 
       const { data: originalFile, error: err } = await tryCatch(

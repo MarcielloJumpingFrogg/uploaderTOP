@@ -5,9 +5,11 @@ import { validateUser } from '../validate/validateUser';
 import customErrorContainer from '../customErrors/customErrorContainer';
 import logger from '../../config/logger';
 
+import type { Request, Response } from 'express';
+
 const signUpController: any = [
   validateUser,
-  async (req: any, res: any) => {
+  async (req: Request, res: Response) => {
     const errors: any = validationResult(req);
     if (!errors.isEmpty()) {
       customErrorContainer.validatorError(errors.errors);

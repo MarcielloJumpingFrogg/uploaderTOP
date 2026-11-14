@@ -1,48 +1,57 @@
 <!DOCTYPE html>
 
-<div class="editFile hidden">
-  <form action="/account/delete" method="POST">
-    <input type="hidden" name="_method" value="DELETE" />
-    <input type="hidden" name="_fileId" value="<%=file.id%>" />
-    <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
-    <input type="hidden" name="_parentFolder" value="<%= currentFolderId %>" />
-    <button type="submit" value="Delete">Delete</button>
-  </form>
-  <form action="/account/rename" method="POST">
-    <input type="hidden" name="_method" value="RENAME" />
-    <input type="hidden" name="_fileId" value="<%=file.id%>" />
-    <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
-    <input type="hidden" name="_parentFolder" value="<%= currentFolderId %>" />
-    <label for="newName">New Name:</label>
-    <input type="text" name="newName" />
-    <button type="submit" value="Rename">Rename</button>
-  </form>
+<div class="editFile hidden flex absolute inset-y-0 right-0 bg-catppuccin-text p-3 border-2 border-black flex-col  text-center gap-10 ">
 
-  <% if(finalFileType !== "folder") {%>
-  <div>
-    <button onclick="toggleOptions(this, '.infos')">Info</button>
-    <div class="infos hidden">
-      <p>need to add them back</p>
+  <div class="absolute right-0 top-0 mx-3 my-1 font-bold text-2xl bg-white w-11 h-11 items-center justify-center font-mono border-2 border-black p-1 rounded-full hover:bg-catppuccin-flaming hover:cursor-pointer transition-all duration-500 "><button class="hover:cursor-pointer" onClick="toggleOptions(this.parentElement.parentElement, '.editFile')" >x</button></div>
+
+  <div class="h-1/4 m-5">
+    <h1 class="font-bold text-2xl"><%= file.fileName %></h1>
+    <br/>
+    <div class="infos flex  flex-col ">
+      <div class="flex justify-around"><p>File Name: </p><p><%= file.fileName %></p></div>
+      <div class="flex justify-around"><p>File size</p><p><%= file.size %></div>
+      <div class="flex justify-around"><p>File Type:</p><p><%= file.fileType %></p></div>
+      <div class="flex justify-around"><p>Created at:</p><p> <%= file.created_at.getDate() %>/<%= file.created_at.getMonth() %>/<%= file.created_at.getFullYear() %></p></div>
     </div>
   </div>
 
-  <form action="/account/download" method="POST">
-    <input type="hidden" name="_method" value="DOWNLOAD" />
-    <input type="hidden" name="_fileId" value="<%=file.id%>" />
-    <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
-    <input type="hidden" name="_parentFolder" value="<%= currentFolderId %>" />
-    <button type="submit">Download</button>
-  </form>
-  <% } %>
+  <div class="h-1/2 flex flex-col text-center">
+    <form action="/account/rename" method="POST" class="flex flex-col">
+      <input type="hidden" name="_method" value="RENAME" />
+      <input type="hidden" name="_fileId" value="<%=file.id%>" />
+      <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
+      <input type="hidden" name="_parentFolder" value="<%= currentFolderId %>" />
+      <label for="newName">New Name:</label>
+      <input type="text" name="newName" class=" border-2 border-black " />
+      <br/>
+      <button type="submit" value="Rename" class=" border-2 border-black  px-10 py-5 my-5  " >Rename</button>
+    </form>
 
-  <form action="/share/create" method="POST">
-    <label for="daysExpiration">Number of days for sharing</label>
-    <input type="number" name="daysExpiration" />
-    <label>Can Be Edited?: </label>
-    <input type="checkbox" name="canEdit" />
-    <input type="hidden" name="_method" value="SHARE" />
-    <input type="hidden" name="_fileId" value="<%=file.id%>" />
-    <input type="hidden" name="_parentFolder" value="<%=parentFolderId%>" />
-    <button type="submit">Create Link</button>
-  </form>
+
+    <form action="/account/download" method="POST">
+      <input type="hidden" name="_method" value="DOWNLOAD" />
+      <input type="hidden" name="_fileId" value="<%=file.id%>" />
+      <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
+      <input type="hidden" name="_parentFolder" value="<%= currentFolderId %>" />
+      <button type="submit" class=" border-2 border-black px-10 py-5 my-5    " >Download</button>
+    </form>
+    <form action="/account/delete" method="POST">
+      <input type="hidden" name="_method" value="DELETE" />
+      <input type="hidden" name="_fileId" value="<%=file.id%>" />
+      <input type="hidden" name="_isOwner" value="<%= ownerOfThisFile %>" />
+      <input type="hidden" name="_parentFolder" value="<%= currentFolderId %>" />
+      <button type="submit" value="Delete" class=" border-2 border-black  px-10 py-5 my-5   " >Delete</button>
+    </form>
+    <form action="/share/create" method="POST" class="flex flex-col">
+      <label for="daysExpiration">Number of days for sharing</label>
+      <input type="number" name="daysExpiration" />
+      <br/>
+      <label class="text-xl">Can Be Edited?: 
+      <input type="checkbox" name="canEdit" class="size-5  self-center" /></label>
+      <input type="hidden" name="_method" value="SHARE" />
+      <input type="hidden" name="_fileId" value="<%=file.id%>" />
+      <input type="hidden" name="_parentFolder" value="<%=parentFolderId%>" />
+      <button type="submit" class=" border-2 border-black   px-10 py-5 my-5 " >Create Link</button>
+    </form>
+  </div>
 </div>

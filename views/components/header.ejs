@@ -1,39 +1,40 @@
-<!DOCTYPE html>
 
-<header class="bg-royalBlue text-white flex h-30 justify-between align-middle p-5 rounded-b-2xl mb-5 "> 
+
+<header class="bg-catppuccin-base  text-harmony-avory  border-2 border-black text-shadow-lg/40 flex h-30 justify-between align-middle px-25 p-5 rounded-b-2xl mb-5 "> 
   <a class="text-3xl self-center " href="/account" >Welcome Back <span class="underline italic "><%= user.username %></span></a
   >
-  <div class="imageContainer">
+  <div class="imageContainer text-catppuccin-text">
     <img
       src="<%= avatar %>"
-      class="size-20 rounded-full border-4 border-white"
+      class="size-20 rounded-full border-4 border-harmony-avory shadow-2xl/30"
       onclick="toggleVisibility()"
     />
-    <div id="user_modal" class="hidden user_modal">
-      <div class="user_modal_header flex w-11 rounded-b-full">
+    <div id="user_modal" class="hidden absolute right-5 flex-col gap-5 p-5 user_modal bg-catppuccin-base outline-2 outline-black border-2 border-catppuccin-text rounded-md ">
+      <div class="user_modal_header flex gap-0 justify-between align-middle px-15 py-3 ">
         <img
           src="<%= avatar %>"
-          class="size-20"
+          class="h-30 w-30 rounded-full outline-4 outline-catppuccin-text"
           onclick="toggleVisibility()"
         />
-        <span class="username"><%= user.username %></span>
+        <span class="username flex items-center text-shadow-none text-4xl font-bold text-white p-10"><%= user.username %></span>
       </div>
-      <div class="user_modal_actions">
-        <hr class="solid" />
+      <hr class="solid" class="border-catppuccin-text" />
+      <div class="user_modal_actions p-5">
         <form
           action="/account/avatar"
           method="post"
           enctype="multipart/form-data"
+          class="flex flex-col align-middle  "
         >
-          <label for="AvatarFile">Upload An Avatar: </label>
-          <input type="file" name="avatar" id="AvatarFile" required />
+          <label for="AvatarFile" class="flex items-center text-shadow-none text-1xl font-bold text-catppuccin-text   m-1 p-1 " >Upload An Avatar: </label>
+          <input type="file" name="avatar" id="AvatarFile" class="text-shadow-none text-center text-1xl font-bold text-catppuccin-mantle m-1 p-5 bg-catppuccin-maroon border-2 border-black rounded-md " required />
           <br />
-          <button type="submit" class="submit-button">Confirm</button>
+          <button type="submit" class="submit-button text-shadow-none text-1xl font-bold text-catppuccin-mantle m-1 p-5 bg-catppuccin-mauve border-2 border-black rounded-md ">Confirm</button>
         </form>
       </div>
-      <div class="user_modal_footer">
-        <hr class="solid" />
-        <a href="/log-out" class="log-out">LOG OUT</a>
+      <hr class="solid" class="border-catppuccin-text"/>
+      <div class="user_modal_footer p-5 flex  justify-center">
+        <a href="/log-out" class="log-out text-center submit-button text-shadow-none text-1xl font-bold text-catppuccin-mantle min-w-full m-1 p-5 bg-catppuccin-red border-2 border-black  rounded-md ">LOG OUT</a>
       </div>
     </div>
   </div>

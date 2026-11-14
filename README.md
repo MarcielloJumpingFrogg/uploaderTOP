@@ -1,6 +1,8 @@
-# Uploader TOP
+# File Uploader
 
-My Personal recreation of the "File Uploader" project from "The Odin Project":
+
+My Recreation of the File Uploader Project with cloud storage and user access.
+
 
 ![Demo Image](./OtherResources/PageDemo.png "Page Demo")
 
@@ -15,24 +17,41 @@ My Personal recreation of the "File Uploader" project from "The Odin Project":
 
 ## Overview
 
-<!-- TODO: Add a screenshot of the live project.
-    1. Link to a 'live demo.'
-    2. Describe your overall experience in a couple of sentences.
-    3. List a few specific technical things that you learned or improved on.
-    4. Share any other tips or guidance for others attempting this or something similar.
- -->
+Recreated this project from the course project known as "The Odin Project"<br>
+The instructions suggested the use of express and ejs in the creation of a Google Drive similar app
+
+Learner quite a few things in the course of this project<br>
+However, the ones i feel were the most usefull were:
+
+- TypeScript and Type-Safety<br>
+Even tho the curriculum of The Odin Project does not cover Typescript i had a great time<br>
+Particularly once i started integrating the types inside the error handling and getting better error management
+
+- Securing the file id when sharing:<br>
+Made sure to change the id of the file before sharing, that way the owner of the file would be able to share without enabling editing of the folder
+and without fear that a malicious user was able to delete files once revealed the id
+
+- Securing the types of file upload:<br>
+Secured the input of files through their magic numbers, however annoyingly enought, simple plain files like text don't have a singular way to write it, but multiple, making the check not 100% accurate, and resorted to using multer for those
+
+- Creating users and securint their passwords and sessions with express-session and bcrypt
+- Escaping user input in username and file name with the ejs syntax
+- Full test coverage using vitest and supertest
+- Docker version for easy spin up and local hosting and development
+
 
 ## Built With
 
-As reccomended by "The Odin Project" i have used Mainly Node with express and passport to authenticate and maintain the session live.
-I also used supabase, for both the database and the storage of the file.
+Used Node with the help of express.js and PrismaOrm to authenticate the user<br>
+Handle the route requests, and keep the session safe, and used supabase for the Storage and vitest to make sure everything was working as expected
 
 * [![Node][Node.com]][Node-url]
 * [![ExpressJs][ExpressJs.com]][Express-url]
 * [![supabase][supabase.com]][supabase-url]
 * [![TypeScript][TypeScript.com]][TypeScript-url]
 * [![prisma][prisma.com]][prisma-url]
-
+* [![Vitest][vitest.com]][vitest-url]
+* [![TailWind css][Tailwind.com]][tailwindcss-url]
 
 <!-- TODO: List any MAJOR libraries/frameworks (e.g. React, Tailwind) with links to their homepages. -->
 
@@ -53,8 +72,9 @@ Then you can just fill out the new `.env` and use any of the commands like `npm 
 - Uploading any type of file
 - Displaying the file type on the icon
 - Grouping them with folders
-- Renaming the folders
-- Sharing the file and being able to decide the duration of the shareSession [To Finish], and if they can edit it or not.
+- Renaming the folders and files
+- Sharing a link to a file and it being deleted automatically once the session expires
+
 
 <!-- ## Contact -->
 <!---->
@@ -63,7 +83,8 @@ Then you can just fill out the new `.env` and use any of the commands like `npm 
 
 ## Acknowledgements
 
-Thanks to "The Odin Project" for creating all of their courses and projects
+Thanks to "The Odin Project" for creating all of their courses and projects.
+Thanks to the team at Catppuccin for the amazing colorscheme i could not give justice to in my site
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
@@ -77,3 +98,7 @@ Thanks to "The Odin Project" for creating all of their courses and projects
 [TypeScript-url]: https://www.typescriptlang.org
 [prisma.com]: https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white
 [prisma-url]: https://www.prisma.io
+[vitest.com]: https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=fff
+[vitest-url]: https://vitest.dev
+[Tailwind.com]: https://img.shields.io/badge/Tailwind%20CSS-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white
+[tailwindcss-url]: https://tailwindcss.com

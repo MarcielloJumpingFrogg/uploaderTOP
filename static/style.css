@@ -5,8 +5,51 @@
   --color-darkBlue: #E5E5E5;
   --color-royalGold: #FDB645;
   --color-regularGrey:  hsl(0, 0%, 90%);
+
+  --color-harmony-blue: #213E58 ;
+  --color-harmony-ligh-blue : #4592AF;
+  --color-harmony-green-blue : #79C4C1 ;
+  --color-harmony-avory : #F4F6E0;
+  --color-harmony-orange : #F0A135;
+
+
+  --color-catppuccin-rosewater: #f5e0dc ;
+  --color-catppuccin-flaming : #f2cdcd ;
+  --color-catppuccin-pink : #f5c2e7 ;
+  --color-catppuccin-mauve : #cba6f7 ;
+  --color-catppuccin-red : #f38ba8 ;
+  --color-catppuccin-maroon : #eba0ac ;
+  --color-catppuccin-peach : #fab387 ;
+  --color-catppuccin-yellow :  #f9e2af;
+  --color-catppuccin-green : #a6e3a1 ;
+  --color-catppuccin-teal :  #94e2d5;
+  --color-catppuccin-sky :  #89dceb;
+  --color-catppuccin-sapphire :  #74c7ec;
+  --color-catppuccin-blue :  #89b4fa;
+  --color-catppuccin-lavender :  #b4befe;
+  --color-catppuccin-text :  #cdd6f4;
+  --color-catppuccin-subtext-1 :  #bac2de;
+  --color-catppuccin-subtext-0 :  #a6adc8;
+  --color-catppuccin-overlay-2 :  #9399b2;
+  --color-catppuccin-overlay-1 :  #7f849c;
+  --color-catppuccin-overlay-0 :  #6c7086;
+  --color-catppuccin-surface-2 :  #585b70;
+  --color-catppuccin-surface-1 :  #45475a;
+  --color-catppuccin-surface-0 :  #313244;
+  --color-catppuccin-base :       #1e1e2e;
+  --color-catppuccin-mantle :     #181825;
+  --color-catppuccin-crust :      #11111b;
 }
 
+
+html {
+  min-height: 100vh;
+}
+
+body, .loginContainer {
+
+  min-height: 70vh 
+}
 
 /* html { */
 /*   min-height: 100vh; */
@@ -16,7 +59,7 @@
 /*   min-height: 75vh; */
 /*   height: 75vh; */
 /* } */
-/**/
+/**/ 
 /* .error { */
 /*   color: red; */
 /* } */
@@ -151,12 +194,12 @@
 /*   margin-left: 15px; */
 /* } */
 /**/
-/* hr.solid { */
-/*   border-top: 3px solid hsl(0 0 84); */
-/*   margin: 10px; */
-/*   padding: 0; */
-/*   border-radius: 5px; */
-/* } */
+hr.solid {
+  border-top: 3px solid ;
+  margin: 10px;
+  padding: 0;
+  border-radius: 5px;
+}
 /**/
 /* input[type="text"], */
 /* input[type="password"] { */
@@ -272,3 +315,11 @@
 /*   z-index: 2; */
 /**/
 /* } */
+
+.textBox{
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

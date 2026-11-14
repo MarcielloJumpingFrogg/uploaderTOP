@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<div class="bottomContainer flex flex-col bg-gray-100 min-h-full m-3 p-2 rounded-2xl">
+<div class="bottomContainer flex flex-col bg-catppuccin-base border-2 border-black min-h-full m-3 p-2 rounded-2xl loginContainer">
 
-  <div class="listContainer flex flex-wrap justify-center min-h-full ">
+  <div class="listContainer flex flex-col flex-wrap justify-center min-h-full min-w-full align-middle">
     <%
     const files = (locals.ownedFiles).concat(sharedFiles)
     if(!files) { %>
@@ -13,32 +13,18 @@
       let finalFileType = file.fileType;
       let finalName=file.fileName; 
       const ownerOfThisFile = i > endOfOwnedFiles ? false : true;
-      let travelUser
-      if(shareSessionTemp != undefined){
-        travelUser = shareSessionTemp
-      } else {
-      ownerOfThisFile ? "0" : "1";
-      }
+      let travelUser = ownerOfThisFile ? '0' : '1'
 
       %>
-    <div class="itemContainer bgAmber">
-      <div>
-        <button class="menuButton" onclick="toggleOptions(this, '.editFile')">
-          <img
-            src="/static/menuLines.svg"
-            alt="menuButton"
-            width="20px"
-            height="20px"
-          />
-        </button>
-        <%- include("editFile", {finalFileType: finalFileType, file: file, ownerOfThisFile: ownerOfThisFile}) %>
-      </div>
+      <div class="itemContainer flex flex-row min-w-full h-30"> 
+        
+
         <%const fileClass = 'item';  %>
       <% let result; if(finalFileType === "folder" || finalFileType === "folder_alt") {result = 'travelFolder(this)'} else {result = ' '} %>
-      <div class=" <%= fileClass %> " onclick="<%=result%>" >
+      <div class=" <%= fileClass %> flex m-2 p-2  align-middle justify-around   w-7/8 " onclick="<%=result%>" >
         <% const imageSource = "/static/resources/" + finalFileType + ".svg" %>
-        <img src="<%= imageSource %>" class="w-20 self-center" />
-        <p><%= finalName %></p>
+          <div class=" rounded-2xl h-30 w-1/6"><div class="bg-white size-20 rounded-2xl border-2 border-black flex align-middle justify-center"><img src="<%= imageSource %>" class="w-15 self-center " /></div></div>
+          <div class=" flex  justify-center flex-col bg-catppuccin-text rounded-2xl self-center h-15 w-1/2 text-center text-xl border-2 border-black font-medium "><p><%= finalName %></p></div>
         <form class="hiddenForm" action="/account/folder" method="POST">
               <input type="hidden" name="_name" value="<%=finalName%>" />
             <a class="travelLink" href="/account/<%= travelUser %>/<%= file.id %>" hidden></a>
@@ -46,7 +32,18 @@
               <button class="submitTravel" type="submit" hidden></button>
         </form>
       </div>
-    </div>
+        <div class="self-center justify-self-end  w-1/8">
+        <button class="menuButton bg-catppuccin-text size-15 flex align-middle justify-center rounded-2xl" onclick="toggleOptions(this, '.editFile')">
+          <img
+            src="/static/menuLines.svg"
+            alt="menuButton"
+            width="30px"
+            height="30px"
+          />
+        </button>
+          <%- include("editFile", {finalFileType: finalFileType, file: file, ownerOfThisFile: ownerOfThisFile}) %>
+        </div>
+      </div>
     <%}}%>
   </div>
 </div>
@@ -54,8 +51,9 @@
 <script>
   function toggleOptions(element, className) {
     const editFile = element.parentElement.querySelector(className);
+    console.log(element)
     editFile.classList.toggle("hidden");
-    editFile.classList.toggle("window");
+    editFile.classList.toggle("flex");
   }
 
   function travelFolder(element) {

@@ -1,32 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
   <%- include("partials/head", {title: title}) %> <%-
   include("partials/errors")%>
-  <body>
-    <header class="">
+  <body  class="min-h-full bg-catppuccin-surface-1">
+    <header class="flex justify-between px-25 p-5 mb-5 bg-catppuccin-base text-white border-black border-2 rounded-b-2xl ">
       <h1 class="text-3xl">Login</h1>
-      <a href="/signUp" class="italic underline text-2xl">Sign Up</a>
+      <a href="/signUp" class="italic underline text-3xl">Sign Up</a>
     </header>
-    <form action="/login" method="post">
-      <label for="username">Username:</label>
-      <input
-        type="text"
-        id="username"
-        name="username"
-        class="border-2"
-        required
-      />
+    <div class="flex  justify-center items-center min-h-full loginContainer" >
+    <div  class="" >
+      <form action="/login" method="post" class="flex flex-col  bg-catppuccin-base textbox gap-5 px-30  rounded-md border-2 border-catppuccin-text">
+          <h1 class="flex items-center text-shadow-none text-5xl font-bold text-catppuccin-text p-10">Login</h1>
+                  <hr class="border-3 border-catppuccin-text rounded-full" >
 
-      <label for="password">Password:</label>
-      <input
-        type="password"
-        id="password"
-        name="password"
-        required
-        value="Password1234!"
-      />
+        <label for="username" class="flex items-center text-shadow-none text-4xl font-bold text-catppuccin-text p-10">User Name:</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="border-2 border-catppuccin-text text-catppuccin-text p-3 rounded-md"
+          required
+        />
 
-      <button type="submit">Submit</button>
-    </form>
+
+        <label for="password" class=" flex items-center text-shadow-none text-4xl font-bold text-catppuccin-text p-10 ">Password:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+            class="border-2 border-catppuccin-text text-catppuccin-text p-3 rounded-md"
+        />
+
+        <button type="submit" class="    text-shadow-none text-4xl font-bold text-catppuccin-crust p-5 m-5 rounded-md   bg-catppuccin-mauve ">Submit</button>
+      </form>
+    </div>
+    </div>
   </body>
 </html>

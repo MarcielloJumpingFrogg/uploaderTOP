@@ -37,7 +37,6 @@ Secured the input of files through their magic numbers, however annoyingly enoug
 - Creating users and securint their passwords and sessions with express-session and bcrypt
 - Escaping user input in username and file name with the ejs syntax
 - Full test coverage using vitest and supertest
-- Docker version for easy spin up and local hosting and development
 
 
 ## Built With
@@ -60,12 +59,23 @@ Handle the route requests, and keep the session safe, and used supabase for the 
 After cloning the repo you need to run
 
 ```
-npm install
-cd uploaderTOP
 cp ./.env.example ./.env
+npm install
+npx supabase start
 ```
 
-Then you can just fill out the new `.env` and use any of the commands like `npm run local`
+Get the supabase links:
+ 
+- Secret key
+- database url inside the 'Direct Url' 
+- supabase studio link inside the 'SUPABASE_URL'
+- fill out the 'EXPRESS_SESSION' with something random
+
+```
+npx prisma migrate dev -n GreatProject && npx prisma generate
+npm run local
+```
+
 
 ## Features
 
